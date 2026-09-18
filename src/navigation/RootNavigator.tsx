@@ -19,6 +19,12 @@ import DoctorProfileScreen from '../features/doctors/screens/DoctorProfileScreen
 import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
 import AppointmentConfirmationScreen from '../features/appointments/screens/AppointmentConfirmationScreen';
 import AppointmentDetailScreen from '../features/appointments/screens/AppointmentDetailScreen';
+import LabListScreen from '../features/labs/screens/LabListScreen';
+import LabProfileScreen from '../features/labs/screens/LabProfileScreen';
+import BookLabServiceScreen from '../features/labBookings/screens/BookLabServiceScreen';
+import LabBookingConfirmationScreen from '../features/labBookings/screens/LabBookingConfirmationScreen';
+import LabBookingDetailScreen from '../features/labBookings/screens/LabBookingDetailScreen';
+import ReportViewerScreen from '../features/labBookings/screens/ReportViewerScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,6 +52,12 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: true, title: 'Book appointment' }} />
             <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="AppointmentDetail" component={AppointmentDetailScreen} options={{ headerShown: true, title: 'Appointment' }} />
+            <Stack.Screen name="LabList" component={LabListScreen} options={{ headerShown: true, title: 'Find a lab' }} />
+            <Stack.Screen name="LabProfile" component={LabProfileScreen} options={{ headerShown: true, title: 'Lab profile' }} />
+            <Stack.Screen name="BookLabService" component={BookLabServiceScreen} options={{ headerShown: true, title: 'Book a test' }} />
+            <Stack.Screen name="LabBookingConfirmation" component={LabBookingConfirmationScreen} options={{ gestureEnabled: false }} />
+            <Stack.Screen name="LabBookingDetail" component={LabBookingDetailScreen} options={{ headerShown: true, title: 'Lab booking' }} />
+            <Stack.Screen name="ReportViewer" component={ReportViewerScreen} options={{ headerShown: true, title: 'Report' }} />
           </Stack.Group>
         ) : (
           <Stack.Group>

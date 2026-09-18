@@ -58,6 +58,11 @@ const HomeScreen: React.FC = () => {
           <Text style={styles.primaryCardSubtitle}>Search by specialization or consultation type.</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity activeOpacity={activeopacity} style={styles.primaryCard} onPress={() => navigation.navigate('LabList')}>
+          <Text style={styles.primaryCardTitle}>Book a lab test</Text>
+          <Text style={styles.primaryCardSubtitle}>Visit the lab or get sample collection at home.</Text>
+        </TouchableOpacity>
+
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>Upcoming appointment</Text>
           <TouchableOpacity activeOpacity={activeopacity} onPress={() => navigation.navigate('MainTabs')}>

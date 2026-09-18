@@ -17,6 +17,13 @@ export type RootStackParamList = {
   AppointmentConfirmation: { appointmentId: string };
   AppointmentDetail: { appointmentId: string };
 
+  LabList: undefined;
+  LabProfile: { laboratoryId: string };
+  BookLabService: { laboratoryId: string; serviceIds: string[] };
+  LabBookingConfirmation: { bookingId: string };
+  LabBookingDetail: { bookingId: string };
+  ReportViewer: { bookingId: string; reportId: string; label: string };
+
   WebViewScreen: { url: string; title: string };
   NoInternet: undefined;
 };
@@ -24,4 +31,5 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Home: undefined;
   Appointments: undefined;
+  Labs: undefined;
 };

@@ -9,6 +9,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from './types';
 import HomeScreen from '../features/home/screens/HomeScreen';
 import MyAppointmentsScreen from '../features/appointments/screens/MyAppointmentsScreen';
+import MyLabBookingsScreen from '../features/labBookings/screens/MyLabBookingsScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -17,6 +18,7 @@ const TabNavigator: React.FC = () => {
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Appointments" component={MyAppointmentsScreen} options={{ title: 'Appointments' }} />
+      <Tab.Screen name="Labs" component={MyLabBookingsScreen} options={{ title: 'Lab Bookings' }} />
     </Tab.Navigator>
   );
 };
