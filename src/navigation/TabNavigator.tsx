@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import type { MainTabParamList } from './types';
 import HomeScreen from '../features/home/screens/HomeScreen';
+import MyAppointmentsScreen from '../features/appointments/screens/MyAppointmentsScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -15,9 +16,7 @@ const TabNavigator: React.FC = () => {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
-      {/* Cart / Orders / Profile screens follow the same feature-slice
-          pattern demonstrated by features/home — scaffold them the same
-          way when those features are built out. */}
+      <Tab.Screen name="Appointments" component={MyAppointmentsScreen} options={{ title: 'Appointments' }} />
     </Tab.Navigator>
   );
 };

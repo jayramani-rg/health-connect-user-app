@@ -18,6 +18,8 @@ export function TextField({
   editable = true,
   multiline,
   autoCapitalize = 'sentences',
+  onSubmitEditing,
+  returnKeyType,
 }: TextFieldProps) {
   const [focused, setFocused] = useState(false);
 
@@ -50,6 +52,8 @@ export function TextField({
           editable={editable}
           multiline={multiline}
           autoCapitalize={autoCapitalize}
+          onSubmitEditing={onSubmitEditing}
+          returnKeyType={returnKeyType}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />

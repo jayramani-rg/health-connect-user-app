@@ -14,6 +14,11 @@ import CreatePasswordScreen from '../features/auth/screens/CreatePasswordScreen'
 import ProfileBasicsScreen from '../features/auth/screens/ProfileBasicsScreen';
 import TabNavigator from './TabNavigator';
 import NoInternetScreen from '../features/common/screens/NoInternetScreen';
+import DoctorListScreen from '../features/doctors/screens/DoctorListScreen';
+import DoctorProfileScreen from '../features/doctors/screens/DoctorProfileScreen';
+import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
+import AppointmentConfirmationScreen from '../features/appointments/screens/AppointmentConfirmationScreen';
+import AppointmentDetailScreen from '../features/appointments/screens/AppointmentDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -36,6 +41,11 @@ const RootNavigator: React.FC = () => {
           <Stack.Group>
             {justRegistered && <Stack.Screen name="ProfileBasics" component={ProfileBasicsScreen} />}
             <Stack.Screen name="MainTabs" component={TabNavigator} />
+            <Stack.Screen name="DoctorList" component={DoctorListScreen} options={{ headerShown: true, title: 'Find a doctor' }} />
+            <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} options={{ headerShown: true, title: 'Doctor profile' }} />
+            <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: true, title: 'Book appointment' }} />
+            <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ gestureEnabled: false }} />
+            <Stack.Screen name="AppointmentDetail" component={AppointmentDetailScreen} options={{ headerShown: true, title: 'Appointment' }} />
           </Stack.Group>
         ) : (
           <Stack.Group>

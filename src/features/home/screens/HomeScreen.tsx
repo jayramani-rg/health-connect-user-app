@@ -1,50 +1,96 @@
 // features/home/screens/HomeScreen.tsx
-// Demonstrates the Banner + FlatList layout pattern (Sec 12.1) — a
-// FlatList with a ListHeaderComponent banner, avoiding nested
-// ScrollViews. Screen owns orchestration only; ProductCard owns
-// presentation.
+// Real appointment dashboard: next upcoming appointment, pending-request count, and quick actions —
+// replaces the earlier mock-first e-commerce placeholder (Sec 17.2) now that the appointment API exists.
 
-import React from 'react';
-import { View, Text, FlatList, Image } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import { Banner } from '../../../components/Banner/Banner';
+import { StatusBadge } from '../../../components/StatusBadge/StatusBadge';
 import { useAppSelector } from '../../../store';
-import images from '../../../assets/profileImages';
-import ProductCard, { ProductDetail } from '../components/ProductCard/ProductCard';
+import { activeopacity } from '../../../utils/helpers';
+import { appointmentService } from '../../../services/appointmentService';
+import type { RootStackParamList } from '../../../navigation/types';
+import { CONSULT_LABEL } from '../../appointments/utils/consultationType';
+import type { AppointmentListItem } from '../../appointments/types/appointment.types';
 import { styles } from '../styles/HomeScreen.styles';
 
-// Sec 17.2 — Mock-first development. Shape matches ProductDetail exactly
-// so swapping to a real API response later requires no UI changes.
-const MOCK_ITEMS: ProductDetail[] = [
-  { id: '1', name: 'Handwoven Rug', price: 2499, imageUrl: 'https://picsum.photos/seed/1/300' },
-  { id: '2', name: 'Terracotta Vase', price: 899, imageUrl: 'https://picsum.photos/seed/2/300' },
-  { id: '3', name: 'Brass Diya Set', price: 1299, imageUrl: 'https://picsum.photos/seed/3/300' },
-];
-
 const HomeScreen: React.FC = () => {
-  // Demo store read — screens use useAppSelector, never raw useSelector.
-  const isConnected = useAppSelector(state => state.networkData.isConnected);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const isConnected = useAppSelector((state) => state.networkData.isConnected);
+
+  const [upcoming, setUpcoming] = useState<AppointmentListItem | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const load = useCallback(async () => {
+    try {
+      const [confirmedRes, pendingRes] = await Promise.all([
+        appointmentService.list({ status: 'CONFIRMED', pageSize: 1 }),
+        appointmentService.list({ status: 'PENDING', pageSize: 1 }),
+      ]);
+      setUpcoming(confirmedRes.data.items[0] ?? null);
+      setPendingCount(pendingRes.data.totalCount);
+    } catch {
+      // Dashboard is best-effort — MyAppointmentsScreen surfaces real errors on demand.
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={MOCK_ITEMS}
-        keyExtractor={item => item.id}
-        numColumns={2}
-        ListHeaderComponent={
-          <Image source={images.homeBanner} style={styles.banner} resizeMode="cover" />
-        }
-        renderItem={({ item }) => (
-          <ProductCard
-            item={item}
-            cartQuantity={0}
-            onPress={() => {}}
-            onAddToCart={() => {}}
-            onRemoveFromCart={() => {}}
-            onWishlistToggle={() => {}}
-          />
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
+        <Text style={styles.greeting}>Welcome back</Text>
+        <Text style={styles.subGreeting}>Here's what's next for your care.</Text>
+
+        {pendingCount > 0 && (
+          <Banner variant="info" message={`You have ${pendingCount} appointment request${pendingCount > 1 ? 's' : ''} awaiting a response.`} />
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No products yet.</Text>}
-      />
+
+        <TouchableOpacity activeOpacity={activeopacity} style={styles.primaryCard} onPress={() => navigation.navigate('DoctorList')}>
+          <Text style={styles.primaryCardTitle}>Find a doctor</Text>
+          <Text style={styles.primaryCardSubtitle}>Search by specialization or consultation type.</Text>
+        </TouchableOpacity>
+
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>Upcoming appointment</Text>
+          <TouchableOpacity activeOpacity={activeopacity} onPress={() => navigation.navigate('MainTabs')}>
+            <Text style={styles.linkText}>View all</Text>
+          </TouchableOpacity>
+        </View>
+
+        {upcoming ? (
+          <TouchableOpacity
+            activeOpacity={activeopacity}
+            style={styles.card}
+            onPress={() => navigation.navigate('AppointmentDetail', { appointmentId: upcoming.id })}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={styles.cardTitle}>{upcoming.doctorName}</Text>
+              <StatusBadge status={upcoming.status} />
+            </View>
+            <Text style={styles.cardSubtitle}>
+              {CONSULT_LABEL[upcoming.consultationType]} ·{' '}
+              {new Date(upcoming.scheduledStartAtUtc).toLocaleString(undefined, {
+                day: 'numeric',
+                month: 'short',
+                hour: 'numeric',
+                minute: '2-digit',
+              })}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.card}>
+            <Text style={styles.emptyCard}>No upcoming appointments yet.</Text>
+          </View>
+        )}
+      </ScrollView>
       {!isConnected && <Text style={styles.offlineBanner}>You are offline</Text>}
     </View>
   );

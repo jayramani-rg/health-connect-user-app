@@ -16,4 +16,6 @@ export interface TextFieldProps {
   editable?: boolean;
   multiline?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  onSubmitEditing?: () => void;
+  returnKeyType?: 'done' | 'search' | 'go' | 'next';
 }

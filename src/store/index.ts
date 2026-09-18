@@ -4,15 +4,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, PersistConfig } from 'redux-persist';
 
 import authReducer, { authDataName, logout, setTokens } from './slices/authSlice';
-import cartReducer, { cartDataName } from './slices/cartSlice';
-import orderReducer, { orderDataName } from './slices/orderSlice';
 import networkReducer, { networkDataName } from './slices/networkSlice';
 import { API } from '../api';
 
 const rootReducer = combineReducers({
   [authDataName]: authReducer,
-  [cartDataName]: cartReducer,
-  [orderDataName]: orderReducer,
   [networkDataName]: networkReducer,
 });
 
@@ -57,6 +53,4 @@ export const useAppDispatch = (): AppDispatch => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export { setAuthSession, setTokens, completeOnboarding, logout } from './slices/authSlice';
-export { setCartItems, clearCart } from './slices/cartSlice';
-export { setActiveOrder } from './slices/orderSlice';
 export { setIsConnected } from './slices/networkSlice';
