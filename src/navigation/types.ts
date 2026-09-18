@@ -24,6 +24,8 @@ export type RootStackParamList = {
   LabBookingDetail: { bookingId: string };
   ReportViewer: { bookingId: string; reportId: string; label: string };
 
+  ChatConversation: { conversationId: string };
+
   WebViewScreen: { url: string; title: string };
   NoInternet: undefined;
 };
@@ -32,4 +34,5 @@ export type MainTabParamList = {
   Home: undefined;
   Appointments: undefined;
   Labs: undefined;
+  Chat: undefined;
 };

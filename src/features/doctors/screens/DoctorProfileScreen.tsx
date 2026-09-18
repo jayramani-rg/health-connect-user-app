@@ -10,6 +10,7 @@ import { doctorService } from '../../../services/doctorService';
 import type { RootStackParamList } from '../../../navigation/types';
 import { CONSULT_LABEL } from '../../appointments/utils/consultationType';
 import type { ConsultationType, DoctorDetail } from '../types/doctor.types';
+import { useChatCta } from '../../chat/hooks/useChatCta';
 import { styles } from '../styles/DoctorProfileScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DoctorProfile'>;
@@ -21,6 +22,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const [doctor, setDoctor] = useState<DoctorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState<string | null>(null);
+  const chatCta = useChatCta('DOCTOR', doctorProfileId);
 
   useEffect(() => {
     let active = true;
@@ -62,6 +64,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const canBook = doctor.isAcceptingAppointments && MODE_ORDER.some((mode) => modeFee[mode].enabled);
+  const chatConversationId = chatCta.state.kind === 'chat' ? chatCta.state.conversationId : null;
 
   return (
     <ScreenContainer>
@@ -116,6 +119,21 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
           disabled={!canBook}
           onPress={() => navigation.navigate('BookAppointment', { doctorProfileId })}
         />
+        {chatCta.state.kind === 'invite' && (
+          <Button label="Chat with doctor" variant="secondary" onPress={chatCta.sendInvitation} style={styles.chatButton} />
+        )}
+        {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} style={styles.chatButton} />}
+        {chatCta.state.kind === 'pending' && (
+          <Button label="Invitation sent — waiting for reply" variant="ghost" disabled onPress={() => {}} style={styles.chatButton} />
+        )}
+        {chatConversationId && (
+          <Button
+            label="Open chat"
+            variant="secondary"
+            onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })}
+            style={styles.chatButton}
+          />
+        )}
       </View>
     </ScreenContainer>
   );

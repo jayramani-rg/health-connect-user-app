@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { colors, radius, shadow, spacing, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -16,22 +16,35 @@ export const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: spacing.lg,
   },
-  primaryCard: {
-    backgroundColor: colors.brand,
+  actionRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  actionCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
+    padding: spacing.md,
+    ...shadow.card,
   },
-  primaryCardTitle: {
-    ...typography.title,
-    color: colors.white,
+  actionIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
   },
-  primaryCardSubtitle: {
+  actionTitle: {
+    ...typography.bodyStrong,
+    color: colors.text,
+  },
+  actionSubtitle: {
     ...typography.caption,
-    color: colors.white,
-    opacity: 0.85,
+    color: colors.textSecondary,
     marginTop: 2,
-    marginBottom: spacing.md,
   },
   sectionTitle: {
     ...typography.title,
@@ -68,6 +81,19 @@ export const styles = StyleSheet.create({
   emptyCard: {
     ...typography.body,
     color: colors.textSecondary,
+  },
+  chatListCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    marginBottom: spacing.lg,
+    overflow: 'hidden',
+  },
+  chatSeparator: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginLeft: spacing.lg + 44 + spacing.md,
   },
   offlineBanner: {
     position: 'absolute',

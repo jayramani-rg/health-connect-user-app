@@ -39,6 +39,29 @@ export const radius = {
   pill: 999,
 };
 
+export const shadow = {
+  card: {
+    shadowColor: '#0B1220',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  raised: {
+    shadowColor: '#0B1220',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+};
+
+export const iconSize = {
+  sm: 16,
+  md: 22,
+  lg: 28,
+};
+
 export const typography = {
   h1: { fontSize: 24, fontWeight: '700' as const, letterSpacing: -0.3 },
   h2: { fontSize: 20, fontWeight: '700' as const, letterSpacing: -0.2 },
@@ -50,6 +73,6 @@ export const typography = {
   stepLabel: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 1.2, textTransform: 'uppercase' as const },
 };
 
-export const theme = { colors, spacing, radius, typography };
+export const theme = { colors, spacing, radius, typography, shadow, iconSize };
 
 export default theme;

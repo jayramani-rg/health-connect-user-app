@@ -12,3 +12,7 @@ function resolveApiBaseUrl(): string {
 export const API_BASE_URL = resolveApiBaseUrl();
 
 export const REQUEST_TIMEOUT_MS = 20000;
+
+/** Same host as API_BASE_URL (already host-substituted for the Android emulator/ngrok cases above),
+ * just swapping the /api REST prefix for the SignalR hub path. */
+export const SIGNALR_HUB_URL = `${API_BASE_URL.replace(/\/api\/?$/, '')}/hubs/chat`;

@@ -6,6 +6,7 @@ import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import authReducer, { authDataName, logout, setTokens } from './slices/authSlice';
 import networkReducer, { networkDataName } from './slices/networkSlice';
 import { API } from '../api';
+import { chatSocket } from '../services/chatSocket';
 
 const rootReducer = combineReducers({
   [authDataName]: authReducer,
@@ -47,6 +48,8 @@ API.configure({
     }
   },
 });
+
+chatSocket.configure(() => store.getState().authData.tokens?.accessToken ?? null);
 
 export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = (): AppDispatch => useDispatch<AppDispatch>();

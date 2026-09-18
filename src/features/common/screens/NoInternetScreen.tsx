@@ -4,14 +4,15 @@
 // purely presentational.
 
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '../styles/NoInternetScreen.styles';
 import { activeopacity } from '../../../utils/helpers';
 
 const NoInternetScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <Text style={styles.title}>No Internet Connection</Text>
       <Text style={styles.subtitle}>Please check your connection and try again.</Text>
       <TouchableOpacity
@@ -23,7 +24,7 @@ const NoInternetScreen: React.FC = () => {
       >
         <Text style={styles.retryText}>Retry</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

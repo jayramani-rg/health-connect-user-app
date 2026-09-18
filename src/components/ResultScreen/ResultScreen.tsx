@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../Button/Button';
 import { styles } from './styles/ResultScreen.styles';
 import type { ResultScreenProps } from './types/ResultScreen.types';
@@ -24,7 +25,7 @@ const TONE_TEXT = {
 
 export function ResultScreen({ tone, title, description, primaryLabel, onPrimaryPress, secondaryLabel, onSecondaryPress }: ResultScreenProps) {
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper} edges={['top', 'bottom']}>
       <View style={[styles.iconCircle, TONE_CIRCLE[tone]]}>
         <Text style={[styles.iconText, TONE_TEXT[tone]]}>{TONE_ICON[tone]}</Text>
       </View>
@@ -34,7 +35,7 @@ export function ResultScreen({ tone, title, description, primaryLabel, onPrimary
         <Button label={primaryLabel} onPress={onPrimaryPress} />
         {secondaryLabel && onSecondaryPress && <Button label={secondaryLabel} onPress={onSecondaryPress} variant="ghost" />}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

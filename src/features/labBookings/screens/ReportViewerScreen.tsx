@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
@@ -37,30 +38,32 @@ const ReportViewerScreen: React.FC<Props> = ({ route }) => {
   }, [bookingId, reportId, accessToken]);
 
   return (
-    <ScrollView contentContainerStyle={{ padding: spacing.lg, flexGrow: 1 }} maximumZoomScale={3} minimumZoomScale={1}>
-      <Text style={{ ...typography.h2, marginBottom: spacing.md }}>{label}</Text>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+      <ScrollView contentContainerStyle={{ padding: spacing.lg, flexGrow: 1 }} maximumZoomScale={3} minimumZoomScale={1}>
+        <Text style={{ ...typography.h2, marginBottom: spacing.md }}>{label}</Text>
 
-      {loading && (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl }}>
-          <ActivityIndicator color={colors.brand} />
-        </View>
-      )}
+        {loading && (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl }}>
+            <ActivityIndicator color={colors.brand} />
+          </View>
+        )}
 
-      {!loading && errorText && <Banner variant="error" message={errorText} />}
+        {!loading && errorText && <Banner variant="error" message={errorText} />}
 
-      {!loading && dataUri && (
-        <>
-          {dataUri.startsWith('data:image') ? (
-            <Image source={{ uri: dataUri }} style={{ width: '100%', aspectRatio: 0.75, borderRadius: 8 }} resizeMode="contain" />
-          ) : (
-            <Banner
-              variant="info"
-              message="This report isn't an image this app can preview yet. Ask your lab to re-upload it as a photo, or view it from a device that can open the file type directly."
-            />
-          )}
-        </>
-      )}
-    </ScrollView>
+        {!loading && dataUri && (
+          <>
+            {dataUri.startsWith('data:image') ? (
+              <Image source={{ uri: dataUri }} style={{ width: '100%', aspectRatio: 0.75, borderRadius: 8 }} resizeMode="contain" />
+            ) : (
+              <Banner
+                variant="info"
+                message="This report isn't an image this app can preview yet. Ask your lab to re-upload it as a photo, or view it from a device that can open the file type directly."
+              />
+            )}
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

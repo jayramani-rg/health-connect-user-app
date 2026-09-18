@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -59,7 +60,7 @@ const MyAppointmentsScreen: React.FC = () => {
   }, [appointments, tab]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <ChipGroup options={TAB_OPTIONS} value={tab} onChange={(v) => setTab(v as AppointmentTab)} />
       </View>
@@ -80,7 +81,7 @@ const MyAppointmentsScreen: React.FC = () => {
           ListEmptyComponent={<EmptyState title={EMPTY_COPY[tab]} />}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

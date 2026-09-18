@@ -10,6 +10,7 @@ import { activeopacity } from '../../../utils/helpers';
 import { labService } from '../../../services/labService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabDetail } from '../types/lab.types';
+import { useChatCta } from '../../chat/hooks/useChatCta';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabProfile'>;
 
@@ -19,6 +20,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const chatCta = useChatCta('LABORATORY', laboratoryId);
 
   useEffect(() => {
     let active = true;
@@ -65,6 +67,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const selectedTotal = lab.services
     .filter((s) => selectedIds.has(s.id))
     .reduce((sum, s) => sum + (s.discountPrice ?? s.price), 0);
+  const chatConversationId = chatCta.state.kind === 'chat' ? chatCta.state.conversationId : null;
 
   return (
     <ScreenContainer>
@@ -110,12 +113,18 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         );
       })}
 
-      <View style={{ marginTop: spacing.xl }}>
+      <View style={{ marginTop: spacing.xl, gap: spacing.sm }}>
         <Button
           label={selectedIds.size > 0 ? `Continue with ${selectedIds.size} selected (₹${selectedTotal})` : 'Select at least one test'}
           disabled={selectedIds.size === 0 || !lab.isAcceptingBookings}
           onPress={() => navigation.navigate('BookLabService', { laboratoryId, serviceIds: Array.from(selectedIds) })}
         />
+        {chatCta.state.kind === 'invite' && <Button label="Chat with laboratory" variant="secondary" onPress={chatCta.sendInvitation} />}
+        {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} />}
+        {chatCta.state.kind === 'pending' && <Button label="Invitation sent — waiting for reply" variant="ghost" disabled onPress={() => {}} />}
+        {chatConversationId && (
+          <Button label="Open chat" variant="secondary" onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })} />
+        )}
       </View>
     </ScreenContainer>
   );

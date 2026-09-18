@@ -80,5 +80,9 @@ export const styles = StyleSheet.create({
   },
   footer: {
     marginTop: spacing.xl,
+    gap: spacing.sm,
+  },
+  chatButton: {
+    marginTop: 0,
   },
 });
