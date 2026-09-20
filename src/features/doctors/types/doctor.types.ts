@@ -7,7 +7,9 @@ export interface DoctorListItem {
   specialization: string;
   subSpecialization: string | null;
   experienceYears: number;
-  consultationFee: number;
+  /** The lowest fee among this doctor's enabled, priced consultation types — null when none are
+   * configured yet. Never assume a single "the" fee; show "Fee not available" when null. */
+  minConsultationFee: number | null;
   profilePhotoUrl: string | null;
   inClinicEnabled: boolean;
   videoEnabled: boolean;
@@ -21,21 +23,30 @@ export interface Qualification {
   passingYear: number;
 }
 
+export interface ScheduleRange {
+  /** "HH:mm" 24-hour, IST wall-clock. */
+  startTime: string;
+  endTime: string;
+}
+
+export interface DaySchedule {
+  /** Sunday..Saturday. */
+  day: string;
+  ranges: ScheduleRange[];
+}
+
+export interface ConsultationTypeSchedule {
+  enabled: boolean;
+  fee: number | null;
+  durationMinutes: number | null;
+  /** Only days with at least one configured range are included. */
+  schedule: DaySchedule[];
+}
+
 export interface DoctorAvailabilitySummary {
-  workingDays: string[];
-  dailyStartTime: string;
-  dailyEndTime: string;
-  breakStartTime: string | null;
-  breakEndTime: string | null;
-  inClinicEnabled: boolean;
-  inClinicFee: number | null;
-  inClinicDurationMinutes: number | null;
-  videoEnabled: boolean;
-  videoFee: number | null;
-  videoDurationMinutes: number | null;
-  voiceEnabled: boolean;
-  voiceFee: number | null;
-  voiceDurationMinutes: number | null;
+  inClinic: ConsultationTypeSchedule;
+  video: ConsultationTypeSchedule;
+  voice: ConsultationTypeSchedule;
   maxAppointmentsPerDay: number | null;
   minNoticeHours: number;
   maxAdvanceBookingDays: number;

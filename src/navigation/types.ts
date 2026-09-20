@@ -13,7 +13,7 @@ export type RootStackParamList = {
 
   DoctorList: { consultationType?: ConsultationType; specialization?: string } | undefined;
   DoctorProfile: { doctorProfileId: string };
-  BookAppointment: { doctorProfileId: string };
+  BookAppointment: { doctorProfileId: string; consultationType?: ConsultationType };
   AppointmentConfirmation: { appointmentId: string };
   AppointmentDetail: { appointmentId: string };
 

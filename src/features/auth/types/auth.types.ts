@@ -6,6 +6,10 @@ export interface AuthUser {
   role: 'USER';
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
   isPhoneVerified: boolean;
+  firstName: string | null;
+  lastName: string | null;
+  /** Backend-computed (FirstName + LastName both set) — never derive this locally. */
+  isProfileComplete: boolean;
 }
 
 export interface AuthTokens {

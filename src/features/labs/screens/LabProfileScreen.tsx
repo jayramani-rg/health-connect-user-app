@@ -11,6 +11,8 @@ import { labService } from '../../../services/labService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabDetail } from '../types/lab.types';
 import { useChatCta } from '../../chat/hooks/useChatCta';
+import { useProfileGate } from '../../profile/hooks/useProfileGate';
+import { ProfileGateDialog } from '../../profile/components/ProfileGateDialog';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabProfile'>;
 
@@ -21,6 +23,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const [errorText, setErrorText] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const chatCta = useChatCta('LABORATORY', laboratoryId);
+  const { runWithProfileGate, dialogVisible, handleCompleteProfile, handleDismissGate } = useProfileGate();
 
   useEffect(() => {
     let active = true;
@@ -117,15 +120,21 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         <Button
           label={selectedIds.size > 0 ? `Continue with ${selectedIds.size} selected (₹${selectedTotal})` : 'Select at least one test'}
           disabled={selectedIds.size === 0 || !lab.isAcceptingBookings}
-          onPress={() => navigation.navigate('BookLabService', { laboratoryId, serviceIds: Array.from(selectedIds) })}
+          onPress={() =>
+            runWithProfileGate(() => navigation.navigate('BookLabService', { laboratoryId, serviceIds: Array.from(selectedIds) }))
+          }
         />
-        {chatCta.state.kind === 'invite' && <Button label="Chat with laboratory" variant="secondary" onPress={chatCta.sendInvitation} />}
+        {chatCta.state.kind === 'invite' && (
+          <Button label="Chat with laboratory" variant="secondary" onPress={() => runWithProfileGate(chatCta.sendInvitation)} />
+        )}
         {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} />}
         {chatCta.state.kind === 'pending' && <Button label="Invitation sent — waiting for reply" variant="ghost" disabled onPress={() => {}} />}
         {chatConversationId && (
           <Button label="Open chat" variant="secondary" onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })} />
         )}
       </View>
+
+      <ProfileGateDialog visible={dialogVisible} onComplete={handleCompleteProfile} onDismiss={handleDismissGate} />
     </ScreenContainer>
   );
 };

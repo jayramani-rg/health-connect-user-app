@@ -55,5 +55,5 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = (): AppDispatch => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export { setAuthSession, setTokens, completeOnboarding, logout } from './slices/authSlice';
+export { setAuthSession, setTokens, updateUserProfile, completeOnboarding, logout } from './slices/authSlice';
 export { setIsConnected } from './slices/networkSlice';

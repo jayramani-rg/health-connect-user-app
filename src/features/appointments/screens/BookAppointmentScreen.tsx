@@ -81,14 +81,16 @@ function groupSlotsByPeriod(slots: AvailableSlot[]): SlotGroup[] {
 }
 
 const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
-  const { doctorProfileId } = route.params;
+  const { doctorProfileId, consultationType: preselectedType } = route.params;
 
   const [doctor, setDoctor] = useState<DoctorDetail | null>(null);
   const [loadingDoctor, setLoadingDoctor] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [step, setStep] = useState(1);
-  const [consultationType, setConsultationType] = useState<ConsultationType | null>(null);
+  // Coming from DoctorProfileScreen with a consultation type already chosen skips straight to slot
+  // selection — the wizard's mode-picker step only exists for entry points that don't already know it.
+  const [step, setStep] = useState(preselectedType ? 2 : 1);
+  const [consultationType, setConsultationType] = useState<ConsultationType | null>(preselectedType ?? null);
   const [dateKey, setDateKey] = useState(todayKey());
   const [slots, setSlots] = useState<AvailableSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -111,8 +113,13 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         const response = await doctorService.getById(doctorProfileId);
         if (!active) return;
         setDoctor(response.data);
-        const firstEnabled = MODE_ORDER.find((mode) => modeEnabled(response.data, mode));
-        setConsultationType(firstEnabled ?? null);
+        if (preselectedType && modeEnabled(response.data, preselectedType)) {
+          setConsultationType(preselectedType);
+        } else {
+          const firstEnabled = MODE_ORDER.find((mode) => modeEnabled(response.data, mode));
+          setConsultationType(firstEnabled ?? null);
+          if (preselectedType) setStep(1); // the preselected type turned out unavailable — let the user pick again
+        }
       } catch (error) {
         if (active) setLoadError(error instanceof Error ? error.message : 'Could not load this doctor.');
       } finally {
@@ -122,7 +129,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
     return () => {
       active = false;
     };
-  }, [doctorProfileId]);
+  }, [doctorProfileId, preselectedType]);
 
   const loadSlots = useCallback(async () => {
     if (!consultationType) return;
@@ -191,10 +198,12 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const modeFee = useMemo(() => {
     const a = doctor?.availability;
+    // Each type's own fee only — never fall back to another type's price or the doctor-wide minimum
+    // once a specific consultation type is in view (that would show a misleading number for this type).
     const map: Record<ConsultationType, { fee: number | null; duration: number | null }> = {
-      IN_CLINIC: { fee: a?.inClinicFee ?? doctor?.consultationFee ?? null, duration: a?.inClinicDurationMinutes ?? null },
-      VIDEO: { fee: a?.videoFee ?? doctor?.consultationFee ?? null, duration: a?.videoDurationMinutes ?? null },
-      VOICE: { fee: a?.voiceFee ?? doctor?.consultationFee ?? null, duration: a?.voiceDurationMinutes ?? null },
+      IN_CLINIC: { fee: a?.inClinic.fee ?? null, duration: a?.inClinic.durationMinutes ?? null },
+      VIDEO: { fee: a?.video.fee ?? null, duration: a?.video.durationMinutes ?? null },
+      VOICE: { fee: a?.voice.fee ?? null, duration: a?.voice.durationMinutes ?? null },
     };
     return map;
   }, [doctor]);
@@ -292,7 +301,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
                     {modeFee[mode].duration ? <Text style={styles.modeDetail}>{modeFee[mode].duration} min</Text> : null}
                   </View>
                 </View>
-                <Text style={styles.modeFee}>₹{modeFee[mode].fee ?? '—'}</Text>
+                <Text style={styles.modeFee}>{modeFee[mode].fee != null ? `₹${modeFee[mode].fee}` : 'Fee not available'}</Text>
               </TouchableOpacity>
             ))}
           </>
@@ -386,7 +395,9 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Fee</Text>
-                <Text style={styles.summaryValue}>₹{modeFee[consultationType].fee ?? doctor.consultationFee}</Text>
+                <Text style={styles.summaryValue}>
+                  {modeFee[consultationType].fee != null ? `₹${modeFee[consultationType].fee}` : 'Fee not available'}
+                </Text>
               </View>
             </View>
             <TextField

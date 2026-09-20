@@ -54,11 +54,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
+  },
+  modeCardSelected: {
+    borderColor: colors.brand,
+    backgroundColor: colors.brandSoft,
   },
   modeName: {
     ...typography.bodyStrong,

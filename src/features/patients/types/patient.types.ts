@@ -35,3 +35,27 @@ export interface SavePatientAddressRequest {
   pincode: string;
   isDefault: boolean;
 }
+
+export type PatientGender = 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+
+export interface PatientProfile {
+  firstName: string | null;
+  lastName: string | null;
+  gender: PatientGender | null;
+  dob: string | null;
+  bloodGroup: string | null;
+  profilePhotoUrl: string | null;
+  allergyDetails: string | null;
+  chronicConditions: string | null;
+  isProfileComplete: boolean;
+}
+
+export interface UpdatePatientProfileRequest {
+  firstName: string;
+  lastName: string;
+  gender?: PatientGender;
+  dob?: string;
+  bloodGroup?: string;
+  allergyDetails?: string;
+  chronicConditions?: string;
+}

@@ -32,7 +32,7 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
           ))}
         </View>
         <View style={styles.footerRow}>
-          <Text style={styles.fee}>₹{doctor.consultationFee}</Text>
+          <Text style={styles.fee}>{doctor.minConsultationFee != null ? `From ₹${doctor.minConsultationFee}` : 'Fee not available'}</Text>
           {!doctor.isAcceptingAppointments && <Text style={styles.pausedText}>Not accepting requests</Text>}
         </View>
       </View>
