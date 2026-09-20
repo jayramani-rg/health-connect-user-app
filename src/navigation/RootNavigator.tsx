@@ -15,11 +15,13 @@ import CreatePasswordScreen from '../features/auth/screens/CreatePasswordScreen'
 import ProfileBasicsScreen from '../features/auth/screens/ProfileBasicsScreen';
 import TabNavigator from './TabNavigator';
 import NoInternetScreen from '../features/common/screens/NoInternetScreen';
+import DoctorCategoriesScreen from '../features/doctors/screens/DoctorCategoriesScreen';
 import DoctorListScreen from '../features/doctors/screens/DoctorListScreen';
 import DoctorProfileScreen from '../features/doctors/screens/DoctorProfileScreen';
 import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
 import AppointmentConfirmationScreen from '../features/appointments/screens/AppointmentConfirmationScreen';
 import AppointmentDetailScreen from '../features/appointments/screens/AppointmentDetailScreen';
+import LabCategoriesScreen from '../features/labs/screens/LabCategoriesScreen';
 import LabListScreen from '../features/labs/screens/LabListScreen';
 import LabProfileScreen from '../features/labs/screens/LabProfileScreen';
 import BookLabServiceScreen from '../features/labBookings/screens/BookLabServiceScreen';
@@ -61,11 +63,13 @@ const RootNavigator: React.FC = () => {
             {justRegistered && <Stack.Screen name="ProfileBasics" component={ProfileBasicsScreen} />}
             <Stack.Screen name="MainTabs" component={TabNavigator} />
             {!justRegistered && <Stack.Screen name="ProfileBasics" component={ProfileBasicsScreen} />}
+            <Stack.Screen name="DoctorCategories" component={DoctorCategoriesScreen} options={{ headerShown: true, title: 'Find a doctor' }} />
             <Stack.Screen name="DoctorList" component={DoctorListScreen} options={{ headerShown: true, title: 'Find a doctor' }} />
             <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} options={{ headerShown: true, title: 'Doctor profile' }} />
             <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: false }} />
             <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="AppointmentDetail" component={AppointmentDetailScreen} options={{ headerShown: true, title: 'Appointment' }} />
+            <Stack.Screen name="LabCategories" component={LabCategoriesScreen} options={{ headerShown: true, title: 'Book a lab test' }} />
             <Stack.Screen name="LabList" component={LabListScreen} options={{ headerShown: true, title: 'Find a lab' }} />
             <Stack.Screen name="LabProfile" component={LabProfileScreen} options={{ headerShown: true, title: 'Lab profile' }} />
             <Stack.Screen name="BookLabService" component={BookLabServiceScreen} options={{ headerShown: true, title: 'Book a test' }} />

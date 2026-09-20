@@ -48,7 +48,7 @@ export function LabCard({ lab, onPress }: { lab: LabListItem; onPress: () => voi
     <TouchableOpacity activeOpacity={activeopacity} style={styles.card} onPress={onPress}>
       <Text style={styles.name}>{lab.name}</Text>
       <Text style={styles.meta}>
-        {lab.city}, {lab.state} · {lab.serviceCount} service{lab.serviceCount === 1 ? '' : 's'}
+        {[lab.city, lab.state].filter(Boolean).join(', ')} · {lab.serviceCount} service{lab.serviceCount === 1 ? '' : 's'}
       </Text>
       <View style={styles.metaRow}>
         <Text style={styles.metaChip}>Lab visit</Text>

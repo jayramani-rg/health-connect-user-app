@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { TextField } from '../../../components/TextField/TextField';
-import { colors } from '../../../theme';
+import { colors, radius, spacing, typography } from '../../../theme';
 import { doctorService } from '../../../services/doctorService';
 import type { RootStackParamList } from '../../../navigation/types';
 import { DoctorCard } from '../components/DoctorCard/DoctorCard';
@@ -23,12 +23,22 @@ const MODE_OPTIONS = [
 ];
 
 const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
-  const [search, setSearch] = useState(route.params?.specialization ?? '');
+  // A specialization arriving via navigation (from the category browse screen) is a precise server-side
+  // filter, kept separate from the free-text search box — pre-filling that box with a long category name
+  // would look like the user typed it, and typing over it would silently drop the filter.
+  const [specialization, setSpecialization] = useState(route.params?.specialization ?? '');
+  const [search, setSearch] = useState('');
   const [consultationType, setConsultationType] = useState<ConsultationType | ''>(route.params?.consultationType ?? '');
   const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (specialization) {
+      navigation.setOptions({ title: specialization });
+    }
+  }, [specialization, navigation]);
 
   const load = useCallback(
     async (isRefresh = false) => {
@@ -36,6 +46,7 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
       setErrorText(null);
       try {
         const response = await doctorService.list({
+          specialization: specialization || undefined,
           search: search || undefined,
           consultationType: consultationType || undefined,
           pageSize: 30,
@@ -47,17 +58,38 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
         isRefresh ? setRefreshing(false) : setLoading(false);
       }
     },
-    [search, consultationType],
+    [search, specialization, consultationType],
   );
 
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [consultationType]);
+  }, [consultationType, specialization]);
 
   return (
     <ScreenContainer scroll={false} style={{ padding: 0 }}>
       <View style={styles.header}>
+        {specialization ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: colors.brandSoft,
+              borderRadius: radius.md,
+              paddingVertical: spacing.sm,
+              paddingHorizontal: spacing.md,
+              marginBottom: spacing.sm,
+            }}
+          >
+            <Text style={{ ...typography.bodyStrong, color: colors.brand }} numberOfLines={1}>
+              {specialization}
+            </Text>
+            <TouchableOpacity onPress={() => setSpecialization('')}>
+              <Text style={{ ...typography.bodyStrong, color: colors.brand }}>Clear</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
         <TextField
           label="Search"
           value={search}
@@ -84,7 +116,7 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
           ListEmptyComponent={
             <EmptyState
               title={errorText ? 'Something went wrong' : 'No doctors found'}
-              description={errorText ?? 'Try a different search or filter.'}
+              description={errorText ?? (specialization ? `No doctors currently offer ${specialization}.` : 'Try a different search or filter.')}
             />
           }
         />

@@ -11,13 +11,15 @@ export type RootStackParamList = {
 
   MainTabs: undefined;
 
+  DoctorCategories: undefined;
   DoctorList: { consultationType?: ConsultationType; specialization?: string } | undefined;
   DoctorProfile: { doctorProfileId: string };
   BookAppointment: { doctorProfileId: string; consultationType?: ConsultationType };
   AppointmentConfirmation: { appointmentId: string };
   AppointmentDetail: { appointmentId: string };
 
-  LabList: undefined;
+  LabCategories: undefined;
+  LabList: { category?: string } | undefined;
   LabProfile: { laboratoryId: string };
   BookLabService: { laboratoryId: string; serviceIds: string[] };
   LabBookingConfirmation: { bookingId: string };

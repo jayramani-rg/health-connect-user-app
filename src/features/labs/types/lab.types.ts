@@ -45,3 +45,23 @@ export interface LabListQuery {
   page?: number;
   pageSize?: number;
 }
+
+export interface LabServiceSearchResultItem {
+  laboratoryServiceId: string;
+  serviceName: string;
+  category: string;
+  price: number;
+  discountPrice: number | null;
+  homeCollectionEnabled: boolean;
+  laboratoryId: string;
+  laboratoryName: string;
+  city: string;
+}
+
+export interface LabServiceSearchQuery {
+  search?: string;
+  category?: string;
+  homeCollectionOnly?: boolean;
+  page?: number;
+  pageSize?: number;
+}

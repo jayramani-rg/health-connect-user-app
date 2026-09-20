@@ -63,7 +63,7 @@ const HomeScreen: React.FC = () => {
         )}
 
         <View style={styles.actionRow}>
-          <TouchableOpacity activeOpacity={activeopacity} style={styles.actionCard} onPress={() => navigation.navigate('DoctorList')}>
+          <TouchableOpacity activeOpacity={activeopacity} style={styles.actionCard} onPress={() => navigation.navigate('DoctorCategories')}>
             <View style={styles.actionIconWrap}>
               <Icon name="medkit" size={22} color={colors.brand} />
             </View>
@@ -71,7 +71,7 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.actionSubtitle}>By specialization or type</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={activeopacity} style={styles.actionCard} onPress={() => navigation.navigate('LabList')}>
+          <TouchableOpacity activeOpacity={activeopacity} style={styles.actionCard} onPress={() => navigation.navigate('LabCategories')}>
             <View style={styles.actionIconWrap}>
               <Icon name="flask" size={22} color={colors.brand} />
             </View>
