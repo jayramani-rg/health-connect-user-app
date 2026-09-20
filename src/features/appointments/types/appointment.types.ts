@@ -108,6 +108,16 @@ export interface AvailableSlotsResponse {
   slots: AvailableSlot[];
 }
 
+export interface DaySlotCount {
+  date: string;
+  availableCount: number;
+}
+
+export interface SlotCountsResponse {
+  doctorAcceptingAppointments: boolean;
+  days: DaySlotCount[];
+}
+
 /// Client-side grouping only (the backend has no "category" concept — these are just AppointmentStatus sets).
 export type AppointmentTab = 'upcoming' | 'pending' | 'past' | 'cancelled';
 

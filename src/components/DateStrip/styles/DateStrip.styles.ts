@@ -2,7 +2,12 @@ import { StyleSheet } from 'react-native';
 import { colors, radius, spacing, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
+  // See AppointmentDateStrip.styles.ts for why both `scroll` and `row.alignItems` are needed here.
+  scroll: {
+    flexGrow: 0,
+  },
   row: {
+    alignItems: 'flex-start',
     gap: spacing.sm,
     paddingVertical: spacing.xs,
   },

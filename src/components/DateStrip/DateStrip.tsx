@@ -16,7 +16,7 @@ export function DateStrip({ selectedDate, onSelectDate, daysCount = 14 }: DateSt
   }, [daysCount]);
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll} contentContainerStyle={styles.row}>
       {days.map((date) => {
         const key = toLocalDateKey(date);
         const selected = key === selectedDate;

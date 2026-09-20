@@ -15,8 +15,24 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   authOverride?: string;
 }
 
+// A real Error subclass, not a plain object literal — every screen in the app checks
+// `error instanceof Error` to decide whether to show the actual server/network message or a generic
+// fallback. A plain `{ message, statusCode, errors }` literal fails that check and silently hides the
+// real reason behind a hardcoded fallback everywhere in the app; extending Error fixes that at the source.
+class ApiError extends Error implements NormalizedError {
+  statusCode: number;
+  errors: string[] | null;
+
+  constructor(message: string, statusCode: number, errors: string[] | null = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = statusCode;
+    this.errors = errors;
+  }
+}
+
 function normalizeError(message: string, statusCode: number, errors: string[] | null = null): NormalizedError {
-  return { message, statusCode, errors };
+  return new ApiError(message, statusCode, errors);
 }
 
 function isFormData(value: unknown): value is FormData {

@@ -7,6 +7,43 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.brand,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  headerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  headerAvatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  headerAvatarInitial: {
+    ...typography.bodyStrong,
+    color: colors.white,
+  },
+  headerTextWrapper: {
+    flex: 1,
+  },
+  headerName: {
+    ...typography.title,
+    color: colors.white,
+  },
+  headerSubtitle: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 2,
+  },
   stepperWrapper: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
@@ -32,6 +69,11 @@ export const styles = StyleSheet.create({
     borderColor: colors.brand,
     backgroundColor: colors.brandSoft,
   },
+  modeCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
   modeName: {
     ...typography.bodyStrong,
     color: colors.text,
@@ -45,18 +87,65 @@ export const styles = StyleSheet.create({
     ...typography.bodyStrong,
     color: colors.brand,
   },
+  slotsHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  slotsHeadingIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slotsHeading: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  selectedDateHeading: {
+    ...typography.title,
+    color: colors.text,
+    marginTop: spacing.lg,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  slotGroup: {
+    marginBottom: spacing.lg,
+  },
+  groupHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  groupLabel: {
+    ...typography.bodyStrong,
+    color: colors.text,
+  },
+  groupCount: {
+    ...typography.caption,
+    color: colors.textTertiary,
+  },
   slotsWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    marginTop: spacing.md,
   },
   slotChip: {
+    minWidth: 84,
+    alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderColor: colors.brand,
     backgroundColor: colors.surface,
   },
   slotChipSelected: {
@@ -65,7 +154,7 @@ export const styles = StyleSheet.create({
   },
   slotText: {
     ...typography.bodyStrong,
-    color: colors.text,
+    color: colors.brand,
   },
   slotTextSelected: {
     color: colors.white,

@@ -59,7 +59,7 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="MainTabs" component={TabNavigator} />
             <Stack.Screen name="DoctorList" component={DoctorListScreen} options={{ headerShown: true, title: 'Find a doctor' }} />
             <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} options={{ headerShown: true, title: 'Doctor profile' }} />
-            <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: true, title: 'Book appointment' }} />
+            <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: false }} />
             <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="AppointmentDetail" component={AppointmentDetailScreen} options={{ headerShown: true, title: 'Appointment' }} />
             <Stack.Screen name="LabList" component={LabListScreen} options={{ headerShown: true, title: 'Find a lab' }} />
