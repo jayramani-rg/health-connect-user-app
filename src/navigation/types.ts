@@ -3,7 +3,7 @@ import type { ConsultationType } from '../features/doctors/types/doctor.types';
 
 export type RootStackParamList = {
   Welcome: undefined;
-  MobileNumber: { mode: 'login' | 'register' };
+  MobileNumber: undefined;
   Otp: { mobileNumber: string; purpose: OtpPurpose; mode: 'register' | 'forgotPassword' };
   LoginPassword: { mobileNumber: string };
   CreatePassword: { verificationToken: string; mobileNumber: string; mode: 'register' | 'reset' };

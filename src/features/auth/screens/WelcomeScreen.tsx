@@ -18,14 +18,7 @@ export default function WelcomeScreen({ navigation }: Props) {
           <Text style={styles.subhead}>Verified doctors and accredited labs. Appointments, reports and prescriptions in one place.</Text>
         </View>
         <View style={styles.actions}>
-          <Button label="Get started" onPress={() => navigation.navigate('MobileNumber', { mode: 'register' })} variant="secondary" />
-          <Button
-            label="I already have an account"
-            onPress={() => navigation.navigate('MobileNumber', { mode: 'login' })}
-            variant="ghost"
-            style={styles.ghostOnBrand}
-            labelStyle={styles.ghostOnBrandLabel}
-          />
+          <Button label="Continue with mobile number" onPress={() => navigation.navigate('MobileNumber')} variant="secondary" />
           <Text style={styles.legal}>By continuing you agree to our Terms & Privacy Policy.</Text>
         </View>
       </View>

@@ -13,8 +13,7 @@ import { styles } from '../styles/MobileNumberScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MobileNumber'>;
 
-export default function MobileNumberScreen({ navigation, route }: Props) {
-  const { mode } = route.params;
+export default function MobileNumberScreen({ navigation }: Props) {
   const [mobileNumber, setMobileNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,14 +23,16 @@ export default function MobileNumberScreen({ navigation, route }: Props) {
   async function handleContinue() {
     if (!valid || loading) return;
     setError('');
-
-    if (mode === 'login') {
-      navigation.navigate('LoginPassword', { mobileNumber });
-      return;
-    }
-
     setLoading(true);
     try {
+      // The backend is the source of truth for whether this number already has a patient account —
+      // never guess client-side which screen to show next.
+      const { data } = await authService.checkAccount(mobileNumber, 'PATIENT');
+      if (data.exists) {
+        navigation.navigate('LoginPassword', { mobileNumber });
+        return;
+      }
+
       await authService.sendOtp(mobileNumber, 'REGISTRATION');
       navigation.navigate('Otp', { mobileNumber, purpose: 'REGISTRATION', mode: 'register' });
     } catch (err) {
@@ -47,9 +48,7 @@ export default function MobileNumberScreen({ navigation, route }: Props) {
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
       <Text style={styles.title}>What&apos;s your mobile number?</Text>
-      <Text style={styles.subtitle}>
-        {mode === 'register' ? "We'll text a 6-digit code to verify it." : 'Enter the number linked to your account.'}
-      </Text>
+      <Text style={styles.subtitle}>We&apos;ll check if you already have an account.</Text>
       <TextField
         label="Mobile number"
         value={mobileNumber}

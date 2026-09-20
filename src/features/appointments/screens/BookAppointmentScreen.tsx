@@ -9,7 +9,7 @@ import { ScreenContainer } from '../../../components/ScreenContainer/ScreenConta
 import { TextField } from '../../../components/TextField/TextField';
 import { DateStrip } from '../../../components/DateStrip/DateStrip';
 import { colors } from '../../../theme';
-import { activeopacity } from '../../../utils/helpers';
+import { activeopacity, toLocalDateKey } from '../../../utils/helpers';
 import { doctorService } from '../../../services/doctorService';
 import { availabilityService } from '../../../services/availabilityService';
 import { appointmentService } from '../../../services/appointmentService';
@@ -25,7 +25,7 @@ const MODE_ORDER: ConsultationType[] = ['VIDEO', 'VOICE', 'IN_CLINIC'];
 const STEP_LABELS = ['Consultation type', 'Date & time', 'Review'];
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalDateKey(new Date());
 }
 
 const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
@@ -41,6 +41,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [slots, setSlots] = useState<AvailableSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsMessage, setSlotsMessage] = useState<string | null>(null);
+  const [slotsError, setSlotsError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +71,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
     if (!consultationType) return;
     setLoadingSlots(true);
     setSlotsMessage(null);
+    setSlotsError(null);
     setSelectedSlot(null);
     try {
       const response = await availabilityService.getAvailableSlots(doctorProfileId, consultationType, dateKey);
@@ -79,7 +81,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
       }
     } catch (error) {
       setSlots([]);
-      setSlotsMessage(error instanceof Error ? error.message : 'Could not load available slots.');
+      setSlotsError(error instanceof Error ? error.message : 'Could not load available slots.');
     } finally {
       setLoadingSlots(false);
     }
@@ -174,6 +176,13 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
             <DateStrip selectedDate={dateKey} onSelectDate={setDateKey} />
             {loadingSlots ? (
               <ActivityIndicator style={{ marginTop: 24 }} color={colors.brand} />
+            ) : slotsError ? (
+              <>
+                <Banner variant="error" message={slotsError} />
+                <TouchableOpacity onPress={loadSlots} style={styles.retryLink}>
+                  <Text style={styles.retryLinkText}>Try again</Text>
+                </TouchableOpacity>
+              </>
             ) : slots.length === 0 ? (
               <Banner variant="info" message={slotsMessage ?? 'No slots available on this day.'} />
             ) : (

@@ -45,8 +45,27 @@ export default function CreatePasswordScreen({ navigation, route }: Props) {
           );
         }
       } else {
-        await authService.resetPassword(verificationToken, password);
-        navigation.reset({ index: 0, routes: [{ name: 'LoginPassword', params: { mobileNumber } }] });
+        // The backend auto-authenticates this account as part of the reset response (it can always
+        // resolve it unambiguously here since we pass Role: 'PATIENT') — dispatching the session flips
+        // RootNavigator straight to the authenticated stack, with no login/password screen in between.
+        const result = await authService.resetPassword(verificationToken, password, 'PATIENT');
+        if (result.data.user && result.data.accessToken && result.data.refreshToken) {
+          dispatch(
+            setAuthSession({
+              user: result.data.user,
+              tokens: {
+                accessToken: result.data.accessToken,
+                refreshToken: result.data.refreshToken,
+                expiresIn: result.data.expiresIn ?? 0,
+                refreshTokenExpiresIn: result.data.refreshTokenExpiresIn ?? 0,
+              },
+            }),
+          );
+        } else {
+          // Password was reset successfully but the account couldn't be auto-authenticated (e.g.
+          // locked) — fall back to manual sign-in rather than stranding the user here.
+          navigation.reset({ index: 0, routes: [{ name: 'LoginPassword', params: { mobileNumber } }] });
+        }
       }
     } catch (err) {
       setError((err as NormalizedError).message);

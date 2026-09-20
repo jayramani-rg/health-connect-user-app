@@ -1,12 +1,8 @@
 import React, { useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
-import { activeopacity } from '../../utils/helpers';
+import { activeopacity, toLocalDateKey } from '../../utils/helpers';
 import { styles } from './styles/DateStrip.styles';
 import type { DateStripProps } from './types/DateStrip.types';
-
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
 
 export function DateStrip({ selectedDate, onSelectDate, daysCount = 14 }: DateStripProps) {
   const days = useMemo(() => {
@@ -22,7 +18,7 @@ export function DateStrip({ selectedDate, onSelectDate, daysCount = 14 }: DateSt
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
       {days.map((date) => {
-        const key = toDateKey(date);
+        const key = toLocalDateKey(date);
         const selected = key === selectedDate;
         return (
           <TouchableOpacity

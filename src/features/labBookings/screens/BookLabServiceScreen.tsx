@@ -10,7 +10,7 @@ import { ProgressStepper } from '../../../components/ProgressStepper/ProgressSte
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { TextField } from '../../../components/TextField/TextField';
 import { colors } from '../../../theme';
-import { activeopacity } from '../../../utils/helpers';
+import { activeopacity, toLocalDateKey } from '../../../utils/helpers';
 import { labService } from '../../../services/labService';
 import { labBookingService } from '../../../services/labBookingService';
 import { dependentService } from '../../../services/dependentService';
@@ -26,7 +26,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'BookLabService'>;
 const STEP_LABELS: Record<number, string> = { 1: 'Patient & method', 2: 'Date & time', 3: 'Address', 4: 'Review' };
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalDateKey(new Date());
 }
 
 const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {

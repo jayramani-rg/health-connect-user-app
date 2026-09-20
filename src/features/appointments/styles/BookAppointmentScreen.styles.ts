@@ -91,6 +91,14 @@ export const styles = StyleSheet.create({
     ...typography.bodyStrong,
     color: colors.text,
   },
+  retryLink: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.sm,
+  },
+  retryLinkText: {
+    ...typography.bodyStrong,
+    color: colors.brand,
+  },
   footer: {
     padding: spacing.lg,
     flexDirection: 'row',

@@ -36,6 +36,10 @@ export interface LoginResult {
   redirect: 'HOME' | 'RESUME_REGISTRATION' | 'START_REGISTRATION' | 'LOGIN';
 }
 
+export interface CheckAccountResult {
+  exists: boolean;
+}
+
 export type OtpPurpose = 'REGISTRATION' | 'LOGIN' | 'FORGOT_PASSWORD' | 'MOBILE_VERIFICATION';
 
 export interface OtpSentResult {

@@ -41,10 +41,4 @@ export const styles = StyleSheet.create({
     fontSize: getFontSize(11),
     color: 'rgba(255,255,255,0.75)',
   },
-  ghostOnBrand: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-  },
-  ghostOnBrandLabel: {
-    color: colors.white,
-  },
 });
