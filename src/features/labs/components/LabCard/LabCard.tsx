@@ -1,17 +1,32 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Icon } from '../../../../components/Icon/Icon';
 import { activeopacity } from '../../../../utils/helpers';
 import { colors, radius, spacing, typography } from '../../../../theme';
+import { ASSETS_BASE_URL } from '../../../../config/env';
 import type { LabListItem } from '../../types/lab.types';
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: 'row',
+    gap: spacing.md,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
     marginBottom: spacing.md,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  info: {
+    flex: 1,
   },
   name: {
     ...typography.bodyStrong,
@@ -30,11 +45,12 @@ const styles = StyleSheet.create({
   },
   metaChip: {
     ...typography.caption,
-    color: colors.textSecondary,
-    backgroundColor: colors.surface2,
+    fontWeight: '600',
+    color: colors.brandStrong,
+    backgroundColor: colors.brandSoft,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
   },
   pausedText: {
     ...typography.caption,
@@ -44,17 +60,36 @@ const styles = StyleSheet.create({
 });
 
 export function LabCard({ lab, onPress }: { lab: LabListItem; onPress: () => void }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = !!lab.photoUrl && !imageFailed;
+
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={styles.card} onPress={onPress}>
-      <Text style={styles.name}>{lab.name}</Text>
-      <Text style={styles.meta}>
-        {[lab.city, lab.state].filter(Boolean).join(', ')} · {lab.serviceCount} service{lab.serviceCount === 1 ? '' : 's'}
-      </Text>
-      <View style={styles.metaRow}>
-        <Text style={styles.metaChip}>Lab visit</Text>
-        {lab.homeCollectionEnabled && <Text style={styles.metaChip}>Home collection</Text>}
+      <View style={styles.avatar}>
+        {showImage ? (
+          <Image
+            source={{ uri: `${ASSETS_BASE_URL}${lab.photoUrl}` }}
+            style={{ width: '100%', height: '100%', borderRadius: radius.md }}
+            resizeMode="cover"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <Icon name="flask" size={24} color={colors.brand} />
+        )}
       </View>
-      {!lab.isAcceptingBookings && <Text style={styles.pausedText}>Not accepting bookings</Text>}
+      <View style={styles.info}>
+        <Text style={styles.name} numberOfLines={1}>
+          {lab.name}
+        </Text>
+        <Text style={styles.meta} numberOfLines={1}>
+          {[lab.city, lab.state].filter(Boolean).join(', ')} · {lab.serviceCount} service{lab.serviceCount === 1 ? '' : 's'}
+        </Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaChip}>Lab visit</Text>
+          {lab.homeCollectionEnabled && <Text style={styles.metaChip}>Home collection</Text>}
+        </View>
+        {!lab.isAcceptingBookings && <Text style={styles.pausedText}>Not accepting bookings</Text>}
+      </View>
     </TouchableOpacity>
   );
 }

@@ -18,6 +18,7 @@ export interface LabListItem {
   name: string;
   city: string;
   state: string;
+  photoUrl: string | null;
   homeCollectionEnabled: boolean;
   isAcceptingBookings: boolean;
   serviceCount: number;
@@ -31,6 +32,7 @@ export interface LabDetail {
   state: string;
   pincode: string;
   contactPhone: string;
+  photoUrl: string | null;
   homeCollectionEnabled: boolean;
   homeCollectionFee: number | null;
   isAcceptingBookings: boolean;

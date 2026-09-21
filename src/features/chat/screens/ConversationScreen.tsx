@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -29,6 +30,35 @@ function isOutgoing(row: Row): row is OutgoingChatMessage {
 
 function makeClientId(): string {
   return `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function formatDateLabel(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === now.toDateString()) return 'Today';
+  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return date.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'long',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+  });
+}
+
+type DisplayRow = { kind: 'message'; row: Row } | { kind: 'separator'; key: string; label: string };
+
+function withDateSeparators(rows: Row[]): DisplayRow[] {
+  const result: DisplayRow[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    result.push({ kind: 'message', row: rows[i] });
+    const currentDate = new Date(rows[i].sentAtUtc).toDateString();
+    const nextDate = rows[i + 1] ? new Date(rows[i + 1].sentAtUtc).toDateString() : null;
+    if (currentDate !== nextDate) {
+      result.push({ kind: 'separator', key: `sep-${currentDate}`, label: formatDateLabel(rows[i].sentAtUtc) });
+    }
+  }
+  return result;
 }
 
 const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
@@ -152,6 +182,8 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
     sendMessage(body, clientId);
   }
 
+  const displayRows = useMemo(() => withDateSeparators(messages), [messages]);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingWrapper} edges={['top', 'bottom']}>
@@ -164,20 +196,30 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
         <FlatList
-          data={messages}
+          data={displayRows}
           inverted
-          keyExtractor={(item) => (isOutgoing(item) ? item.clientId : item.id)}
+          keyExtractor={(entry) => (entry.kind === 'separator' ? entry.key : isOutgoing(entry.row) ? entry.row.clientId : entry.row.id)}
           contentContainerStyle={styles.listContent}
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}
           ListFooterComponent={loadingMore ? <ActivityIndicator style={styles.paginationSpinner} color={colors.brand} /> : undefined}
-          renderItem={({ item }) => (
-            <MessageBubble
-              message={item}
-              isMine={item.isFromPatient}
-              onRetry={isOutgoing(item) ? () => handleRetry(item.clientId, item.body) : undefined}
-            />
-          )}
+          renderItem={({ item: entry }) => {
+            if (entry.kind === 'separator') {
+              return (
+                <View style={styles.dateSeparatorRow}>
+                  <Text style={styles.dateSeparatorText}>{entry.label}</Text>
+                </View>
+              );
+            }
+            const row = entry.row;
+            return (
+              <MessageBubble
+                message={row}
+                isMine={row.isFromPatient}
+                onRetry={isOutgoing(row) ? () => handleRetry(row.clientId, row.body) : undefined}
+              />
+            );
+          }}
         />
 
         <View style={styles.inputBar}>
@@ -223,6 +265,19 @@ const styles = StyleSheet.create({
   },
   paginationSpinner: {
     marginVertical: spacing.md,
+  },
+  dateSeparatorRow: {
+    alignItems: 'center',
+    marginVertical: spacing.sm,
+  },
+  dateSeparatorText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    backgroundColor: colors.surface2,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
   },
   inputBar: {
     flexDirection: 'row',

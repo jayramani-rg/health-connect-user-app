@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NetInfo from '@react-native-community/netinfo';
 
 import type { RootStackParamList } from './types';
-import { useAppDispatch, useAppSelector, setIsConnected } from '../store';
+import { useAppDispatch, useAppSelector, setIsConnected, setUnreadCount } from '../store';
 import { chatSocket } from '../services/chatSocket';
 
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
@@ -29,6 +29,10 @@ import LabBookingConfirmationScreen from '../features/labBookings/screens/LabBoo
 import LabBookingDetailScreen from '../features/labBookings/screens/LabBookingDetailScreen';
 import ReportViewerScreen from '../features/labBookings/screens/ReportViewerScreen';
 import ConversationScreen from '../features/chat/screens/ConversationScreen';
+import NotificationCenterScreen from '../features/notifications/screens/NotificationCenterScreen';
+import { notificationService } from '../services/notificationService';
+import ProfileScreen from '../features/profile/screens/ProfileScreen';
+import FamilyMembersScreen from '../features/profile/screens/FamilyMembersScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -47,10 +51,14 @@ const RootNavigator: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       chatSocket.connect();
+      notificationService
+        .unreadCount()
+        .then((res) => dispatch(setUnreadCount(res.data.count)))
+        .catch(() => {});
     } else {
       chatSocket.disconnect();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, dispatch]);
 
   return (
     <NavigationContainer>
@@ -77,6 +85,9 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="LabBookingDetail" component={LabBookingDetailScreen} options={{ headerShown: true, title: 'Lab booking' }} />
             <Stack.Screen name="ReportViewer" component={ReportViewerScreen} options={{ headerShown: true, title: 'Report' }} />
             <Stack.Screen name="ChatConversation" component={ConversationScreen} options={{ headerShown: true, title: 'Chat' }} />
+            <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} options={{ headerShown: true, title: 'Notifications' }} />
+            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Profile' }} />
+            <Stack.Screen name="FamilyMembers" component={FamilyMembersScreen} options={{ headerShown: true, title: 'Family members' }} />
           </Stack.Group>
         ) : (
           <Stack.Group>

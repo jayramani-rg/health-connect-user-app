@@ -12,14 +12,27 @@ export const styles = StyleSheet.create({
     gap: spacing.md,
     alignItems: 'center',
   },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: radius.lg,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   name: {
     ...typography.h2,
     color: colors.text,
   },
-  specialization: {
+  address: {
     ...typography.body,
     color: colors.textSecondary,
     marginTop: 2,
+  },
+  operatingHours: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 4,
   },
   sectionTitle: {
     ...typography.title,
@@ -27,20 +40,7 @@ export const styles = StyleSheet.create({
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
   },
-  bodyText: {
-    ...typography.body,
-    color: colors.text,
-    lineHeight: 21,
-  },
-  qualificationRow: {
-    ...typography.body,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  modeCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  serviceCard: {
     backgroundColor: colors.surface,
     borderWidth: 1.5,
     borderColor: colors.border,
@@ -48,33 +48,53 @@ export const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
-  modeCardSelected: {
+  serviceCardSelected: {
     borderColor: colors.brand,
     backgroundColor: colors.brandSoft,
   },
-  modeName: {
+  serviceTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  serviceName: {
     ...typography.bodyStrong,
     color: colors.text,
   },
-  modeDetail: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  modeFee: {
+  servicePrice: {
     ...typography.bodyStrong,
     color: colors.brand,
   },
-  policyText: {
+  serviceStrikePrice: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    textDecorationLine: 'line-through',
+  },
+  categoryPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.surface2,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    marginTop: spacing.xs,
+  },
+  categoryPillText: {
     ...typography.caption,
     color: colors.textSecondary,
-    marginTop: spacing.xs,
+    fontWeight: '600',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: spacing.sm,
+  },
+  metaText: {
+    ...typography.caption,
+    color: colors.textSecondary,
   },
   footer: {
     marginTop: spacing.xl,
     gap: spacing.sm,
-  },
-  chatButton: {
-    marginTop: 0,
   },
 });

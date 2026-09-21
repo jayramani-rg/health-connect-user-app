@@ -172,7 +172,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               key={r.id}
               activeOpacity={activeopacity}
               style={reportRowStyle}
-              onPress={() => navigation.navigate('ReportViewer', { bookingId, reportId: r.id, label: r.label })}
+              onPress={() => navigation.navigate('ReportViewer', { bookingId, reportId: r.id, label: r.label, mimeType: r.mimeType })}
             >
               <Text style={typography.bodyStrong}>{r.label}</Text>
               <Text style={{ ...typography.caption, color: colors.brand }}>View</Text>

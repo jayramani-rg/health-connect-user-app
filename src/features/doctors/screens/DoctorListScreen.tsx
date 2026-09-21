@@ -27,7 +27,7 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
   // filter, kept separate from the free-text search box — pre-filling that box with a long category name
   // would look like the user typed it, and typing over it would silently drop the filter.
   const [specialization, setSpecialization] = useState(route.params?.specialization ?? '');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(route.params?.search ?? '');
   const [consultationType, setConsultationType] = useState<ConsultationType | ''>(route.params?.consultationType ?? '');
   const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,10 +1,12 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { SIGNALR_HUB_URL } from '../config/env';
 import type { ChatInvitation, ChatMessage, MessagesReadEvent } from '../features/chat/types/chat.types';
+import type { AppNotification } from '../features/notifications/types/notification.types';
 
 type MessageHandler = (message: ChatMessage) => void;
 type InvitationHandler = (invitation: ChatInvitation) => void;
 type ReadHandler = (event: MessagesReadEvent) => void;
+type NotificationHandler = (notification: AppNotification) => void;
 
 /**
  * Thin singleton around the SignalR client — mirrors the ApiSingleton pattern (a `configure()` call wired
@@ -18,6 +20,7 @@ class ChatSocket {
   private messageHandlers = new Set<MessageHandler>();
   private invitationHandlers = new Set<InvitationHandler>();
   private readHandlers = new Set<ReadHandler>();
+  private notificationHandlers = new Set<NotificationHandler>();
 
   configure(getToken: () => string | null): void {
     this.getToken = getToken;
@@ -39,6 +42,7 @@ class ChatSocket {
     connection.on('InvitationAccepted', (invitation: ChatInvitation) => this.invitationHandlers.forEach((h) => h(invitation)));
     connection.on('InvitationRejected', (invitation: ChatInvitation) => this.invitationHandlers.forEach((h) => h(invitation)));
     connection.on('MessagesRead', (event: MessagesReadEvent) => this.readHandlers.forEach((h) => h(event)));
+    connection.on('NotificationReceived', (notification: AppNotification) => this.notificationHandlers.forEach((h) => h(notification)));
 
     this.connection = connection;
 
@@ -93,6 +97,11 @@ class ChatSocket {
   onMessagesRead(handler: ReadHandler): () => void {
     this.readHandlers.add(handler);
     return () => this.readHandlers.delete(handler);
+  }
+
+  onNotification(handler: NotificationHandler): () => void {
+    this.notificationHandlers.add(handler);
+    return () => this.notificationHandlers.delete(handler);
   }
 }
 

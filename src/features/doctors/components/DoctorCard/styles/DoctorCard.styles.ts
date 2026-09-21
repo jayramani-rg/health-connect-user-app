@@ -12,18 +12,6 @@ export const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
   },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
-    backgroundColor: colors.brandSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarInitial: {
-    ...typography.title,
-    color: colors.brand,
-  },
   info: {
     flex: 1,
   },
@@ -44,11 +32,12 @@ export const styles = StyleSheet.create({
   },
   metaChip: {
     ...typography.caption,
-    color: colors.textSecondary,
-    backgroundColor: colors.surface2,
+    fontWeight: '600',
+    color: colors.brandStrong,
+    backgroundColor: colors.brandSoft,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
   },
   footerRow: {
     flexDirection: 'row',

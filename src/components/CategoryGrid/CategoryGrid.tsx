@@ -1,13 +1,15 @@
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { activeopacity } from '../../utils/helpers';
 import { colors } from '../../theme';
+import { ASSETS_BASE_URL } from '../../config/env';
 import { styles } from './styles/CategoryGrid.styles';
 import type { CategoryGridItem, CategoryGridProps } from './types/CategoryGrid.types';
 
 // Rotating soft-tint palette, same soft/strong color pairs used for avatar-initial treatments
 // elsewhere in the app (see DoctorCard) — keeps categories visually distinct without maintaining a
-// bespoke icon-per-category mapping that would need updating every time an admin adds one.
+// bespoke icon-per-category mapping that would need updating every time an admin adds one. Only used
+// as a fallback now — an admin-uploaded image (CategoryGridItem.imageUrl) always takes priority.
 const PALETTE = [
   { bg: colors.brandSoft, fg: colors.brand },
   { bg: colors.successSoft, fg: colors.success },
@@ -34,10 +36,22 @@ function CategoryTile({
   tint: { bg: string; fg: string };
   onPress: () => void;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = !!category.imageUrl && !imageFailed;
+
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={styles.tile} onPress={onPress}>
       <View style={[styles.avatar, { backgroundColor: tint.bg }]}>
-        <Text style={[styles.avatarInitial, { color: tint.fg }]}>{category.name.trim().charAt(0).toUpperCase() || '?'}</Text>
+        {showImage ? (
+          <Image
+            source={{ uri: `${ASSETS_BASE_URL}${category.imageUrl}` }}
+            style={styles.avatarImage}
+            resizeMode="cover"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <Text style={[styles.avatarInitial, { color: tint.fg }]}>{category.name.trim().charAt(0).toUpperCase() || '?'}</Text>
+        )}
       </View>
       <Text style={styles.name} numberOfLines={2}>
         {category.name}

@@ -1,6 +1,7 @@
 export interface CategoryGridItem {
   id: string;
   name: string;
+  imageUrl?: string | null;
 }
 
 export interface CategoryGridProps {

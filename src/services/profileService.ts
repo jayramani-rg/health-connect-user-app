@@ -7,4 +7,12 @@ export const profileService = {
 
   updateMyProfile: (payload: UpdatePatientProfileRequest): Promise<ApiResponse<PatientProfile>> =>
     API.request<PatientProfile>('/patient-profile/me', { method: 'PUT', body: payload }),
+
+  uploadMyPhoto: (file: { uri: string; name: string; type: string }): Promise<ApiResponse<PatientProfile>> => {
+    const body = new FormData();
+    body.append('file', file as unknown as Blob);
+    return API.request<PatientProfile>('/patient-profile/me/photo', { method: 'POST', body });
+  },
+
+  removeMyPhoto: (): Promise<ApiResponse<PatientProfile>> => API.request<PatientProfile>('/patient-profile/me/photo', { method: 'DELETE' }),
 };

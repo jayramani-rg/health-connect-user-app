@@ -31,6 +31,7 @@ function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
         name: row.laboratoryName,
         city: row.city,
         state: '',
+        photoUrl: null,
         homeCollectionEnabled: row.homeCollectionEnabled,
         isAcceptingBookings: true,
         serviceCount: 1,

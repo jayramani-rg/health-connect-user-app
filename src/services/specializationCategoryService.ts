@@ -4,6 +4,7 @@ import type { ApiResponse } from '../types/common.types';
 export interface ApprovedSpecializationCategory {
   id: string;
   name: string;
+  imageUrl: string | null;
 }
 
 export const specializationCategoryService = {

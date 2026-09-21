@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { Avatar } from '../../../../components/Avatar/Avatar';
 import { activeopacity } from '../../../../utils/helpers';
 import { styles } from './styles/DoctorCard.styles';
 import type { DoctorCardProps } from './types/DoctorCard.types';
@@ -13,9 +14,7 @@ export function DoctorCard({ doctor, onPress }: DoctorCardProps) {
 
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={styles.card} onPress={onPress}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarInitial}>{doctor.fullName.trim().charAt(0).toUpperCase() || '?'}</Text>
-      </View>
+      <Avatar name={doctor.fullName} imageUrl={doctor.profilePhotoUrl} size={56} />
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
           {doctor.fullName}

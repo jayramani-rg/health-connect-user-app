@@ -1,3 +1,4 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { OtpPurpose } from '../features/auth/types/auth.types';
 import type { ConsultationType } from '../features/doctors/types/doctor.types';
 
@@ -9,10 +10,10 @@ export type RootStackParamList = {
   CreatePassword: { verificationToken: string; mobileNumber: string; mode: 'register' | 'reset' };
   ProfileBasics: undefined;
 
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
 
   DoctorCategories: undefined;
-  DoctorList: { consultationType?: ConsultationType; specialization?: string } | undefined;
+  DoctorList: { consultationType?: ConsultationType; specialization?: string; search?: string } | undefined;
   DoctorProfile: { doctorProfileId: string };
   BookAppointment: { doctorProfileId: string; consultationType?: ConsultationType };
   AppointmentConfirmation: { appointmentId: string };
@@ -24,9 +25,13 @@ export type RootStackParamList = {
   BookLabService: { laboratoryId: string; serviceIds: string[] };
   LabBookingConfirmation: { bookingId: string };
   LabBookingDetail: { bookingId: string };
-  ReportViewer: { bookingId: string; reportId: string; label: string };
+  ReportViewer: { bookingId: string; reportId: string; label: string; mimeType: string };
 
   ChatConversation: { conversationId: string };
+
+  NotificationCenter: undefined;
+  Profile: undefined;
+  FamilyMembers: undefined;
 
   WebViewScreen: { url: string; title: string };
   NoInternet: undefined;

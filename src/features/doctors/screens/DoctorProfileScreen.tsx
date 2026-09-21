@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import { Avatar } from '../../../components/Avatar/Avatar';
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -83,9 +84,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <ScreenContainer>
       <View style={styles.headerRow}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarInitial}>{doctor.fullName.trim().charAt(0).toUpperCase() || '?'}</Text>
-        </View>
+        <Avatar name={doctor.fullName} imageUrl={doctor.profilePhotoUrl} size={72} />
         <View>
           <Text style={styles.name}>{doctor.fullName}</Text>
           <Text style={styles.specialization}>
