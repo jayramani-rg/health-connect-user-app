@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { colors, motion } from '../../theme';
+import { haptics } from '../../utils/haptics';
 import { styles } from './styles/Button.styles';
 import type { ButtonProps } from './types/Button.types';
 
@@ -31,14 +32,28 @@ const SPINNER_COLOR = {
   destructive: colors.error,
 };
 
-export function Button({ label, onPress, variant = 'primary', disabled, loading, icon, fullWidth = true, style, labelStyle }: ButtonProps) {
+export function Button({
+  label,
+  onPress,
+  variant = 'primary',
+  disabled,
+  loading,
+  icon,
+  fullWidth = true,
+  style,
+  labelStyle,
+  haptics: enableHaptics = true,
+}: ButtonProps) {
   const isDisabled = disabled || loading;
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
     <AnimatedPressable
-      onPress={onPress}
+      onPress={() => {
+        if (enableHaptics) haptics.light();
+        onPress();
+      }}
       disabled={isDisabled}
       onPressIn={() => {
         scale.value = withSpring(0.96, motion.spring.press);

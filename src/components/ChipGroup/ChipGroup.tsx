@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { colors, motion } from '../../theme';
+import { haptics } from '../../utils/haptics';
 import { styles } from './styles/ChipGroup.styles';
 import type { ChipGroupProps } from './types/ChipGroup.types';
 
@@ -18,7 +19,13 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean; 
   }));
 
   return (
-    <AnimatedPressable onPress={onPress} style={[styles.chip, animatedStyle]}>
+    <AnimatedPressable
+      onPress={() => {
+        haptics.selection();
+        onPress();
+      }}
+      style={[styles.chip, animatedStyle]}
+    >
       <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
     </AnimatedPressable>
   );

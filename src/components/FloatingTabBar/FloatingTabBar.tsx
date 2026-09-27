@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors, motion } from '../../theme';
+import { haptics } from '../../utils/haptics';
 import { Icon, type IoniconsIconName } from '../Icon/Icon';
 import { BAR_BOTTOM_INSET, BAR_SIDE_INSET, ITEM_INNER_INSET, styles } from './styles/FloatingTabBar.styles';
 
@@ -41,6 +42,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         const label = typeof options.tabBarLabel === 'string' ? options.tabBarLabel : (options.title ?? route.name);
 
         function onPress() {
+          haptics.selection();
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
           if (!focused && !event.defaultPrevented) {
             navigation.navigate(route.name);

@@ -13,4 +13,5 @@ export interface ButtonProps {
   fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  haptics?: boolean;
 }
