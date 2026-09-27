@@ -1,15 +1,14 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius } from '../../../theme';
-import { getFontSize, getHeight } from '../../../utils/helpers';
+import { colors, radius, typography } from '../../../theme';
+import { getHeight } from '../../../utils/helpers';
 
 export const styles = StyleSheet.create({
   wrapper: {
     gap: 8,
   },
   label: {
-    fontSize: getFontSize(13),
-    fontWeight: '600',
-    color: colors.textSecondary,
+    ...typography.label,
+    color: colors.inkSoft,
   },
   row: {
     flexDirection: 'row',
@@ -17,23 +16,18 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    paddingHorizontal: getHeight(14),
-    paddingVertical: getHeight(8),
+    paddingHorizontal: getHeight(16),
+    paddingVertical: getHeight(9),
     borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
+    borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  chipSelected: {
-    borderColor: colors.brand,
-    backgroundColor: colors.brandSoft,
-  },
   chipText: {
-    fontSize: getFontSize(13),
-    fontWeight: '600',
-    color: colors.textSecondary,
+    ...typography.label,
+    color: colors.inkSoft,
   },
   chipTextSelected: {
-    color: colors.brandStrong,
+    color: colors.primaryStrong,
   },
 });

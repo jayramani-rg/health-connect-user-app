@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { LabStatusBadge } from '../../../components/LabStatusBadge/LabStatusBadge';
+import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
 import { activeopacity } from '../../../utils/helpers';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { labBookingService } from '../../../services/labBookingService';
@@ -62,7 +63,7 @@ const MyLabBookingsScreen: React.FC = () => {
   }, [bookings, tab]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.canvas }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.canvas }} edges={[]}>
       <View style={styles.header}>
         <ChipGroup options={TAB_OPTIONS} value={tab} onChange={(v) => setTab(v as LabBookingTab)} />
       </View>
@@ -75,7 +76,7 @@ const MyLabBookingsScreen: React.FC = () => {
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: spacing.lg }}
+          contentContainerStyle={{ padding: spacing.lg, paddingBottom: TAB_BAR_CLEARANCE }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
           renderItem={({ item }) => {
             const scheduled = new Date(item.scheduledAtUtc);
@@ -117,9 +118,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   card: {
     backgroundColor: colors.surface,

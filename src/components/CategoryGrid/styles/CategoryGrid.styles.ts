@@ -7,16 +7,25 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+  strip: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
   tile: {
     width: '48%',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
     padding: spacing.lg,
     marginBottom: spacing.md,
     alignItems: 'flex-start',
     ...shadow.card,
+  },
+  stripTile: {
+    width: 76,
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   avatar: {
     width: 44,
@@ -25,6 +34,15 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
+    overflow: 'hidden',
+  },
+  stripAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
     overflow: 'hidden',
   },
   avatarImage: {
@@ -36,6 +54,11 @@ export const styles = StyleSheet.create({
   },
   name: {
     ...typography.bodyStrong,
-    color: colors.text,
+    color: colors.ink,
+  },
+  stripName: {
+    ...typography.caption,
+    color: colors.ink,
+    textAlign: 'center',
   },
 });

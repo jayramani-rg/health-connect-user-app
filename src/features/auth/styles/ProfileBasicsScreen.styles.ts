@@ -1,29 +1,29 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
-import { getFontSize, getHeight } from '../../../utils/helpers';
+import { colors, spacing, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: spacing.xl,
   },
   title: {
-    fontSize: getFontSize(20),
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.h1,
+    color: colors.ink,
   },
   skipLink: {
-    fontSize: getFontSize(13),
-    fontWeight: '700',
-    color: colors.brand,
+    ...typography.label,
+    color: colors.primary,
   },
   subtitle: {
-    fontSize: getFontSize(13),
-    color: colors.textTertiary,
+    ...typography.body,
+    color: colors.inkFaint,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
   },
   footer: {
     marginTop: 'auto',
-    gap: getHeight(8),
+    gap: spacing.sm,
   },
 });

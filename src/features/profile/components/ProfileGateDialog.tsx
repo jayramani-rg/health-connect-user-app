@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog } from '../../../components/Dialog/Dialog';
+import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 
 interface ProfileGateDialogProps {
   visible: boolean;
@@ -9,7 +9,7 @@ interface ProfileGateDialogProps {
 
 export function ProfileGateDialog({ visible, onComplete, onDismiss }: ProfileGateDialogProps) {
   return (
-    <Dialog
+    <ConfirmSheet
       visible={visible}
       title="Complete your profile"
       message="Please add your first name and last name before booking an appointment or starting a chat."

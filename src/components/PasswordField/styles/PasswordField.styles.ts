@@ -1,12 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
-import { getFontSize } from '../../../utils/helpers';
+import { colors, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   toggle: {
-    fontSize: getFontSize(13),
-    fontWeight: '600',
-    color: colors.brand,
+    ...typography.label,
+    color: colors.primary,
   },
   checklist: {
     marginTop: 8,
@@ -19,17 +17,17 @@ export const styles = StyleSheet.create({
   },
   ruleMarkMet: {
     color: colors.success,
-    fontWeight: '700',
+    fontFamily: typography.bodyStrong.fontFamily,
   },
   ruleMarkUnmet: {
-    color: colors.textTertiary,
+    color: colors.inkFaint,
   },
   ruleTextMet: {
-    fontSize: getFontSize(12),
-    color: colors.text,
+    ...typography.caption,
+    color: colors.ink,
   },
   ruleTextUnmet: {
-    fontSize: getFontSize(12),
-    color: colors.textTertiary,
+    ...typography.caption,
+    color: colors.inkFaint,
   },
 });

@@ -31,13 +31,14 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   metaChip: {
-    ...typography.caption,
-    fontWeight: '600',
-    color: colors.brandStrong,
-    backgroundColor: colors.brandSoft,
+    ...typography.label,
+    fontSize: 11,
+    color: colors.primaryStrong,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: radius.pill,
+    overflow: 'hidden',
   },
   footerRow: {
     flexDirection: 'row',

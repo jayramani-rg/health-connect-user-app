@@ -10,6 +10,7 @@ import { Icon } from '../../../components/Icon/Icon';
 import type { IoniconsIconName } from '../../../components/Icon/Icon';
 import { ProgressStepper } from '../../../components/ProgressStepper/ProgressStepper';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { TextField } from '../../../components/TextField/TextField';
 import { AppointmentDateStrip } from '../components/AppointmentDateStrip/AppointmentDateStrip';
 import { colors } from '../../../theme';
@@ -236,9 +237,9 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loadingDoctor) {
     return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={4} />
+      </ScreenContainer>
     );
   }
 

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+import { BackButton } from '../../../components/BackButton/BackButton';
 import { Button } from '../../../components/Button/Button';
 import { PasswordField } from '../../../components/PasswordField/PasswordField';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -27,7 +29,12 @@ export default function LoginPasswordScreen({ navigation, route }: Props) {
     setError('');
     setLocked(false);
     try {
-      const result = await authService.login({ role: 'PATIENT', mobileNumber, password, platform: 'ANDROID' });
+      const result = await authService.login({
+        role: 'PATIENT',
+        mobileNumber,
+        password,
+        platform: Platform.OS === 'ios' ? 'IOS' : 'ANDROID',
+      });
       if (result.data.user && result.data.accessToken && result.data.refreshToken) {
         dispatch(
           setAuthSession({
@@ -63,10 +70,13 @@ export default function LoginPasswordScreen({ navigation, route }: Props) {
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Welcome back</Text>
-      <Text style={styles.subtitle}>
-        Enter your password to sign in as <Text style={styles.subtitleBold}>+91 {mobileNumber}</Text>.
-      </Text>
+      <BackButton onPress={() => navigation.goBack()} />
+      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.subtitle}>
+          Enter your password to sign in as <Text style={styles.subtitleBold}>+91 {mobileNumber}</Text>.
+        </Text>
+      </Animated.View>
       <PasswordField label="Password" value={password} onChangeText={setPassword} placeholder="••••••••" />
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgotLink}>Forgot password?</Text>

@@ -1,8 +1,28 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { activeopacity } from '../../utils/helpers';
+import { Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { colors, motion } from '../../theme';
 import { styles } from './styles/ChipGroup.styles';
 import type { ChipGroupProps } from './types/ChipGroup.types';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  const progress = useSharedValue(selected ? 1 : 0);
+  progress.value = withTiming(selected ? 1 : 0, { duration: motion.duration.fast });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: selected ? colors.primarySoft : colors.surface,
+    borderColor: selected ? colors.primary : colors.border,
+    transform: [{ scale: 0.97 + progress.value * 0.03 }],
+  }));
+
+  return (
+    <AnimatedPressable onPress={onPress} style={[styles.chip, animatedStyle]}>
+      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
+    </AnimatedPressable>
+  );
+}
 
 export function ChipGroup({ label, options, value, onChange, multi }: ChipGroupProps) {
   const selectedValues = Array.isArray(value) ? value : [value];
@@ -21,19 +41,9 @@ export function ChipGroup({ label, options, value, onChange, multi }: ChipGroupP
     <View style={styles.wrapper}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={styles.row}>
-        {options.map((option) => {
-          const selected = selectedValues.includes(option.value);
-          return (
-            <TouchableOpacity
-              key={option.value}
-              activeOpacity={activeopacity}
-              onPress={() => toggle(option.value)}
-              style={[styles.chip, selected && styles.chipSelected]}
-            >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{option.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
+        {options.map((option) => (
+          <Chip key={option.value} label={option.label} selected={selectedValues.includes(option.value)} onPress={() => toggle(option.value)} />
+        ))}
       </View>
     </View>
   );

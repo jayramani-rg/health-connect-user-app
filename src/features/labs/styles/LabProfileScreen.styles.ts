@@ -79,9 +79,9 @@ export const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   categoryPillText: {
-    ...typography.caption,
+    ...typography.label,
+    fontSize: 11,
     color: colors.textSecondary,
-    fontWeight: '600',
   },
   metaRow: {
     flexDirection: 'row',

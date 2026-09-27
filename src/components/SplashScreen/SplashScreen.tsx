@@ -1,18 +1,19 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../theme';
+import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { colors, typography } from '../../theme';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
+    gap: 20,
   },
   wordmark: {
-    fontSize: 28,
-    fontWeight: '700',
+    ...typography.display,
+    fontSize: 30,
+    letterSpacing: 2,
     color: colors.white,
   },
 });
@@ -20,6 +21,7 @@ const styles = StyleSheet.create({
 export function SplashScreen() {
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <Text style={styles.wordmark}>CAROVA</Text>
       <ActivityIndicator color={colors.white} />
     </View>

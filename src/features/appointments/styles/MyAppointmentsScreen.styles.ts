@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { colors, spacing } from '../../../theme';
+import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -10,12 +11,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   listContent: {
     padding: spacing.lg,
+    paddingBottom: TAB_BAR_CLEARANCE,
   },
   loadingWrapper: {
     flex: 1,

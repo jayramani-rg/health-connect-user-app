@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+import { BackButton } from '../../../components/BackButton/BackButton';
 import { Button } from '../../../components/Button/Button';
 import { TextField } from '../../../components/TextField/TextField';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -44,11 +46,11 @@ export default function MobileNumberScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>←</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>What&apos;s your mobile number?</Text>
-      <Text style={styles.subtitle}>We&apos;ll check if you already have an account.</Text>
+      <BackButton onPress={() => navigation.goBack()} />
+      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+        <Text style={styles.title}>What's your mobile number?</Text>
+        <Text style={styles.subtitle}>We'll check if you already have an account.</Text>
+      </Animated.View>
       <TextField
         label="Mobile number"
         value={mobileNumber}

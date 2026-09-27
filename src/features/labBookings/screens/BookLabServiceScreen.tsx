@@ -8,6 +8,7 @@ import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { DateStrip } from '../../../components/DateStrip/DateStrip';
 import { ProgressStepper } from '../../../components/ProgressStepper/ProgressStepper';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { TextField } from '../../../components/TextField/TextField';
 import { colors } from '../../../theme';
 import { activeopacity, toLocalDateKey } from '../../../utils/helpers';
@@ -164,9 +165,9 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loadingLab) {
     return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={4} />
+      </ScreenContainer>
     );
   }
 

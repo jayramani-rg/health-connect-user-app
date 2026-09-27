@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useCallback, useEffect, useState } from 'react';
 
+import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ResultScreen } from '../../../components/ResultScreen/ResultScreen';
-import { colors } from '../../../theme';
+import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { appointmentService } from '../../../services/appointmentService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { AppointmentDetail } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AppointmentConfirmation'>;
 
@@ -15,27 +16,38 @@ const AppointmentConfirmationScreen: React.FC<Props> = ({ route, navigation }) =
   const { appointmentId } = route.params;
   const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const response = await appointmentService.getById(appointmentId);
-        if (active) setAppointment(response.data);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
+  const load = useCallback(async () => {
+    setLoading(true);
+    setErrorText(null);
+    try {
+      const response = await appointmentService.getById(appointmentId);
+      setAppointment(response.data);
+    } catch (error) {
+      setErrorText(error instanceof Error ? error.message : 'Could not load your appointment.');
+    } finally {
+      setLoading(false);
+    }
   }, [appointmentId]);
 
-  if (loading || !appointment) {
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={2} />
+      </ScreenContainer>
+    );
+  }
+
+  if (!appointment) {
+    return (
+      <ScreenContainer>
+        <EmptyState title="Something went wrong" description={errorText ?? 'Could not load your appointment.'} actionLabel="Try again" onActionPress={load} />
+      </ScreenContainer>
     );
   }
 

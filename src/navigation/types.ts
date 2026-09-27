@@ -27,11 +27,14 @@ export type RootStackParamList = {
   LabBookingDetail: { bookingId: string };
   ReportViewer: { bookingId: string; reportId: string; label: string; mimeType: string };
 
+  ChatList: undefined;
   ChatConversation: { conversationId: string };
 
   NotificationCenter: undefined;
-  Profile: undefined;
+  EditProfile: undefined;
   FamilyMembers: undefined;
+  Settings: undefined;
+  HelpSupport: undefined;
 
   WebViewScreen: { url: string; title: string };
   NoInternet: undefined;
@@ -39,7 +42,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Appointments: undefined;
-  Labs: undefined;
-  Chat: undefined;
+  Book: undefined;
+  Appointments: { initialMode?: 'DOCTOR' | 'LAB' } | undefined;
+  Profile: undefined;
 };

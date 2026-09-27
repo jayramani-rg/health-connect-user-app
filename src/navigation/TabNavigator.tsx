@@ -5,52 +5,26 @@
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { MainTabParamList } from './types';
-import { Icon, type IoniconsIconName } from '../components/Icon/Icon';
-import { colors } from '../theme';
+import { FloatingTabBar } from '../components/FloatingTabBar/FloatingTabBar';
 import HomeScreen from '../features/home/screens/HomeScreen';
-import MyAppointmentsScreen from '../features/appointments/screens/MyAppointmentsScreen';
-import MyLabBookingsScreen from '../features/labBookings/screens/MyLabBookingsScreen';
-import ChatListScreen from '../features/chat/screens/ChatListScreen';
+import BookHomeScreen from '../features/book/screens/BookHomeScreen';
+import AppointmentsHomeScreen from '../features/appointments/screens/AppointmentsHomeScreen';
+import ProfileHomeScreen from '../features/profile/screens/ProfileHomeScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TAB_ICONS: Record<keyof MainTabParamList, { active: IoniconsIconName; inactive: IoniconsIconName }> = {
-  Home: { active: 'home', inactive: 'home-outline' },
-  Appointments: { active: 'calendar', inactive: 'calendar-outline' },
-  Labs: { active: 'flask', inactive: 'flask-outline' },
-  Chat: { active: 'chatbubble-ellipses', inactive: 'chatbubble-ellipses-outline' },
-};
-
 const TabNavigator: React.FC = () => {
-  const insets = useSafeAreaInsets();
-
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.brand,
-        tabBarInactiveTintColor: colors.textTertiary,
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
-        tabBarStyle: {
-          height: 56 + insets.bottom,
-          paddingTop: 8,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-        },
-        tabBarIcon: ({ focused, color, size }) => {
-          const icons = TAB_ICONS[route.name as keyof MainTabParamList];
-          return <Icon name={focused ? icons.active : icons.inactive} size={size} color={color} />;
-        },
-      })}
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <FloatingTabBar {...props} />}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Appointments" component={MyAppointmentsScreen} options={{ title: 'Appointments' }} />
-      <Tab.Screen name="Labs" component={MyLabBookingsScreen} options={{ title: 'Lab Bookings' }} />
-      <Tab.Screen name="Chat" component={ChatListScreen} options={{ title: 'Chat' }} />
+      <Tab.Screen name="Book" component={BookHomeScreen} />
+      <Tab.Screen name="Appointments" component={AppointmentsHomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileHomeScreen} />
     </Tab.Navigator>
   );
 };

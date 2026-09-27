@@ -150,34 +150,6 @@ export const styles = StyleSheet.create({
   categoryStrip: {
     marginBottom: spacing.xl,
   },
-  categoryStripContent: {
-    gap: spacing.md,
-    paddingRight: spacing.lg,
-  },
-  categoryTile: {
-    width: 76,
-    alignItems: 'center',
-  },
-  categoryAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xs,
-    overflow: 'hidden',
-  },
-  categoryAvatarInitial: {
-    ...typography.title,
-  },
-  categoryName: {
-    ...typography.caption,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  categorySeeAllAvatar: {
-    backgroundColor: colors.surface2,
-  },
   reportCard: {
     flexDirection: 'row',
     alignItems: 'center',

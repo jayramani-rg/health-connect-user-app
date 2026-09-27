@@ -1,12 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
+import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import { LabStatusBadge } from '../../../components/LabStatusBadge/LabStatusBadge';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
 import { labBookingService } from '../../../services/labBookingService';
@@ -34,6 +36,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [cancelSheetVisible, setCancelSheetVisible] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -52,33 +55,25 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }, [load]),
   );
 
-  function confirmCancel() {
-    Alert.alert('Cancel booking', 'Are you sure you want to cancel this booking?', [
-      { text: 'No', style: 'cancel' },
-      {
-        text: 'Yes, cancel',
-        style: 'destructive',
-        onPress: async () => {
-          setActionLoading(true);
-          setActionError(null);
-          try {
-            const response = await labBookingService.cancel(bookingId);
-            setBooking(response.data);
-          } catch (error) {
-            setActionError(error instanceof Error ? error.message : 'This action could not be completed.');
-          } finally {
-            setActionLoading(false);
-          }
-        },
-      },
-    ]);
+  async function handleConfirmCancel() {
+    setCancelSheetVisible(false);
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const response = await labBookingService.cancel(bookingId);
+      setBooking(response.data);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'This action could not be completed.');
+    } finally {
+      setActionLoading(false);
+    }
   }
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={3} />
+      </ScreenContainer>
     );
   }
 
@@ -183,9 +178,20 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       {canCancel && (
         <View style={{ marginTop: spacing.lg }}>
-          <Button label="Cancel booking" variant="secondary" disabled={actionLoading} onPress={confirmCancel} />
+          <Button label="Cancel booking" variant="secondary" disabled={actionLoading} onPress={() => setCancelSheetVisible(true)} />
         </View>
       )}
+
+      <ConfirmSheet
+        visible={cancelSheetVisible}
+        title="Cancel booking"
+        message="Are you sure you want to cancel this booking?"
+        actions={[
+          { label: 'No', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
+          { label: 'Yes, cancel', variant: 'destructive', onPress: handleConfirmCancel },
+        ]}
+        onRequestClose={() => setCancelSheetVisible(false)}
+      />
     </ScreenContainer>
   );
 };

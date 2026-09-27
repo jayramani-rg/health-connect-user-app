@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
 import { Icon } from '../../../components/Icon/Icon';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
 import { ASSETS_BASE_URL } from '../../../config/env';
@@ -57,9 +58,9 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={4} />
+      </ScreenContainer>
     );
   }
 

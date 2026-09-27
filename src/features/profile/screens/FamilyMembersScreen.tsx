@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 import { Avatar } from '../../../components/Avatar/Avatar';
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
+import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import { DateField } from '../../../components/DateField/DateField';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { Icon } from '../../../components/Icon/Icon';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { TextField } from '../../../components/TextField/TextField';
 import { colors, spacing } from '../../../theme';
 import { dependentService } from '../../../services/dependentService';
@@ -25,6 +27,7 @@ const FamilyMembersScreen: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<SaveDependentRequest>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<Dependent | null>(null);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -79,28 +82,22 @@ const FamilyMembersScreen: React.FC = () => {
     }
   }
 
-  function confirmRemove(dependent: Dependent) {
-    Alert.alert('Remove family member', `Remove ${dependent.firstName} ${dependent.lastName}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await dependentService.remove(dependent.id);
-            await load();
-          } catch (error) {
-            setErrorText(error instanceof Error ? error.message : 'Could not remove this family member.');
-          }
-        },
-      },
-    ]);
+  async function handleConfirmRemove() {
+    if (!removeTarget) return;
+    const dependent = removeTarget;
+    setRemoveTarget(null);
+    try {
+      await dependentService.remove(dependent.id);
+      await load();
+    } catch (error) {
+      setErrorText(error instanceof Error ? error.message : 'Could not remove this family member.');
+    }
   }
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.brand} />
+      <View style={{ padding: spacing.lg }}>
+        <SkeletonList count={3} />
       </View>
     );
   }
@@ -161,12 +158,23 @@ const FamilyMembersScreen: React.FC = () => {
               <TouchableOpacity onPress={() => openEdit(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Icon name="create-outline" size={20} color={colors.text} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => confirmRemove(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity onPress={() => setRemoveTarget(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Icon name="trash-outline" size={20} color={colors.error} />
               </TouchableOpacity>
             </View>
           </View>
         )}
+      />
+
+      <ConfirmSheet
+        visible={!!removeTarget}
+        title="Remove family member"
+        message={removeTarget ? `Remove ${removeTarget.firstName} ${removeTarget.lastName}?` : ''}
+        actions={[
+          { label: 'Cancel', variant: 'secondary', onPress: () => setRemoveTarget(null) },
+          { label: 'Remove', variant: 'destructive', onPress: handleConfirmRemove },
+        ]}
+        onRequestClose={() => setRemoveTarget(null)}
       />
     </View>
   );

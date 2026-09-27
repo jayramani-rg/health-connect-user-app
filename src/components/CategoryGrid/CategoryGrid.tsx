@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { activeopacity } from '../../utils/helpers';
 import { colors } from '../../theme';
 import { ASSETS_BASE_URL } from '../../config/env';
@@ -11,13 +11,23 @@ import type { CategoryGridItem, CategoryGridProps } from './types/CategoryGrid.t
 // bespoke icon-per-category mapping that would need updating every time an admin adds one. Only used
 // as a fallback now — an admin-uploaded image (CategoryGridItem.imageUrl) always takes priority.
 const PALETTE = [
-  { bg: colors.brandSoft, fg: colors.brand },
+  { bg: colors.primarySoft, fg: colors.primary },
   { bg: colors.successSoft, fg: colors.success },
   { bg: colors.pendingSoft, fg: colors.pending },
   { bg: colors.warningSoft, fg: colors.warning },
 ];
 
-export function CategoryGrid({ categories, onSelect }: CategoryGridProps) {
+export function CategoryGrid({ categories, onSelect, variant = 'grid' }: CategoryGridProps) {
+  if (variant === 'strip') {
+    return (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+        {categories.map((category, index) => (
+          <CategoryTile key={category.id} category={category} tint={PALETTE[index % PALETTE.length]} onPress={() => onSelect(category)} strip />
+        ))}
+      </ScrollView>
+    );
+  }
+
   return (
     <View style={styles.grid}>
       {categories.map((category, index) => (
@@ -31,17 +41,19 @@ function CategoryTile({
   category,
   tint,
   onPress,
+  strip,
 }: {
   category: CategoryGridItem;
   tint: { bg: string; fg: string };
   onPress: () => void;
+  strip?: boolean;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = !!category.imageUrl && !imageFailed;
 
   return (
-    <TouchableOpacity activeOpacity={activeopacity} style={styles.tile} onPress={onPress}>
-      <View style={[styles.avatar, { backgroundColor: tint.bg }]}>
+    <TouchableOpacity activeOpacity={activeopacity} style={strip ? styles.stripTile : styles.tile} onPress={onPress}>
+      <View style={[strip ? styles.stripAvatar : styles.avatar, { backgroundColor: tint.bg }]}>
         {showImage ? (
           <Image
             source={{ uri: `${ASSETS_BASE_URL}${category.imageUrl}` }}
@@ -53,7 +65,7 @@ function CategoryTile({
           <Text style={[styles.avatarInitial, { color: tint.fg }]}>{category.name.trim().charAt(0).toUpperCase() || '?'}</Text>
         )}
       </View>
-      <Text style={styles.name} numberOfLines={2}>
+      <Text style={strip ? styles.stripName : styles.name} numberOfLines={2}>
         {category.name}
       </Text>
     </TouchableOpacity>

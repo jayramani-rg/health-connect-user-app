@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePicker, { DateTimePickerAndroid, type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { activeopacity } from '../../utils/helpers';
+import { colors } from '../../theme';
 import { styles } from '../TextField/styles/TextField.styles';
 
 interface DateFieldProps {
@@ -57,7 +58,7 @@ export function DateField({ label, value, onChange, placeholder = '16-Sept-2005'
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity activeOpacity={activeopacity} onPress={openPicker} style={[styles.fieldRow, !!errorText && styles.fieldRowError]}>
-        <Text style={[styles.input, !selectedDate && { color: '#9AA1AC' }]}>{selectedDate ? formatDisplay(selectedDate) : placeholder}</Text>
+        <Text style={[styles.input, !selectedDate && { color: colors.inkFaint }]}>{selectedDate ? formatDisplay(selectedDate) : placeholder}</Text>
       </TouchableOpacity>
       {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
       {Platform.OS === 'ios' && iosPickerVisible && (

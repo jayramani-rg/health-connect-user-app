@@ -1,15 +1,15 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius } from '../../../theme';
-import { getFontSize, getHeight, getWidth } from '../../../utils/helpers';
+import { colors, radius, typography } from '../../../theme';
+import { getHeight, getWidth } from '../../../utils/helpers';
 
 export const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     paddingHorizontal: getHeight(12),
     paddingVertical: getHeight(10),
     backgroundColor: colors.surface,
@@ -24,21 +24,19 @@ export const styles = StyleSheet.create({
     width: getWidth(28),
     height: getWidth(28),
     borderRadius: radius.sm,
-    backgroundColor: colors.surface2,
+    backgroundColor: colors.surfaceSunken,
   },
   iconSuccess: {
     backgroundColor: colors.successSoft,
   },
   label: {
+    ...typography.body,
     flex: 1,
-    fontSize: getFontSize(14),
-    fontWeight: '500',
-    color: colors.text,
+    color: colors.ink,
   },
   status: {
-    fontSize: getFontSize(13),
-    fontWeight: '600',
-    color: colors.textTertiary,
+    ...typography.label,
+    color: colors.inkFaint,
   },
   statusSuccess: {
     color: colors.success,
@@ -47,6 +45,6 @@ export const styles = StyleSheet.create({
     color: colors.error,
   },
   statusUploading: {
-    color: colors.brand,
+    color: colors.primary,
   },
 });

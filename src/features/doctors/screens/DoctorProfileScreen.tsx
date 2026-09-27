@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Avatar } from '../../../components/Avatar/Avatar';
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
-import { colors } from '../../../theme';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { activeopacity } from '../../../utils/helpers';
 import { doctorService } from '../../../services/doctorService';
 import type { RootStackParamList } from '../../../navigation/types';
@@ -52,9 +52,9 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={4} />
+      </ScreenContainer>
     );
   }
 

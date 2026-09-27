@@ -1,40 +1,33 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
-import { getFontSize, getHeight } from '../../../utils/helpers';
+import { colors, spacing, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
-  backText: {
-    fontSize: getFontSize(20),
-    color: colors.textSecondary,
-  },
   title: {
-    fontSize: getFontSize(20),
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.h1,
+    color: colors.ink,
+    marginTop: spacing.xl,
   },
   subtitle: {
-    fontSize: getFontSize(13),
-    color: colors.textTertiary,
-  },
-  link: {
-    fontWeight: '700',
-    color: colors.brand,
+    ...typography.body,
+    color: colors.inkFaint,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xl,
   },
   resendRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: spacing.lg,
   },
   resendText: {
-    fontSize: getFontSize(12),
-    color: colors.textTertiary,
+    ...typography.caption,
+    color: colors.inkFaint,
   },
   resendLink: {
-    fontSize: getFontSize(12),
-    fontWeight: '700',
-    color: colors.brand,
+    ...typography.label,
+    color: colors.primary,
   },
   footer: {
     marginTop: 'auto',
-    gap: getHeight(8),
+    gap: spacing.sm,
   },
 });

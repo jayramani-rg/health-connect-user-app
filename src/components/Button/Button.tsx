@@ -1,31 +1,62 @@
 import React from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { colors } from '../../theme';
-import { activeopacity } from '../../utils/helpers';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { colors, motion } from '../../theme';
 import { styles } from './styles/Button.styles';
 import type { ButtonProps } from './types/Button.types';
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const VARIANT_STYLE = {
+  primary: styles.primary,
+  secondary: styles.secondary,
+  tertiary: styles.tertiary,
+  ghost: styles.ghost,
+  destructive: styles.destructive,
+};
+
+const VARIANT_LABEL_STYLE = {
+  primary: styles.labelPrimary,
+  secondary: styles.labelSecondary,
+  tertiary: styles.labelTertiary,
+  ghost: styles.labelGhost,
+  destructive: styles.labelDestructive,
+};
+
+const SPINNER_COLOR = {
+  primary: colors.white,
+  secondary: colors.primaryStrong,
+  tertiary: colors.ink,
+  ghost: colors.primary,
+  destructive: colors.error,
+};
+
 export function Button({ label, onPress, variant = 'primary', disabled, loading, icon, fullWidth = true, style, labelStyle }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const variantStyle = variant === 'primary' ? styles.primary : variant === 'secondary' ? styles.secondary : styles.ghost;
-  const variantLabelStyle = variant === 'primary' ? styles.labelPrimary : variant === 'secondary' ? styles.labelSecondary : styles.labelGhost;
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <TouchableOpacity
-      activeOpacity={activeopacity}
+    <AnimatedPressable
       onPress={onPress}
       disabled={isDisabled}
-      style={[styles.base, variantStyle, fullWidth && styles.fullWidth, isDisabled && styles.disabled, style]}
+      onPressIn={() => {
+        scale.value = withSpring(0.96, motion.spring.press);
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, motion.spring.press);
+      }}
+      style={[styles.base, VARIANT_STYLE[variant], fullWidth && styles.fullWidth, isDisabled && styles.disabled, animatedStyle, style]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? colors.white : colors.brand} />
+        <ActivityIndicator color={SPINNER_COLOR[variant]} />
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {icon}
-          <Text style={[variantLabelStyle, labelStyle]}>{label}</Text>
+          <Text style={[VARIANT_LABEL_STYLE[variant], labelStyle]}>{label}</Text>
         </View>
       )}
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 }
 

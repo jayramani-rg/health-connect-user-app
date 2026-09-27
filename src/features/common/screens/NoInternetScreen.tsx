@@ -1,28 +1,41 @@
-// features/common/screens/NoInternetScreen.tsx
-// Cross-cutting screen (Sec 3.1) — shown by the navigator when
-// networkSlice.isConnected === false (Sec 15.1). No business logic;
-// purely presentational.
-
-import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import NetInfo from '@react-native-community/netinfo';
+import { useNavigation } from '@react-navigation/native';
 
 import { styles } from '../styles/NoInternetScreen.styles';
+import { Icon } from '../../../components/Icon/Icon';
+import { colors } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
+import { useAppDispatch, setIsConnected } from '../../../store';
 
 const NoInternetScreen: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigation = useNavigation();
+  const [checking, setChecking] = useState(false);
+
+  async function handleRetry() {
+    if (checking) return;
+    setChecking(true);
+    const state = await NetInfo.fetch();
+    const connected = !!state.isConnected;
+    dispatch(setIsConnected(connected));
+    setChecking(false);
+    if (connected && navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <Text style={styles.title}>No Internet Connection</Text>
+      <View style={styles.iconCircle}>
+        <Icon name="cloud-offline-outline" size={32} color={colors.inkFaint} />
+      </View>
+      <Text style={styles.title}>No internet connection</Text>
       <Text style={styles.subtitle}>Please check your connection and try again.</Text>
-      <TouchableOpacity
-        style={styles.retryButton}
-        activeOpacity={activeopacity}
-        onPress={() => {
-          // Demo only — real implementation re-checks NetInfo state.
-        }}
-      >
-        <Text style={styles.retryText}>Retry</Text>
+      <TouchableOpacity style={styles.retryButton} activeOpacity={activeopacity} onPress={handleRetry} disabled={checking}>
+        {checking ? <ActivityIndicator color={colors.white} /> : <Text style={styles.retryText}>Retry</Text>}
       </TouchableOpacity>
     </SafeAreaView>
   );

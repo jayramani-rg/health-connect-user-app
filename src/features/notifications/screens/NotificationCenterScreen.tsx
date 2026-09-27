@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { Icon, type IoniconsIconName } from '../../../components/Icon/Icon';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
 import { notificationService } from '../../../services/notificationService';
@@ -87,7 +88,7 @@ const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
     } else if (item.entityType === 'ChatConversation') {
       navigation.navigate('ChatConversation', { conversationId: item.entityId });
     } else if (item.entityType === 'ChatInvitation') {
-      navigation.navigate('MainTabs', { screen: 'Chat' });
+      navigation.navigate('ChatList');
     }
   }
 
@@ -113,8 +114,8 @@ const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator color={colors.brand} />
+        <View style={{ padding: spacing.lg }}>
+          <SkeletonList count={5} />
         </View>
       ) : (
         <FlatList

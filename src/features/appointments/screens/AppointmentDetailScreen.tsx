@@ -1,13 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
+import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { StatusBadge } from '../../../components/StatusBadge/StatusBadge';
-import { colors } from '../../../theme';
 import { appointmentService } from '../../../services/appointmentService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { AppointmentDetail } from '../types/appointment.types';
@@ -26,6 +27,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [cancelSheetVisible, setCancelSheetVisible] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -44,13 +46,6 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
     }, [load]),
   );
 
-  function confirmCancel() {
-    Alert.alert('Cancel appointment', 'Are you sure you want to cancel this appointment?', [
-      { text: 'No', style: 'cancel' },
-      { text: 'Yes, cancel', style: 'destructive', onPress: () => runAction(() => appointmentService.cancel(appointmentId)) },
-    ]);
-  }
-
   async function runAction(action: () => Promise<{ data: AppointmentDetail }>) {
     setActionLoading(true);
     setActionError(null);
@@ -64,11 +59,16 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
     }
   }
 
+  function handleConfirmCancel() {
+    setCancelSheetVisible(false);
+    runAction(() => appointmentService.cancel(appointmentId));
+  }
+
   if (loading) {
     return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={3} />
+      </ScreenContainer>
     );
   }
 
@@ -191,9 +191,20 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
 
       {canCancel && !isRescheduleProposed && (
         <View style={styles.actions}>
-          <Button label="Cancel appointment" variant="secondary" disabled={actionLoading} onPress={confirmCancel} />
+          <Button label="Cancel appointment" variant="secondary" disabled={actionLoading} onPress={() => setCancelSheetVisible(true)} />
         </View>
       )}
+
+      <ConfirmSheet
+        visible={cancelSheetVisible}
+        title="Cancel appointment"
+        message="Are you sure you want to cancel this appointment?"
+        actions={[
+          { label: 'No', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
+          { label: 'Yes, cancel', variant: 'destructive', onPress: handleConfirmCancel },
+        ]}
+        onRequestClose={() => setCancelSheetVisible(false)}
+      />
     </ScreenContainer>
   );
 };

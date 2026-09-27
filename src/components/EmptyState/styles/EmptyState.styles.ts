@@ -5,17 +5,17 @@ export const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.xxl,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xxxl,
+    paddingHorizontal: spacing.xl,
   },
   title: {
     ...typography.title,
-    color: colors.text,
+    color: colors.ink,
     textAlign: 'center',
   },
   description: {
     ...typography.body,
-    color: colors.textSecondary,
+    color: colors.inkSoft,
     textAlign: 'center',
     marginTop: spacing.xs,
   },

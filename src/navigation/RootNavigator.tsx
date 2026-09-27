@@ -6,6 +6,7 @@ import NetInfo from '@react-native-community/netinfo';
 import type { RootStackParamList } from './types';
 import { useAppDispatch, useAppSelector, setIsConnected, setUnreadCount } from '../store';
 import { chatSocket } from '../services/chatSocket';
+import { colors, fontFamily } from '../theme';
 
 import WelcomeScreen from '../features/auth/screens/WelcomeScreen';
 import MobileNumberScreen from '../features/auth/screens/MobileNumberScreen';
@@ -28,11 +29,14 @@ import BookLabServiceScreen from '../features/labBookings/screens/BookLabService
 import LabBookingConfirmationScreen from '../features/labBookings/screens/LabBookingConfirmationScreen';
 import LabBookingDetailScreen from '../features/labBookings/screens/LabBookingDetailScreen';
 import ReportViewerScreen from '../features/labBookings/screens/ReportViewerScreen';
+import ChatListScreen from '../features/chat/screens/ChatListScreen';
 import ConversationScreen from '../features/chat/screens/ConversationScreen';
 import NotificationCenterScreen from '../features/notifications/screens/NotificationCenterScreen';
 import { notificationService } from '../services/notificationService';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import FamilyMembersScreen from '../features/profile/screens/FamilyMembersScreen';
+import SettingsScreen from '../features/profile/screens/SettingsScreen';
+import HelpSupportScreen from '../features/profile/screens/HelpSupportScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -62,7 +66,17 @@ const RootNavigator: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          headerStyle: { backgroundColor: colors.surface },
+          headerShadowVisible: false,
+          headerTintColor: colors.primary,
+          headerTitleStyle: { fontFamily: fontFamily.semiBold, fontSize: 17, color: colors.ink },
+          headerBackButtonDisplayMode: 'minimal',
+          contentStyle: { backgroundColor: colors.canvas },
+        }}
+      >
         {isAuthenticated ? (
           <Stack.Group>
             {/* ProfileBasics is always registered (the profile-completion gate can navigate to it from
@@ -84,10 +98,13 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="LabBookingConfirmation" component={LabBookingConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="LabBookingDetail" component={LabBookingDetailScreen} options={{ headerShown: true, title: 'Lab booking' }} />
             <Stack.Screen name="ReportViewer" component={ReportViewerScreen} options={{ headerShown: true, title: 'Report' }} />
+            <Stack.Screen name="ChatList" component={ChatListScreen} options={{ headerShown: true, title: 'Chats' }} />
             <Stack.Screen name="ChatConversation" component={ConversationScreen} options={{ headerShown: true, title: 'Chat' }} />
             <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} options={{ headerShown: true, title: 'Notifications' }} />
-            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Profile' }} />
+            <Stack.Screen name="EditProfile" component={ProfileScreen} options={{ headerShown: true, title: 'Edit profile' }} />
             <Stack.Screen name="FamilyMembers" component={FamilyMembersScreen} options={{ headerShown: true, title: 'Family members' }} />
+            <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: true, title: 'Settings' }} />
+            <Stack.Screen name="HelpSupport" component={HelpSupportScreen} options={{ headerShown: true, title: 'Help & support' }} />
           </Stack.Group>
         ) : (
           <Stack.Group>

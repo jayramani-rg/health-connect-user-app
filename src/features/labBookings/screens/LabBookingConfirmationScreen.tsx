@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ResultScreen } from '../../../components/ResultScreen/ResultScreen';
-import { colors } from '../../../theme';
+import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { labBookingService } from '../../../services/labBookingService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabBookingDetail } from '../types/labBooking.types';
@@ -14,27 +15,38 @@ const LabBookingConfirmationScreen: React.FC<Props> = ({ route, navigation }) =>
   const { bookingId } = route.params;
   const [booking, setBooking] = useState<LabBookingDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const response = await labBookingService.getById(bookingId);
-        if (active) setBooking(response.data);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
+  const load = useCallback(async () => {
+    setLoading(true);
+    setErrorText(null);
+    try {
+      const response = await labBookingService.getById(bookingId);
+      setBooking(response.data);
+    } catch (error) {
+      setErrorText(error instanceof Error ? error.message : 'Could not load your booking.');
+    } finally {
+      setLoading(false);
+    }
   }, [bookingId]);
 
-  if (loading || !booking) {
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.brand} />
-      </View>
+      <ScreenContainer>
+        <SkeletonList count={2} />
+      </ScreenContainer>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <ScreenContainer>
+        <EmptyState title="Something went wrong" description={errorText ?? 'Could not load your booking.'} actionLabel="Try again" onActionPress={load} />
+      </ScreenContainer>
     );
   }
 

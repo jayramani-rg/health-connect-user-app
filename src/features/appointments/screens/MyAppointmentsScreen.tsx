@@ -60,7 +60,7 @@ const MyAppointmentsScreen: React.FC = () => {
   }, [appointments, tab]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.header}>
         <ChipGroup options={TAB_OPTIONS} value={tab} onChange={(v) => setTab(v as AppointmentTab)} />
       </View>

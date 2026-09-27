@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius } from '../../../theme';
-import { getFontSize, getHeight } from '../../../utils/helpers';
+import { colors, radius, typography } from '../../../theme';
+import { getHeight } from '../../../utils/helpers';
 
 export const styles = StyleSheet.create({
   base: {
@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.md,
-    height: getHeight(48),
+    height: getHeight(52),
     paddingHorizontal: getHeight(20),
     gap: 8,
   },
@@ -16,30 +16,41 @@ export const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   primary: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.primary,
   },
   secondary: {
-    backgroundColor: colors.surface2,
+    backgroundColor: colors.primarySoft,
+  },
+  tertiary: {
+    backgroundColor: colors.surfaceSunken,
   },
   ghost: {
     backgroundColor: 'transparent',
+  },
+  destructive: {
+    backgroundColor: colors.errorSoft,
   },
   disabled: {
     opacity: 0.5,
   },
   labelPrimary: {
+    ...typography.bodyStrong,
     color: colors.white,
-    fontSize: getFontSize(15),
-    fontWeight: '600',
   },
   labelSecondary: {
-    color: colors.text,
-    fontSize: getFontSize(15),
-    fontWeight: '600',
+    ...typography.bodyStrong,
+    color: colors.primaryStrong,
+  },
+  labelTertiary: {
+    ...typography.bodyStrong,
+    color: colors.ink,
   },
   labelGhost: {
-    color: colors.brand,
-    fontSize: getFontSize(15),
-    fontWeight: '600',
+    ...typography.bodyStrong,
+    color: colors.primary,
+  },
+  labelDestructive: {
+    ...typography.bodyStrong,
+    color: colors.error,
   },
 });

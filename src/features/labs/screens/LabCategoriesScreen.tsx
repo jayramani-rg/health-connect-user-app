@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { CategoryGrid } from '../../../components/CategoryGrid/CategoryGrid';
+import { Card } from '../../../components/Card/Card';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { Icon } from '../../../components/Icon/Icon';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, spacing, typography } from '../../../theme';
-import { activeopacity } from '../../../utils/helpers';
 import { labTestCategoryService, type ApprovedLabTestCategory } from '../../../services/labTestCategoryService';
 import type { RootStackParamList } from '../../../navigation/types';
 
@@ -37,32 +39,19 @@ const LabCategoriesScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <ScreenContainer>
       <Text style={typography.h2}>What are you testing for?</Text>
-      <Text style={{ ...typography.body, color: colors.textSecondary, marginTop: spacing.xs, marginBottom: spacing.lg }}>
+      <Text style={{ ...typography.body, color: colors.inkSoft, marginTop: spacing.xs, marginBottom: spacing.md }}>
         Pick a category to see every lab that offers it, or browse the full list.
       </Text>
 
-      <TouchableOpacity
-        activeOpacity={activeopacity}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: colors.brandSoft,
-          borderRadius: 12,
-          paddingVertical: spacing.md,
-          paddingHorizontal: spacing.lg,
-          marginBottom: spacing.xl,
-        }}
-        onPress={() => navigation.navigate('LabList')}
-      >
-        <Text style={{ ...typography.bodyStrong, color: colors.brand }}>Browse all labs</Text>
-        <Text style={{ ...typography.bodyStrong, color: colors.brand }}>{'→'}</Text>
-      </TouchableOpacity>
+      <Card variant="outline" elevation="none" onPress={() => navigation.navigate('LabList')} style={{ marginBottom: spacing.xl }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ ...typography.bodyStrong, color: colors.primary }}>Browse all labs</Text>
+          <Icon name="arrow-forward" size={18} color={colors.primary} />
+        </View>
+      </Card>
 
       {loading ? (
-        <View style={{ paddingVertical: spacing.xxl, alignItems: 'center' }}>
-          <ActivityIndicator color={colors.brand} />
-        </View>
+        <SkeletonList count={3} />
       ) : categories.length === 0 ? (
         <EmptyState
           title={errorText ? 'Something went wrong' : 'No categories yet'}

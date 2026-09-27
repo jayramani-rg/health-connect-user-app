@@ -1,19 +1,19 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
-import { getFontSize, getWidth } from '../../../utils/helpers';
+import { colors, spacing, typography } from '../../../theme';
+import { getWidth } from '../../../utils/helpers';
 
 export const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
-    paddingHorizontal: getWidth(24),
+    gap: spacing.lg,
+    paddingHorizontal: spacing.xxl,
   },
   iconCircle: {
-    width: getWidth(64),
-    height: getWidth(64),
-    borderRadius: getWidth(32),
+    width: getWidth(72),
+    height: getWidth(72),
+    borderRadius: getWidth(36),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.errorSoft,
   },
   iconText: {
-    fontSize: getFontSize(28),
+    fontSize: getWidth(30),
   },
   iconTextSuccess: {
     color: colors.success,
@@ -39,19 +39,18 @@ export const styles = StyleSheet.create({
     color: colors.error,
   },
   title: {
-    fontSize: getFontSize(20),
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.h2,
+    color: colors.ink,
     textAlign: 'center',
   },
   description: {
-    fontSize: getFontSize(14),
-    color: colors.textSecondary,
+    ...typography.body,
+    color: colors.inkSoft,
     textAlign: 'center',
   },
   actions: {
     width: '100%',
-    gap: 8,
-    marginTop: 8,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { Button } from '../../../components/Button/Button';
 import { PasswordField, isPasswordValid } from '../../../components/PasswordField/PasswordField';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -76,12 +77,14 @@ export default function CreatePasswordScreen({ navigation, route }: Props) {
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>{mode === 'register' ? 'Create a password' : 'Set a new password'}</Text>
-      <Text style={styles.subtitle}>
-        {mode === 'register'
-          ? "You'll use your mobile number and this password to sign in."
-          : 'Choose a new password for your account.'}
-      </Text>
+      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+        <Text style={styles.title}>{mode === 'register' ? 'Create a password' : 'Set a new password'}</Text>
+        <Text style={styles.subtitle}>
+          {mode === 'register'
+            ? "You'll use your mobile number and this password to sign in."
+            : 'Choose a new password for your account.'}
+        </Text>
+      </Animated.View>
       <PasswordField label="Password" value={password} onChangeText={setPassword} placeholder="••••••••" showChecklist />
       {error ? <Banner variant="error" message={error} /> : null}
       <View style={styles.footer}>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -8,6 +8,7 @@ import { Button } from '../../../components/Button/Button';
 import { ChatListItem } from '../../../components/ChatListItem/ChatListItem';
 import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
@@ -15,6 +16,10 @@ import type { RootStackParamList } from '../../../navigation/types';
 import type { ChatConversationListItem, ChatInvitation } from '../types/chat.types';
 
 type ChatTab = 'chats' | 'pending';
+
+function ItemSeparator() {
+  return <View style={styles.separator} />;
+}
 
 const TAB_OPTIONS: { label: string; value: ChatTab }[] = [
   { label: 'Chats', value: 'chats' },
@@ -79,7 +84,7 @@ const ChatListScreen: React.FC = () => {
 
       {loading ? (
         <View style={styles.loadingWrapper}>
-          <ActivityIndicator color={colors.brand} />
+          <SkeletonList count={5} />
         </View>
       ) : tab === 'chats' ? (
         <FlatList
@@ -89,7 +94,7 @@ const ChatListScreen: React.FC = () => {
           renderItem={({ item }) => (
             <ChatListItem conversation={item} onPress={() => navigation.navigate('ChatConversation', { conversationId: item.id })} />
           )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ItemSeparatorComponent={ItemSeparator}
           contentContainerStyle={conversations.length === 0 ? styles.emptyContent : undefined}
           ListEmptyComponent={
             <EmptyState title="No chats yet" description="Accepted chat invitations with your doctors and labs will show up here." />
@@ -139,9 +144,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   loadingWrapper: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: spacing.lg,
   },
   separator: {
     height: 1,

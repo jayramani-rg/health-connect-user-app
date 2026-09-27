@@ -1,44 +1,46 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
-import { getFontSize, getHeight, getWidth } from '../../../utils/helpers';
+import { colors, radius, spacing, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brand,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'space-between',
-    paddingHorizontal: getWidth(24),
-    paddingTop: getHeight(64),
-    paddingBottom: getHeight(32),
+    backgroundColor: colors.primary,
   },
   hero: {
-    gap: getHeight(14),
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xxl,
+    gap: spacing.md,
   },
   wordmark: {
-    fontSize: getFontSize(28),
-    fontWeight: '700',
-    color: colors.white,
+    ...typography.overline,
+    color: 'rgba(255,255,255,0.8)',
+    letterSpacing: 3,
   },
   headline: {
-    fontSize: getFontSize(22),
-    fontWeight: '700',
+    ...typography.display,
+    fontSize: 32,
+    lineHeight: 38,
     color: colors.white,
-    lineHeight: getFontSize(28),
+    marginTop: spacing.sm,
   },
   subhead: {
-    fontSize: getFontSize(14),
-    color: 'rgba(255,255,255,0.85)',
-    lineHeight: getFontSize(20),
+    ...typography.body,
+    color: 'rgba(255,255,255,0.82)',
+    marginTop: spacing.xs,
   },
-  actions: {
-    gap: getHeight(10),
+  sheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingHorizontal: spacing.xxl,
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.xxl,
+    gap: spacing.md,
   },
   legal: {
+    ...typography.caption,
     textAlign: 'center',
-    fontSize: getFontSize(11),
-    color: 'rgba(255,255,255,0.75)',
+    color: colors.inkFaint,
   },
 });

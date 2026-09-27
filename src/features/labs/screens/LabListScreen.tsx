@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
-import { TextField } from '../../../components/TextField/TextField';
+import { SearchBar } from '../../../components/SearchBar/SearchBar';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, spacing } from '../../../theme';
 import { labService } from '../../../services/labService';
 import type { RootStackParamList } from '../../../navigation/types';
@@ -83,27 +84,25 @@ const LabListScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <ScreenContainer scroll={false} style={{ padding: 0 }}>
-      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <TextField
-          label="Search"
+      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm }}>
+        <SearchBar
           value={search}
           onChangeText={setSearch}
           placeholder={category ? `Search within ${category}` : 'Lab name or city'}
           onSubmitEditing={() => load()}
-          returnKeyType="search"
         />
       </View>
 
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator color={colors.brand} />
+        <View style={{ paddingHorizontal: spacing.lg }}>
+          <SkeletonList count={5} />
         </View>
       ) : (
         <FlatList
           data={labs}
           keyExtractor={(item) => item.laboratoryId}
           contentContainerStyle={{ padding: spacing.lg }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
           renderItem={({ item }) => (
             <LabCard lab={item} onPress={() => navigation.navigate('LabProfile', { laboratoryId: item.laboratoryId })} />
           )}

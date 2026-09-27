@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
-import { TextField } from '../../../components/TextField/TextField';
+import { SearchBar } from '../../../components/SearchBar/SearchBar';
+import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { doctorService } from '../../../services/doctorService';
 import type { RootStackParamList } from '../../../navigation/types';
@@ -75,41 +76,37 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              backgroundColor: colors.brandSoft,
+              backgroundColor: colors.primarySoft,
               borderRadius: radius.md,
               paddingVertical: spacing.sm,
               paddingHorizontal: spacing.md,
               marginBottom: spacing.sm,
             }}
           >
-            <Text style={{ ...typography.bodyStrong, color: colors.brand }} numberOfLines={1}>
+            <Text style={{ ...typography.bodyStrong, color: colors.primary }} numberOfLines={1}>
               {specialization}
             </Text>
             <TouchableOpacity onPress={() => setSpecialization('')}>
-              <Text style={{ ...typography.bodyStrong, color: colors.brand }}>Clear</Text>
+              <Text style={{ ...typography.bodyStrong, color: colors.primary }}>Clear</Text>
             </TouchableOpacity>
           </View>
         ) : null}
-        <TextField
-          label="Search"
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Doctor name or specialization"
-          onSubmitEditing={() => load()}
-        />
-        <ChipGroup options={MODE_OPTIONS} value={consultationType} onChange={(v) => setConsultationType(v as ConsultationType | '')} />
+        <SearchBar value={search} onChangeText={setSearch} placeholder="Doctor name or specialization" onSubmitEditing={() => load()} />
+        <View style={{ marginTop: spacing.sm }}>
+          <ChipGroup options={MODE_OPTIONS} value={consultationType} onChange={(v) => setConsultationType(v as ConsultationType | '')} />
+        </View>
       </View>
 
       {loading ? (
-        <View style={styles.loadingWrapper}>
-          <ActivityIndicator color={colors.brand} />
+        <View style={{ paddingHorizontal: spacing.lg }}>
+          <SkeletonList count={5} />
         </View>
       ) : (
         <FlatList
           data={doctors}
           keyExtractor={(item) => item.doctorProfileId}
           contentContainerStyle={styles.listContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
           renderItem={({ item }) => (
             <DoctorCard doctor={item} onPress={() => navigation.navigate('DoctorProfile', { doctorProfileId: item.doctorProfileId })} />
           )}

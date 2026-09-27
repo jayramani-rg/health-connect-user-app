@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   statusAvailable: {
     color: colors.success,
-    fontWeight: '600',
+    fontFamily: typography.bodyStrong.fontFamily,
   },
   statusUnavailable: {
     color: colors.textTertiary,

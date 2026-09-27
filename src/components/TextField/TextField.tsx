@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
+import { colors } from '../../theme';
 import { styles } from './styles/TextField.styles';
 import type { TextFieldProps } from './types/TextField.types';
 
@@ -45,7 +46,7 @@ export function TextField({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#9AA1AC"
+          placeholderTextColor={colors.inkFaint}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           maxLength={maxLength}
