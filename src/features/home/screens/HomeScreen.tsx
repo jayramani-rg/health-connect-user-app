@@ -11,6 +11,7 @@ import { ChatListItem } from '../../../components/ChatListItem/ChatListItem';
 import { Icon } from '../../../components/Icon/Icon';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
+import { StatCard } from '../../../components/StatCard/StatCard';
 import { StatusBadge } from '../../../components/StatusBadge/StatusBadge';
 import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
 import { colors } from '../../../theme';
@@ -38,9 +39,12 @@ const HomeScreen: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [categories, setCategories] = useState<ApprovedSpecializationCategory[]>([]);
   const [upcoming, setUpcoming] = useState<AppointmentListItem | null>(null);
+  const [upcomingCount, setUpcomingCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [chats, setChats] = useState<ChatConversationListItem[]>([]);
+  const [chatsTotal, setChatsTotal] = useState(0);
   const [reports, setReports] = useState<LabBookingListItem[]>([]);
+  const [reportsTotal, setReportsTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,9 +67,12 @@ const HomeScreen: React.FC = () => {
         labBookingService.list({ status: 'REPORT_READY', pageSize: 3 }),
       ]);
       setUpcoming(confirmedRes.data.items[0] ?? null);
+      setUpcomingCount(confirmedRes.data.totalCount);
       setPendingCount(pendingRes.data.totalCount);
       setChats(chatsRes.data.slice(0, 2));
+      setChatsTotal(chatsRes.data.length);
       setReports(reportsRes.data.items);
+      setReportsTotal(reportsRes.data.totalCount);
     } catch {
     } finally {
       setLoading(false);
@@ -122,6 +129,13 @@ const HomeScreen: React.FC = () => {
           <SkeletonList count={3} />
         ) : (
           <>
+            <View style={styles.statsRow}>
+              <StatCard index={0} icon="calendar-outline" tint={colors.brand} tintSoft={colors.brandSoft} value={upcomingCount} label="Upcoming appointments" />
+              <StatCard index={1} icon="hourglass-outline" tint={colors.pending} tintSoft={colors.pendingSoft} value={pendingCount} label="Pending requests" />
+              <StatCard index={2} icon="document-text-outline" tint={colors.success} tintSoft={colors.successSoft} value={reportsTotal} label="Reports ready" />
+              <StatCard index={3} icon="chatbubble-ellipses-outline" tint={colors.accent} tintSoft={colors.accentSoft} value={chatsTotal} label="Active chats" />
+            </View>
+
             {categories.length > 0 && (
               <View style={styles.categoryStrip}>
                 <View style={styles.sectionHeaderRow}>

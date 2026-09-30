@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { colors, radius, shadow, spacing, typography } from '../../../theme';
+import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
 
 export const styles = StyleSheet.create({
   container: {
@@ -67,6 +68,12 @@ export const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textTertiary,
     marginLeft: spacing.sm,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
   actionRow: {
     flexDirection: 'row',
@@ -172,9 +179,11 @@ export const styles = StyleSheet.create({
   },
   offlineBanner: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: TAB_BAR_CLEARANCE,
+    left: spacing.lg,
+    right: spacing.lg,
+    borderRadius: radius.md,
+    overflow: 'hidden',
     backgroundColor: colors.error,
     color: colors.white,
     textAlign: 'center',

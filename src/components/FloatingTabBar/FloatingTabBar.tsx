@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Pressable, Text, View } from 'react-native';
+import { Dimensions, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -50,9 +50,15 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         }
 
         return (
-          <Pressable key={route.key} onPress={onPress} style={styles.item} accessibilityRole="button" accessibilityState={focused ? { selected: true } : {}}>
+          <Pressable
+            key={route.key}
+            onPress={onPress}
+            style={styles.item}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            accessibilityState={focused ? { selected: true } : {}}
+          >
             <Icon name={focused ? icons.active : icons.inactive} size={22} color={focused ? colors.primaryStrong : colors.inkFaint} />
-            {focused && <Text style={styles.label}>{label}</Text>}
           </Pressable>
         );
       })}

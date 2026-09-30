@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, shadow, spacing, typography } from '../../../theme';
+import { colors, shadow, spacing } from '../../../theme';
 
 export const BAR_HEIGHT = 64;
 export const BAR_SIDE_INSET = spacing.lg;
@@ -33,12 +33,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
     height: '100%',
-    gap: 6,
-  },
-  label: {
-    ...typography.label,
-    color: colors.primaryStrong,
   },
 });
