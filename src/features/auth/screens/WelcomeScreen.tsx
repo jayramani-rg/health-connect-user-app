@@ -3,8 +3,10 @@ import { StatusBar, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { CarovaWordmark } from '../../../components/BrandLogo/BrandLogo';
 import { Button } from '../../../components/Button/Button';
 import type { RootStackParamList } from '../../../navigation/types';
+import { colors } from '../../../theme';
 import { styles } from '../styles/WelcomeScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
@@ -14,7 +16,7 @@ export default function WelcomeScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <Animated.View entering={FadeInUp.duration(400)} style={styles.hero}>
-        <Text style={styles.wordmark}>CAROVA</Text>
+        <CarovaWordmark width={132} color={colors.white} />
         <Text style={styles.headline}>Healthcare you can trust, booked in a minute.</Text>
         <Text style={styles.subhead}>Verified doctors and accredited labs. Appointments, reports and prescriptions in one place.</Text>
       </Animated.View>

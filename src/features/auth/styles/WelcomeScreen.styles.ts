@@ -12,11 +12,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxl,
     gap: spacing.md,
   },
-  wordmark: {
-    ...typography.overline,
-    color: 'rgba(255,255,255,0.8)',
-    letterSpacing: 3,
-  },
   headline: {
     ...typography.display,
     fontSize: 32,

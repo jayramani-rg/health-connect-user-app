@@ -27,7 +27,7 @@ export function outcomeMessage(outcome: DeviceLocationOutcome): string | null {
     case 'denied':
       return 'Location permission was not granted. You can still browse all doctors and labs.';
     case 'blocked':
-      return 'Location is turned off for HealthConnect. You can enable it in your phone settings, or pick a saved address instead.';
+      return 'Location is turned off for Carova. You can enable it in your phone settings, or pick a saved address instead.';
     case 'services_off':
       return "Your phone's location services seem to be off. Turn them on, or pick a saved address instead.";
     case 'timeout':
