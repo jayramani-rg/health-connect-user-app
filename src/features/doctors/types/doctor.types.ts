@@ -15,7 +15,14 @@ export interface DoctorListItem {
   videoEnabled: boolean;
   voiceEnabled: boolean;
   isAcceptingAppointments: boolean;
+  /** Area-level clinic location for display ("Prahlad Nagar", "Ahmedabad"). */
+  clinicLocality: string | null;
+  clinicCity: string | null;
+  /** Relative to the nearLocality/nearCity sent with the request; null when none was sent. */
+  localityMatch: LocalityMatch | null;
 }
+
+export type LocalityMatch = 'SAME_LOCALITY' | 'SAME_CITY' | 'OTHER';
 
 export interface Qualification {
   degree: string;
@@ -57,6 +64,9 @@ export interface DoctorAvailabilitySummary {
 
 export interface DoctorDetail extends DoctorListItem {
   bio: string | null;
+  clinicName: string | null;
+  clinicAddress: string | null;
+  clinicPincode: string | null;
   qualifications: Qualification[];
   availability: DoctorAvailabilitySummary | null;
 }
@@ -65,6 +75,9 @@ export interface DoctorListQuery {
   specialization?: string;
   search?: string;
   consultationType?: ConsultationType;
+  /** Ordering only — same locality first, then same city, then everyone else. */
+  nearLocality?: string;
+  nearCity?: string;
   page?: number;
   pageSize?: number;
 }

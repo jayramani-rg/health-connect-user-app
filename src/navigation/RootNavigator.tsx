@@ -37,6 +37,9 @@ import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import FamilyMembersScreen from '../features/profile/screens/FamilyMembersScreen';
 import SettingsScreen from '../features/profile/screens/SettingsScreen';
 import HelpSupportScreen from '../features/profile/screens/HelpSupportScreen';
+import SelectLocationScreen from '../features/location/screens/SelectLocationScreen';
+import SavedAddressesScreen from '../features/addresses/screens/SavedAddressesScreen';
+import AddressEditorScreen from '../features/addresses/screens/AddressEditorScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -105,6 +108,9 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="FamilyMembers" component={FamilyMembersScreen} options={{ headerShown: true, title: 'Family members' }} />
             <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: true, title: 'Settings' }} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} options={{ headerShown: true, title: 'Help & support' }} />
+            <Stack.Screen name="SelectLocation" component={SelectLocationScreen} options={{ headerShown: true, title: 'Your location', presentation: 'modal' }} />
+            <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} options={{ headerShown: true, title: 'Saved addresses' }} />
+            <Stack.Screen name="AddressEditor" component={AddressEditorScreen} options={{ headerShown: true, title: 'Address' }} />
           </Stack.Group>
         ) : (
           <Stack.Group>

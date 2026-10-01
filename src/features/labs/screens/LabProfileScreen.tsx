@@ -96,7 +96,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={{ flex: 1 }}>
           <Text style={styles.name}>{lab.name}</Text>
           <Text style={styles.address}>
-            {lab.address}, {lab.city}, {lab.state} {lab.pincode}
+            {[lab.address, lab.locality, lab.city, lab.state].filter(Boolean).join(', ')} {lab.pincode}
           </Text>
           {lab.operatingHours && <Text style={styles.operatingHours}>Open {lab.operatingHours}</Text>}
         </View>

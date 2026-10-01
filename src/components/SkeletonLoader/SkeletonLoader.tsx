@@ -1,22 +1,41 @@
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { colors, radius, spacing } from '../../theme';
 import type { SkeletonBlockProps } from './types/SkeletonLoader.types';
 
+const SHIMMER_COLORS = ['rgba(255,255,255,0)', 'rgba(255,255,255,0.65)', 'rgba(255,255,255,0)'];
+
+/** A placeholder bar with a soft light sweep. Same props as before, so every existing skeleton upgrades in place. */
 export function SkeletonBlock({ width, height, radius: cornerRadius = radius.sm, style }: SkeletonBlockProps) {
-  const opacity = useSharedValue(0.5);
+  const [measuredWidth, setMeasuredWidth] = useState(0);
+  const progress = useSharedValue(0);
 
   useEffect(() => {
-    opacity.value = withRepeat(withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }), -1, true);
-  }, [opacity]);
+    progress.value = withRepeat(withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.ease) }), -1, false);
+  }, [progress]);
 
-  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const sweepStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: -measuredWidth + progress.value * measuredWidth * 2 }],
+  }));
+
+  function handleLayout(event: LayoutChangeEvent) {
+    const next = Math.round(event.nativeEvent.layout.width);
+    if (next !== measuredWidth) setMeasuredWidth(next);
+  }
 
   return (
-    <Animated.View
-      style={[{ width, height, borderRadius: cornerRadius, backgroundColor: colors.surfaceSunken }, animatedStyle, style]}
-    />
+    <View
+      onLayout={handleLayout}
+      style={[{ width, height, borderRadius: cornerRadius, backgroundColor: colors.surfaceSunken, overflow: 'hidden' }, style]}
+    >
+      {measuredWidth > 0 && (
+        <Animated.View style={[StyleSheet.absoluteFill, { width: measuredWidth }, sweepStyle]}>
+          <LinearGradient colors={SHIMMER_COLORS} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={{ flex: 1 }} />
+        </Animated.View>
+      )}
+    </View>
   );
 }
 

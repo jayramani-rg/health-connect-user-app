@@ -6,6 +6,7 @@ import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import authReducer, { authDataName, logout, setTokens } from './slices/authSlice';
 import networkReducer, { networkDataName } from './slices/networkSlice';
 import notificationsReducer, { notificationsDataName, incrementUnread } from './slices/notificationsSlice';
+import locationReducer, { locationDataName } from './slices/locationSlice';
 import { API } from '../api';
 import { chatSocket } from '../services/chatSocket';
 
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   [authDataName]: authReducer,
   [networkDataName]: networkReducer,
   [notificationsDataName]: notificationsReducer,
+  [locationDataName]: locationReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -20,7 +22,8 @@ export type RootState = ReturnType<typeof rootReducer>;
 const persistConfig: PersistConfig<RootState> = {
   key: 'app_root',
   storage: AsyncStorage,
-  whitelist: [authDataName],
+  // locationData persists area-level locality + "already asked" only — no coordinates are ever in the store.
+  whitelist: [authDataName, locationDataName],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -61,3 +64,4 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export { setAuthSession, setTokens, updateUserProfile, completeOnboarding, logout } from './slices/authSlice';
 export { setIsConnected } from './slices/networkSlice';
 export { setUnreadCount } from './slices/notificationsSlice';
+export { setLocality, clearLocality, setLocationPermission, markLocationPrompted, resetLocation } from './slices/locationSlice';

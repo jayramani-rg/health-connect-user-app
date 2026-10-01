@@ -86,6 +86,9 @@ export const styles = StyleSheet.create({
   summaryValue: {
     ...typography.bodyStrong,
     color: colors.text,
+    flexShrink: 1,
+    textAlign: 'right',
+    marginLeft: spacing.md,
   },
   footer: {
     padding: spacing.lg,
@@ -100,5 +103,63 @@ export const styles = StyleSheet.create({
   },
   addNewRow: {
     paddingVertical: spacing.sm,
+  },
+  optionCardMuted: {
+    opacity: 0.75,
+  },
+  addressTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  defaultPill: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.primary,
+    backgroundColor: colors.primarySoft,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 1,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+  },
+  eligibilityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  eligibilityChecking: {
+    ...typography.caption,
+    color: colors.inkFaint,
+  },
+  eligibilityOk: {
+    ...typography.label,
+    color: colors.success,
+  },
+  eligibilityNo: {
+    ...typography.label,
+    color: colors.error,
+  },
+  eligibilityWarn: {
+    ...typography.label,
+    color: colors.warning,
+  },
+  noAddressCard: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+  },
+  noAddressIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
   },
 });

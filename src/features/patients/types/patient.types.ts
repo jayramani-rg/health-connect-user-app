@@ -23,7 +23,14 @@ export interface PatientAddress {
   city: string;
   state: string;
   pincode: string;
+  /** Google-resolved fields — null only on addresses saved before geocoding existed. */
+  googleAddress: string | null;
+  locality: string | null;
+  latitude: number | null;
+  longitude: number | null;
   isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SavePatientAddressRequest {
@@ -33,6 +40,10 @@ export interface SavePatientAddressRequest {
   city: string;
   state: string;
   pincode: string;
+  googleAddress?: string;
+  locality?: string | null;
+  latitude?: number;
+  longitude?: number;
   isDefault: boolean;
 }
 

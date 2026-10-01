@@ -54,4 +54,45 @@ export const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.error,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  nameFlex: {
+    flexShrink: 1,
+  },
+  nearBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.pill,
+  },
+  nearBadgeCity: {
+    backgroundColor: colors.primarySoft,
+  },
+  nearBadgeText: {
+    ...typography.label,
+    fontSize: 10,
+    lineHeight: 13,
+    color: colors.white,
+  },
+  nearBadgeTextCity: {
+    color: colors.primary,
+  },
+  areaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    flexShrink: 1,
+    marginLeft: spacing.sm,
+  },
+  areaText: {
+    ...typography.caption,
+    color: colors.inkSoft,
+    flexShrink: 1,
+  },
 });

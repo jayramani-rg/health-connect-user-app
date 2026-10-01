@@ -1,16 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
-import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { doctorService } from '../../../services/doctorService';
+import { usePaginatedList } from '../../../hooks/usePaginatedList';
 import type { RootStackParamList } from '../../../navigation/types';
+import { LocalityStrip } from '../../location/components/LocalityStrip';
+import { useUserLocality } from '../../location/hooks/useUserLocality';
 import { DoctorCard } from '../components/DoctorCard/DoctorCard';
+import { DoctorCardSkeleton, DoctorListSkeleton } from '../components/DoctorCard/DoctorCardSkeleton';
 import type { ConsultationType, DoctorListItem } from '../types/doctor.types';
 import { styles } from '../styles/DoctorListScreen.styles';
 
@@ -23,17 +27,17 @@ const MODE_OPTIONS = [
   { label: 'Voice', value: 'VOICE' },
 ];
 
+const PAGE_SIZE = 20;
+
 const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
   // A specialization arriving via navigation (from the category browse screen) is a precise server-side
   // filter, kept separate from the free-text search box — pre-filling that box with a long category name
   // would look like the user typed it, and typing over it would silently drop the filter.
   const [specialization, setSpecialization] = useState(route.params?.specialization ?? '');
-  const [search, setSearch] = useState(route.params?.search ?? '');
+  const [searchText, setSearchText] = useState(route.params?.search ?? '');
+  const [appliedSearch, setAppliedSearch] = useState(route.params?.search ?? '');
   const [consultationType, setConsultationType] = useState<ConsultationType | ''>(route.params?.consultationType ?? '');
-  const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [errorText, setErrorText] = useState<string | null>(null);
+  const { label: localityLabel, nearParams } = useUserLocality();
 
   useEffect(() => {
     if (specialization) {
@@ -41,31 +45,28 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [specialization, navigation]);
 
-  const load = useCallback(
-    async (isRefresh = false) => {
-      isRefresh ? setRefreshing(true) : setLoading(true);
-      setErrorText(null);
-      try {
-        const response = await doctorService.list({
-          specialization: specialization || undefined,
-          search: search || undefined,
-          consultationType: consultationType || undefined,
-          pageSize: 30,
-        });
-        setDoctors(response.data.items);
-      } catch (error) {
-        setErrorText(error instanceof Error ? error.message : 'Could not load doctors.');
-      } finally {
-        isRefresh ? setRefreshing(false) : setLoading(false);
-      }
+  // Locality only changes ORDER (server-side, before paging) — every doctor still appears.
+  const fetchPage = useCallback(
+    async (page: number) => {
+      const response = await doctorService.list({
+        specialization: specialization || undefined,
+        search: appliedSearch || undefined,
+        consultationType: consultationType || undefined,
+        ...nearParams,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      return response.data;
     },
-    [search, specialization, consultationType],
+    [specialization, appliedSearch, consultationType, nearParams],
   );
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [consultationType, specialization]);
+  const resetKey = [specialization, appliedSearch, consultationType, nearParams.nearLocality, nearParams.nearCity].join('|');
+  const list = usePaginatedList<DoctorListItem>(fetchPage, resetKey);
+
+  const header = (
+    <LocalityStrip label={localityLabel} noun="doctors" onPress={() => navigation.navigate('SelectLocation')} />
+  );
 
   return (
     <ScreenContainer scroll={false} style={{ padding: 0 }}>
@@ -91,30 +92,55 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         ) : null}
-        <SearchBar value={search} onChangeText={setSearch} placeholder="Doctor name or specialization" onSubmitEditing={() => load()} />
+        <SearchBar
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Doctor name or specialization"
+          onSubmitEditing={() => setAppliedSearch(searchText.trim())}
+        />
         <View style={{ marginTop: spacing.sm }}>
           <ChipGroup options={MODE_OPTIONS} value={consultationType} onChange={(v) => setConsultationType(v as ConsultationType | '')} />
         </View>
       </View>
 
-      {loading ? (
-        <View style={{ paddingHorizontal: spacing.lg }}>
-          <SkeletonList count={5} />
+      {list.loading ? (
+        <View style={styles.listContent}>
+          {header}
+          <DoctorListSkeleton count={6} />
         </View>
       ) : (
         <FlatList
-          data={doctors}
+          data={list.items}
           keyExtractor={(item) => item.doctorProfileId}
           contentContainerStyle={styles.listContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
+          refreshControl={<RefreshControl refreshing={list.refreshing} onRefresh={list.refresh} tintColor={colors.primary} />}
+          ListHeaderComponent={header}
           renderItem={({ item }) => (
-            <DoctorCard doctor={item} onPress={() => navigation.navigate('DoctorProfile', { doctorProfileId: item.doctorProfileId })} />
+            <Animated.View entering={FadeIn.duration(220)}>
+              <DoctorCard doctor={item} onPress={() => navigation.navigate('DoctorProfile', { doctorProfileId: item.doctorProfileId })} />
+            </Animated.View>
           )}
+          onEndReached={list.loadMore}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={
+            list.loadingMore ? (
+              <View>
+                <DoctorCardSkeleton />
+                <DoctorCardSkeleton />
+              </View>
+            ) : list.error && list.items.length > 0 ? (
+              <EmptyState title="Couldn't load more doctors" description={list.error} actionLabel="Try again" onActionPress={list.retry} />
+            ) : undefined
+          }
           ListEmptyComponent={
-            <EmptyState
-              title={errorText ? 'Something went wrong' : 'No doctors found'}
-              description={errorText ?? (specialization ? `No doctors currently offer ${specialization}.` : 'Try a different search or filter.')}
-            />
+            list.error ? (
+              <EmptyState title="Something went wrong" description={list.error} actionLabel="Try again" onActionPress={list.retry} />
+            ) : (
+              <EmptyState
+                title="No doctors found"
+                description={specialization ? `No doctors currently offer ${specialization}.` : 'Try a different search or filter.'}
+              />
+            )
           }
         />
       )}

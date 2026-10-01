@@ -28,6 +28,9 @@ import type { AppointmentListItem } from '../../appointments/types/appointment.t
 import type { ChatConversationListItem } from '../../chat/types/chat.types';
 import type { LabBookingListItem } from '../../labBookings/types/labBooking.types';
 import { ASSETS_BASE_URL } from '../../../config/env';
+import { LocalityChip } from '../../location/components/LocalityChip';
+import { LocationPromptCard } from '../../location/components/LocationPromptCard';
+import { useUserLocality } from '../../location/hooks/useUserLocality';
 import { styles } from '../styles/HomeScreen.styles';
 
 const HomeScreen: React.FC = () => {
@@ -46,6 +49,15 @@ const HomeScreen: React.FC = () => {
   const [reports, setReports] = useState<LabBookingListItem[]>([]);
   const [reportsTotal, setReportsTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const locality = useUserLocality();
+  const { refreshQuietly } = locality;
+
+  // Location is optional: this never prompts and never blocks — it only refreshes a stale locality when
+  // permission was already granted, or falls back to the default saved address.
+  useEffect(() => {
+    refreshQuietly();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     profileService
@@ -116,6 +128,12 @@ const HomeScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
+
+        <LocalityChip label={locality.label} onPress={() => navigation.navigate('SelectLocation')} />
+
+        {locality.shouldShowPrompt && (
+          <LocationPromptCard loading={locality.detecting} onEnable={() => locality.enableAndDetect()} onDismiss={locality.dismissPrompt} />
+        )}
 
         <View style={{ marginBottom: 24 }}>
           <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors by name or specialization" onPress={() => navigation.navigate('DoctorList', {})} />

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { API_BASE_URL as CONFIGURED_API_BASE_URL } from '@env';
+import { API_BASE_URL as CONFIGURED_API_BASE_URL, GOOGLE_API_KEY as CONFIGURED_GOOGLE_API_KEY } from '@env';
 
 function resolveApiBaseUrl(): string {
   if (CONFIGURED_API_BASE_URL.includes('localhost')) {
@@ -21,3 +21,7 @@ export const SIGNALR_HUB_URL = `${API_BASE_URL.replace(/\/api\/?$/, '')}/hubs/ch
  * ImageUrl fields from the API are already relative paths like "/category-images/xyz.png"; prefix with
  * this to get something <Image> can load directly. */
 export const ASSETS_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+
+/** Google Maps Platform key, from the same .env the API URL comes from — never hardcoded. Empty string means
+ * "not configured": address lookup/map preview degrade gracefully instead of failing requests. */
+export const GOOGLE_API_KEY: string = (CONFIGURED_GOOGLE_API_KEY ?? '').trim();

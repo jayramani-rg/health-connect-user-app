@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Approximate location only: the app needs the user's locality ("Prahlad Nagar, Ahmedabad") to rank
+         nearby doctors/labs first, never a precise or background fix. Optional — denial is handled gracefully. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
       android:name=".MainApplication"

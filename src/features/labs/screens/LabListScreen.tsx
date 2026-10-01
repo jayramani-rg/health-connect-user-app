@@ -1,24 +1,32 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
-import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, spacing } from '../../../theme';
 import { labService } from '../../../services/labService';
+import { usePaginatedList } from '../../../hooks/usePaginatedList';
 import type { RootStackParamList } from '../../../navigation/types';
+import type { PaginatedResponse } from '../../../types/common.types';
+import { LocalityStrip } from '../../location/components/LocalityStrip';
+import { useUserLocality } from '../../location/hooks/useUserLocality';
 import { LabCard } from '../components/LabCard/LabCard';
+import { LabCardSkeleton, LabListSkeleton } from '../components/LabCard/LabCardSkeleton';
 import type { LabListItem, LabServiceSearchResultItem } from '../types/lab.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabList'>;
+
+const PAGE_SIZE = 20;
 
 // /lab-services/search returns one row per matching service, not per lab — group them into the same
 // LabListItem shape LabCard already renders, so a category-filtered browse looks identical to the
 // default "every lab" list. `state`/`isAcceptingBookings` aren't in that response (it's a service-level
 // search, not the lab directory), so they're left blank/optimistic; the lab profile screen shows the
-// real truth once tapped.
+// real truth once tapped. Insertion order is kept (Map preserves it): the server already ranked rows by
+// the lab's locality, so re-sorting here would undo "near you first".
 function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
   const byLab = new Map<string, LabListItem>();
   for (const row of rows) {
@@ -32,23 +40,25 @@ function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
         name: row.laboratoryName,
         city: row.city,
         state: '',
+        locality: row.locality,
         photoUrl: null,
         homeCollectionEnabled: row.homeCollectionEnabled,
         isAcceptingBookings: true,
         serviceCount: 1,
+        localityMatch: row.localityMatch,
+        homeCollectionAvailableAtPincode: null,
       });
     }
   }
-  return Array.from(byLab.values()).sort((a, b) => a.name.localeCompare(b.name));
+  return Array.from(byLab.values());
 }
 
 const LabListScreen: React.FC<Props> = ({ route, navigation }) => {
   const category = route.params?.category;
-  const [search, setSearch] = useState('');
-  const [labs, setLabs] = useState<LabListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [errorText, setErrorText] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
+  const { label: localityLabel, nearParams, location } = useUserLocality();
+  const pincode = location.pincode ?? undefined;
 
   useEffect(() => {
     if (category) {
@@ -56,61 +66,70 @@ const LabListScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [category, navigation]);
 
-  const load = useCallback(
-    async (isRefresh = false) => {
-      isRefresh ? setRefreshing(true) : setLoading(true);
-      setErrorText(null);
-      try {
-        if (category) {
-          const response = await labService.searchServices({ category, search: search || undefined, pageSize: 100 });
-          setLabs(groupByLaboratory(response.data.items));
-        } else {
-          const response = await labService.list({ search: search || undefined, pageSize: 30 });
-          setLabs(response.data.items);
-        }
-      } catch (error) {
-        setErrorText(error instanceof Error ? error.message : 'Could not load labs.');
-      } finally {
-        isRefresh ? setRefreshing(false) : setLoading(false);
+  const fetchPage = useCallback(
+    async (page: number): Promise<PaginatedResponse<LabListItem>> => {
+      if (category) {
+        const response = await labService.searchServices({ category, search: appliedSearch || undefined, ...nearParams, pageSize: 100 });
+        const labs = groupByLaboratory(response.data.items);
+        return { items: labs, totalCount: labs.length, pageNumber: 1, pageSize: labs.length, totalPages: 1, hasNextPage: false, hasPreviousPage: false };
       }
+      const response = await labService.list({ search: appliedSearch || undefined, ...nearParams, pincode, page, pageSize: PAGE_SIZE });
+      return response.data;
     },
-    [search, category],
+    [category, appliedSearch, nearParams, pincode],
   );
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const resetKey = [category, appliedSearch, nearParams.nearLocality, nearParams.nearCity, pincode].join('|');
+  const list = usePaginatedList<LabListItem>(fetchPage, resetKey);
+
+  const header = <LocalityStrip label={localityLabel} noun="labs" onPress={() => navigation.navigate('SelectLocation')} />;
 
   return (
     <ScreenContainer scroll={false} style={{ padding: 0 }}>
       <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm }}>
         <SearchBar
-          value={search}
-          onChangeText={setSearch}
-          placeholder={category ? `Search within ${category}` : 'Lab name or city'}
-          onSubmitEditing={() => load()}
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder={category ? `Search within ${category}` : 'Lab name, area or city'}
+          onSubmitEditing={() => setAppliedSearch(searchText.trim())}
         />
       </View>
 
-      {loading ? (
-        <View style={{ paddingHorizontal: spacing.lg }}>
-          <SkeletonList count={5} />
+      {list.loading ? (
+        <View style={{ padding: spacing.lg }}>
+          {header}
+          <LabListSkeleton count={6} />
         </View>
       ) : (
         <FlatList
-          data={labs}
+          data={list.items}
           keyExtractor={(item) => item.laboratoryId}
           contentContainerStyle={{ padding: spacing.lg }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
+          refreshControl={<RefreshControl refreshing={list.refreshing} onRefresh={list.refresh} tintColor={colors.primary} />}
+          ListHeaderComponent={header}
           renderItem={({ item }) => (
-            <LabCard lab={item} onPress={() => navigation.navigate('LabProfile', { laboratoryId: item.laboratoryId })} />
+            <Animated.View entering={FadeIn.duration(220)}>
+              <LabCard lab={item} onPress={() => navigation.navigate('LabProfile', { laboratoryId: item.laboratoryId })} />
+            </Animated.View>
           )}
+          onEndReached={list.loadMore}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={
+            list.loadingMore ? (
+              <View>
+                <LabCardSkeleton />
+                <LabCardSkeleton />
+              </View>
+            ) : list.error && list.items.length > 0 ? (
+              <EmptyState title="Couldn't load more labs" description={list.error} actionLabel="Try again" onActionPress={list.retry} />
+            ) : undefined
+          }
           ListEmptyComponent={
-            <EmptyState
-              title={errorText ? 'Something went wrong' : 'No labs found'}
-              description={errorText ?? (category ? `No labs currently offer ${category}.` : 'Try a different search.')}
-            />
+            list.error ? (
+              <EmptyState title="Something went wrong" description={list.error} actionLabel="Try again" onActionPress={list.retry} />
+            ) : (
+              <EmptyState title="No labs found" description={category ? `No labs currently offer ${category}.` : 'Try a different search.'} />
+            )
           }
         />
       )}

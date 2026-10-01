@@ -33,6 +33,12 @@ export type RootStackParamList = {
   NotificationCenter: undefined;
   EditProfile: undefined;
   FamilyMembers: undefined;
+
+  /** Pick the locality used for "near you first" ordering — current location or a saved address. */
+  SelectLocation: undefined;
+  SavedAddresses: undefined;
+  /** addressId absent = add new. */
+  AddressEditor: { addressId?: string } | undefined;
   Settings: undefined;
   HelpSupport: undefined;
 

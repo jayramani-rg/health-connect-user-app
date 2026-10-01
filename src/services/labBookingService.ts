@@ -4,6 +4,7 @@ import type {
   AvailableLabSlotsResponse,
   BookLabServicePayload,
   CollectionMethod,
+  HomeCollectionEligibility,
   LabBookingDetail,
   LabBookingListItem,
   LabBookingQuery,
@@ -35,6 +36,12 @@ export const labBookingService = {
   getAvailableSlots: (laboratoryId: string, collectionMethod: CollectionMethod, date: string): Promise<ApiResponse<AvailableLabSlotsResponse>> =>
     API.request<AvailableLabSlotsResponse>(
       `/lab-availability/slots?laboratoryId=${laboratoryId}&collectionMethod=${collectionMethod}&date=${date}`,
+      { method: 'GET' },
+    ),
+
+  checkHomeCollectionEligibility: (laboratoryId: string, patientAddressId: string): Promise<ApiResponse<HomeCollectionEligibility>> =>
+    API.request<HomeCollectionEligibility>(
+      `/lab-bookings/home-collection-eligibility${buildQuery({ laboratoryId, patientAddressId })}`,
       { method: 'GET' },
     ),
 

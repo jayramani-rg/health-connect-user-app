@@ -109,6 +109,12 @@ export default function ProfileHomeScreen() {
       subtitle: familyCount > 0 ? `${familyCount} added` : 'Book on behalf of family',
       onPress: () => navigation.navigate('FamilyMembers'),
     },
+    {
+      icon: 'location-outline',
+      title: 'Saved addresses',
+      subtitle: 'Home, work and more for home collection',
+      onPress: () => navigation.navigate('SavedAddresses'),
+    },
     { icon: 'settings-outline', title: 'Settings', onPress: () => navigation.navigate('Settings') },
     { icon: 'help-circle-outline', title: 'Help & support', onPress: () => navigation.navigate('HelpSupport') },
   ];

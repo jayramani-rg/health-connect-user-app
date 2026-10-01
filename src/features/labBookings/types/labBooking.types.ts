@@ -74,6 +74,8 @@ export interface LabBookingDetail {
   addressCity: string | null;
   addressState: string | null;
   addressPincode: string | null;
+  addressGoogleAddress: string | null;
+  addressLocality: string | null;
 
   assignedCollectorId: string | null;
   assignedCollectorName: string | null;
@@ -123,6 +125,16 @@ export interface AvailableLabSlotsResponse {
   collectionMethod: CollectionMethod;
   labAcceptingBookings: boolean;
   slots: AvailableLabSlot[];
+}
+
+export type HomeCollectionEligibilityCode = 'OK' | 'HOME_COLLECTION_NOT_OFFERED' | 'PINCODE_NOT_SERVICEABLE' | 'NOT_ACCEPTING_BOOKINGS';
+
+/** Same rule the booking endpoint enforces — the backend stays the final authority. */
+export interface HomeCollectionEligibility {
+  eligible: boolean;
+  code: HomeCollectionEligibilityCode;
+  message: string;
+  pincode: string | null;
 }
 
 export type LabBookingTab = 'upcoming' | 'pending' | 'processing' | 'reports' | 'cancelled';

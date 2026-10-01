@@ -103,6 +103,15 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         </>
       ) : null}
 
+      {doctor.inClinicEnabled && doctor.clinicAddress ? (
+        <>
+          <Text style={styles.sectionTitle}>Clinic</Text>
+          <Text style={styles.bodyText}>
+            {[doctor.clinicName, doctor.clinicAddress, doctor.clinicLocality, doctor.clinicCity, doctor.clinicPincode].filter(Boolean).join(', ')}
+          </Text>
+        </>
+      ) : null}
+
       {doctor.qualifications.length > 0 && (
         <>
           <Text style={styles.sectionTitle}>Qualifications</Text>
