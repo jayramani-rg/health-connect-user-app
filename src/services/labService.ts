@@ -19,8 +19,6 @@ export const labService = {
 
   getById: (laboratoryId: string): Promise<ApiResponse<LabDetail>> => API.request<LabDetail>(`/labs/${laboratoryId}`, { method: 'GET' }),
 
-  // Cross-lab search by service/category — the backend for "browse by category, see every lab that
-  // offers it" (route lives at /lab-services/search, not nested under /labs).
   searchServices: (query: LabServiceSearchQuery = {}): Promise<ApiResponse<PaginatedResponse<LabServiceSearchResultItem>>> =>
     API.request<PaginatedResponse<LabServiceSearchResultItem>>(`/lab-services/search${buildQuery(query)}`, { method: 'GET' }),
 };

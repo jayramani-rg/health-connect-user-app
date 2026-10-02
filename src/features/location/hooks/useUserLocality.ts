@@ -1,10 +1,3 @@
-// Everything the UI needs about the user's locality, with all the "location is optional" rules in one place:
-//  • we show our own soft prompt once (Home), and only trigger the OS dialog when the user taps "Enable";
-//  • once granted, the locality is refreshed silently at most every 30 minutes — no watchers, no background;
-//  • a locality the user explicitly picked from a saved address is never overridden by the device;
-//  • with no permission, the default saved address's locality is used if there is one;
-//  • nothing here throws or blocks — failure just means "no personalization yet".
-
 import { useCallback, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
 import { useAppDispatch, useAppSelector, setLocality, setLocationPermission, markLocationPrompted } from '../../../store';
@@ -66,7 +59,6 @@ export function useUserLocality() {
     [dispatch],
   );
 
-  /** The explicit user action ("Enable location" / "Use current location"). */
   const enableAndDetect = useCallback(async (): Promise<DeviceLocationOutcome> => {
     dispatch(markLocationPrompted());
     setDetecting(true);
@@ -98,12 +90,10 @@ export function useUserLocality() {
     [dispatch],
   );
 
-  /** Silent, launch-time upkeep. Never prompts. */
   const refreshQuietly = useCallback(async () => {
     const stale = !location.updatedAt || Date.now() - location.updatedAt > REFRESH_AFTER_MS;
 
     if (location.permission === 'granted' && location.source !== 'address' && stale) {
-      // Android: the user may have revoked permission in Settings since last time.
       if (Platform.OS === 'android' && !(await checkLocationPermission())) {
         dispatch(setLocationPermission('denied'));
       } else {
@@ -113,14 +103,12 @@ export function useUserLocality() {
       }
     }
 
-    // No usable device locality — fall back to the default saved address, if any.
     if (!location.city && !location.locality) {
       try {
         const response = await patientAddressService.listMine();
         const fallback = response.data.find((a) => a.isDefault) ?? response.data[0];
         if (fallback) selectSavedAddress(fallback);
       } catch {
-        // Offline or not a patient profile yet — personalization just stays off.
       }
     }
   }, [location.permission, location.source, location.updatedAt, location.city, location.locality, dispatch, applyDeviceOutcome, selectSavedAddress]);

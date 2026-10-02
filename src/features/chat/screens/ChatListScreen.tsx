@@ -52,7 +52,6 @@ const ChatListScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       load();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 
@@ -63,7 +62,6 @@ const ChatListScreen: React.FC = () => {
       offMessage();
       offInvitation();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleCancel(invitationId: string) {

@@ -8,8 +8,6 @@ export interface ApprovedLabTestCategory {
 }
 
 export const labTestCategoryService = {
-  // Anonymous on the backend, but called post-login here — the patient app's "browse lab tests by
-  // category" entry point.
   getApproved: (): Promise<ApiResponse<ApprovedLabTestCategory[]>> =>
     API.request<ApprovedLabTestCategory[]>('/lab-test-categories/approved', { method: 'GET' }),
 };

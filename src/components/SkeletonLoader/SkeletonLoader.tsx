@@ -7,7 +7,6 @@ import type { SkeletonBlockProps } from './types/SkeletonLoader.types';
 
 const SHIMMER_COLORS = ['rgba(255,255,255,0)', 'rgba(255,255,255,0.65)', 'rgba(255,255,255,0)'];
 
-/** A placeholder bar with a soft light sweep. Same props as before, so every existing skeleton upgrades in place. */
 export function SkeletonBlock({ width, height, radius: cornerRadius = radius.sm, style }: SkeletonBlockProps) {
   const [measuredWidth, setMeasuredWidth] = useState(0);
   const progress = useSharedValue(0);

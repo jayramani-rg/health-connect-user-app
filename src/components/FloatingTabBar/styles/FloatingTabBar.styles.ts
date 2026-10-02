@@ -5,9 +5,6 @@ export const BAR_HEIGHT = 64;
 export const BAR_SIDE_INSET = spacing.lg;
 export const BAR_BOTTOM_INSET = spacing.sm;
 export const ITEM_INNER_INSET = 4;
-/** How much bottom padding a tab-root screen's scroll content needs so the floating bar never
- * covers its last item. Does not include the safe-area inset, which varies per device and is
- * already applied separately by the screen's own SafeAreaView. */
 export const TAB_BAR_CLEARANCE = BAR_HEIGHT + BAR_BOTTOM_INSET + spacing.lg;
 
 export const styles = StyleSheet.create({

@@ -129,7 +129,6 @@ export interface AvailableLabSlotsResponse {
 
 export type HomeCollectionEligibilityCode = 'OK' | 'HOME_COLLECTION_NOT_OFFERED' | 'PINCODE_NOT_SERVICEABLE' | 'NOT_ACCEPTING_BOOKINGS';
 
-/** Same rule the booking endpoint enforces — the backend stays the final authority. */
 export interface HomeCollectionEligibility {
   eligible: boolean;
   code: HomeCollectionEligibilityCode;

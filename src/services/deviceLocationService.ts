@@ -1,7 +1,3 @@
-// One-shot, approximate device location → locality. No watchers, no background tracking: a single coarse
-// fix (cached up to 10 min by the OS) is reverse-geocoded and only the area-level result is kept. Every
-// failure resolves to a typed outcome instead of throwing, so callers can simply "carry on without location".
-
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import { LocationLookupError, reverseGeocode, type ResolvedLocation } from './googleLocationService';
@@ -17,7 +13,6 @@ export type DeviceLocationOutcome =
 export type PermissionOutcome = 'granted' | 'denied' | 'blocked';
 
 Geolocation.setRNConfiguration({
-  // We ask ourselves (below) so the OS dialog only ever appears after the user tapped "Enable location".
   skipPermissionRequests: true,
   authorizationLevel: 'whenInUse',
   locationProvider: 'auto',
@@ -31,7 +26,6 @@ export async function checkLocationPermission(): Promise<boolean> {
       return false;
     }
   }
-  // iOS has no silent check through this module; the persisted status in the store is the source of truth.
   return false;
 }
 
@@ -70,7 +64,6 @@ function getCoarsePosition(): Promise<{ latitude: number; longitude: number }> {
   });
 }
 
-/** Assumes permission was already granted. */
 export async function detectCurrentLocality(): Promise<DeviceLocationOutcome> {
   let coords: { latitude: number; longitude: number };
   try {
@@ -79,7 +72,6 @@ export async function detectCurrentLocality(): Promise<DeviceLocationOutcome> {
     const code = (error as { code?: number } | undefined)?.code;
     if (code === 1) return { status: 'denied' };
     if (code === 3) return { status: 'timeout' };
-    // 2 = POSITION_UNAVAILABLE (location services off / no provider) and anything unexpected.
     return { status: 'services_off' };
   }
 

@@ -1,7 +1,3 @@
-// src/store/slices/networkSlice.ts
-// Handbook Sec 5.1 — Infrastructure State: updated by a NetInfo listener in
-// the root navigator or app entry point. Drives NoInternetScreen (Sec 15.1).
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface NetworkState {

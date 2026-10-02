@@ -11,8 +11,6 @@ interface LocationPromptCardProps {
   onDismiss: () => void;
 }
 
-/** Our own soft ask, shown once. The OS permission dialog appears only after "Enable location" — declining here
- * (or there) just hides the card; the app works the same, minus "near you first" ordering. */
 export function LocationPromptCard({ loading, onEnable, onDismiss }: LocationPromptCardProps) {
   return (
     <View style={styles.promptCard}>

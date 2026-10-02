@@ -38,7 +38,6 @@ export default function ProfileHomeScreen() {
         setPhotoUrl(profileRes.data.profilePhotoUrl ?? null);
         setFamilyCount(dependentsRes.data.length);
       } catch {
-        // Non-critical for the hub — the menu still works without the photo/count.
       }
     })();
   }, []);
@@ -59,7 +58,6 @@ export default function ProfileHomeScreen() {
       });
       setPhotoUrl(response.data.profilePhotoUrl ?? null);
     } catch {
-      // Non-critical — the hub still works, the user can retry from the same avatar tap.
     } finally {
       setPhotoBusy(false);
     }
@@ -72,7 +70,6 @@ export default function ProfileHomeScreen() {
       const response = await profileService.removeMyPhoto();
       setPhotoUrl(response.data.profilePhotoUrl ?? null);
     } catch {
-      // Non-critical — the hub still works, the user can retry from the same avatar tap.
     } finally {
       setPhotoBusy(false);
     }

@@ -46,9 +46,6 @@ export default function CreatePasswordScreen({ navigation, route }: Props) {
           );
         }
       } else {
-        // The backend auto-authenticates this account as part of the reset response (it can always
-        // resolve it unambiguously here since we pass Role: 'PATIENT') — dispatching the session flips
-        // RootNavigator straight to the authenticated stack, with no login/password screen in between.
         const result = await authService.resetPassword(verificationToken, password, 'PATIENT');
         if (result.data.user && result.data.accessToken && result.data.refreshToken) {
           dispatch(
@@ -63,8 +60,6 @@ export default function CreatePasswordScreen({ navigation, route }: Props) {
             }),
           );
         } else {
-          // Password was reset successfully but the account couldn't be auto-authenticated (e.g.
-          // locked) — fall back to manual sign-in rather than stranding the user here.
           navigation.reset({ index: 0, routes: [{ name: 'LoginPassword', params: { mobileNumber } }] });
         }
       }

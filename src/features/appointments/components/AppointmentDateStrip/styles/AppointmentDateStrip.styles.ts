@@ -2,9 +2,6 @@ import { StyleSheet } from 'react-native';
 import { colors, radius, spacing, typography } from '../../../../../theme';
 
 export const styles = StyleSheet.create({
-  // A horizontal ScrollView's content container defaults to `alignItems: 'stretch'` on its cross axis
-  // (vertical, since flexDirection is row here) — without overriding it, every card stretches to match
-  // whichever sibling ends up tallest, so a "No slots" card can end up hundreds of px tall for no reason.
   scroll: {
     flexGrow: 0,
   },

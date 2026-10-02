@@ -30,9 +30,6 @@ const MODE_OPTIONS = [
 const PAGE_SIZE = 20;
 
 const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
-  // A specialization arriving via navigation (from the category browse screen) is a precise server-side
-  // filter, kept separate from the free-text search box — pre-filling that box with a long category name
-  // would look like the user typed it, and typing over it would silently drop the filter.
   const [specialization, setSpecialization] = useState(route.params?.specialization ?? '');
   const [searchText, setSearchText] = useState(route.params?.search ?? '');
   const [appliedSearch, setAppliedSearch] = useState(route.params?.search ?? '');
@@ -45,7 +42,6 @@ const DoctorListScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [specialization, navigation]);
 
-  // Locality only changes ORDER (server-side, before paging) — every doctor still appears.
   const fetchPage = useCallback(
     async (page: number) => {
       const response = await doctorService.list({

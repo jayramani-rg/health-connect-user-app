@@ -15,8 +15,6 @@ export interface StatCardProps {
   index?: number;
 }
 
-/** Premium KPI tile used in 2x2 dashboard grids — an icon badge tinted per metric, a large
- * value, and a caption label. Kept visually identical to the Doctor and Lab apps' StatCard. */
 export function StatCard({ icon, tint, tintSoft, value, label, index = 0 }: StatCardProps) {
   return (
     <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * motion.listStagger).duration(220).springify().damping(18)} style={styles.card}>

@@ -51,7 +51,6 @@ const MyLabBookingsScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       load();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 

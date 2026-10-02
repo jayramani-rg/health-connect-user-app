@@ -8,12 +8,6 @@ type InvitationHandler = (invitation: ChatInvitation) => void;
 type ReadHandler = (event: MessagesReadEvent) => void;
 type NotificationHandler = (notification: AppNotification) => void;
 
-/**
- * Thin singleton around the SignalR client — mirrors the ApiSingleton pattern (a `configure()` call wired
- * from the Redux store bootstrap) so both the REST and real-time layers pull the current access token the
- * same way. Connect/join failures never throw past this class: chat still works over plain REST polling if
- * the socket can't connect, it just won't be live — never presented as a hard error.
- */
 class ChatSocket {
   private connection: HubConnection | null = null;
   private getToken: () => string | null = () => null;
@@ -49,7 +43,6 @@ class ChatSocket {
     try {
       await connection.start();
     } catch {
-      // Best-effort real-time — screens still work by calling chatService directly.
     }
   }
 
@@ -59,7 +52,6 @@ class ChatSocket {
     try {
       await connection?.stop();
     } catch {
-      // Ignore — we're tearing down anyway (e.g. logout).
     }
   }
 
@@ -69,7 +61,6 @@ class ChatSocket {
       try {
         await this.connection.invoke('JoinConversation', conversationId);
       } catch {
-        // Unauthorized or offline — the REST layer is still the source of truth.
       }
     }
   }
@@ -79,7 +70,6 @@ class ChatSocket {
       try {
         await this.connection.invoke('LeaveConversation', conversationId);
       } catch {
-        // Non-fatal.
       }
     }
   }

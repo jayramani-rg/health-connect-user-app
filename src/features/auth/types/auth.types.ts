@@ -8,7 +8,6 @@ export interface AuthUser {
   isPhoneVerified: boolean;
   firstName: string | null;
   lastName: string | null;
-  /** Backend-computed (FirstName + LastName both set) — never derive this locally. */
   isProfileComplete: boolean;
 }
 

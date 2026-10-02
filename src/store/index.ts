@@ -22,7 +22,6 @@ export type RootState = ReturnType<typeof rootReducer>;
 const persistConfig: PersistConfig<RootState> = {
   key: 'app_root',
   storage: AsyncStorage,
-  // locationData persists area-level locality + "already asked" only — no coordinates are ever in the store.
   whitelist: [authDataName, locationDataName],
 };
 

@@ -9,8 +9,6 @@ export const availabilityService = {
       { method: 'GET' },
     ),
 
-  // Powers the date-strip's "N slots available" preview for a run of days in one round trip instead
-  // of one /slots call per visible day.
   getSlotCounts: (
     doctorProfileId: string,
     consultationType: ConsultationType,

@@ -52,11 +52,8 @@ const HomeScreen: React.FC = () => {
   const locality = useUserLocality();
   const { refreshQuietly } = locality;
 
-  // Location is optional: this never prompts and never blocks — it only refreshes a stale locality when
-  // permission was already granted, or falls back to the default saved address.
   useEffect(() => {
     refreshQuietly();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

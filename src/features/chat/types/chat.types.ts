@@ -57,7 +57,6 @@ export interface ChatMessagePage {
   nextBeforeId: string | null;
 }
 
-/** Client-only shape for an optimistic outgoing message that hasn't been confirmed by the server yet. */
 export interface OutgoingChatMessage extends ChatMessage {
   clientId: string;
   sendState: 'sending' | 'sent' | 'failed';

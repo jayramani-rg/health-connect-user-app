@@ -86,7 +86,6 @@ export const styles = StyleSheet.create({
     ...typography.bodyStrong,
     color: colors.primary,
   },
-  // Home soft-prompt card
   promptCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -115,7 +114,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
   },
-  // Home locality chip
   chip: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -9,8 +9,6 @@ export type ChatCtaState =
   | { kind: 'pending'; invitationId: string }
   | { kind: 'chat'; conversationId: string };
 
-/** Resolves the "Chat with Doctor/Laboratory" CTA state for a provider profile screen — backend remains the
- * source of truth (this just reads the caller's own invitations/conversations), never inferred locally. */
 export function useChatCta(providerType: ChatProviderType, providerId: string) {
   const [state, setState] = useState<ChatCtaState>({ kind: 'loading' });
 

@@ -88,8 +88,6 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loadingDoctor, setLoadingDoctor] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Coming from DoctorProfileScreen with a consultation type already chosen skips straight to slot
-  // selection — the wizard's mode-picker step only exists for entry points that don't already know it.
   const [step, setStep] = useState(preselectedType ? 2 : 1);
   const [consultationType, setConsultationType] = useState<ConsultationType | null>(preselectedType ?? null);
   const [dateKey, setDateKey] = useState(todayKey());
@@ -119,7 +117,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         } else {
           const firstEnabled = MODE_ORDER.find((mode) => modeEnabled(response.data, mode));
           setConsultationType(firstEnabled ?? null);
-          if (preselectedType) setStep(1); // the preselected type turned out unavailable — let the user pick again
+          if (preselectedType) setStep(1);
         }
       } catch (error) {
         if (active) setLoadError(error instanceof Error ? error.message : 'Could not load this doctor.');
@@ -156,7 +154,6 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
     if (step === 2) {
       loadSlots();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, dateKey, consultationType]);
 
   const loadSlotCounts = useCallback(async () => {
@@ -166,9 +163,6 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
       const response = await availabilityService.getSlotCounts(doctorProfileId, consultationType, todayKey(), DATE_WINDOW_DAYS);
       const byDate: Record<string, number> = {};
       response.data.days.forEach((day) => {
-        // day.date is an ISO date string ("2026-09-22T00:00:00") for an IST calendar date — slicing the
-        // literal "yyyy-MM-dd" prefix avoids re-parsing it as a JS Date (which would re-interpret it
-        // against the device's timezone and risk shifting the date by a day again).
         byDate[day.date.slice(0, 10)] = day.availableCount;
       });
       setSlotCounts(byDate);
@@ -182,12 +176,8 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
     if (step === 2) {
       loadSlotCounts();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, consultationType]);
 
-  // A doctor can change their availability (hours, break, accepting-appointments toggle) at any time —
-  // re-pull both the slot list and the date-strip counts whenever this screen regains focus, rather than
-  // trusting whatever was fetched the last time it mounted.
   useFocusEffect(
     useCallback(() => {
       if (step === 2) {
@@ -199,8 +189,6 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const modeFee = useMemo(() => {
     const a = doctor?.availability;
-    // Each type's own fee only — never fall back to another type's price or the doctor-wide minimum
-    // once a specific consultation type is in view (that would show a misleading number for this type).
     const map: Record<ConsultationType, { fee: number | null; duration: number | null }> = {
       IN_CLINIC: { fee: a?.inClinic.fee ?? null, duration: a?.inClinic.durationMinutes ?? null },
       VIDEO: { fee: a?.video.fee ?? null, duration: a?.video.durationMinutes ?? null },

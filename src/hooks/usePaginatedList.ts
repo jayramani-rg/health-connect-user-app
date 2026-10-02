@@ -1,15 +1,9 @@
-// Server-paginated list state for directory screens: first load, pull-to-refresh, infinite "load more",
-// and protection against out-of-order responses (a slow page-1 for an old search must never overwrite the
-// results of a newer one). The server owns ordering — including locality prioritization — so pages are
-// appended as-is, never re-sorted on the device.
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PaginatedResponse } from '../types/common.types';
 
 export interface PaginatedListState<T> {
   items: T[];
   totalCount: number;
-  /** First page (or a filter change) in flight with nothing to show yet — render skeletons. */
   loading: boolean;
   refreshing: boolean;
   loadingMore: boolean;
@@ -22,7 +16,6 @@ export interface PaginatedListState<T> {
 
 export function usePaginatedList<T>(
   fetchPage: (page: number) => Promise<PaginatedResponse<T>>,
-  /** Any change here restarts from page 1 (filters, search, locality). */
   resetKey: string,
 ): PaginatedListState<T> {
   const [items, setItems] = useState<T[]>([]);
@@ -57,7 +50,6 @@ export function usePaginatedList<T>(
       if (requestId !== requestIdRef.current) return;
       const message = err instanceof Error ? err.message : 'Something went wrong.';
       if (mode === 'more') {
-        // Keep what's already on screen; stop auto-paging until the user retries.
         setHasMore(false);
         setError(message);
       } else {

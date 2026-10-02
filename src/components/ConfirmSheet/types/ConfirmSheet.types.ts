@@ -8,7 +8,6 @@ export interface ConfirmSheetProps {
   visible: boolean;
   title: string;
   message: string;
-  /** Rendered top-to-bottom; the last one is treated as the primary/confirming action. */
   actions: ConfirmSheetAction[];
   onRequestClose?: () => void;
 }

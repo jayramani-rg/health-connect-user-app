@@ -6,10 +6,6 @@ import { ASSETS_BASE_URL } from '../../config/env';
 import { styles } from './styles/CategoryGrid.styles';
 import type { CategoryGridItem, CategoryGridProps } from './types/CategoryGrid.types';
 
-// Rotating soft-tint palette, same soft/strong color pairs used for avatar-initial treatments
-// elsewhere in the app (see DoctorCard) — keeps categories visually distinct without maintaining a
-// bespoke icon-per-category mapping that would need updating every time an admin adds one. Only used
-// as a fallback now — an admin-uploaded image (CategoryGridItem.imageUrl) always takes priority.
 const PALETTE = [
   { bg: colors.primarySoft, fg: colors.primary },
   { bg: colors.successSoft, fg: colors.success },

@@ -1,7 +1,3 @@
-// features/appointments/types/appointment.types.ts
-// Mirrors HealthConnect.Application.Dtos.Appointments on the backend — keep in sync with the
-// AppointmentsController/DoctorAvailabilityController contracts.
-
 import type { ConsultationType } from '../../doctors/types/doctor.types';
 
 export type { ConsultationType };
@@ -118,7 +114,6 @@ export interface SlotCountsResponse {
   days: DaySlotCount[];
 }
 
-/// Client-side grouping only (the backend has no "category" concept — these are just AppointmentStatus sets).
 export type AppointmentTab = 'upcoming' | 'pending' | 'past' | 'cancelled';
 
 export const STATUS_BY_TAB: Record<AppointmentTab, AppointmentStatus[]> = {

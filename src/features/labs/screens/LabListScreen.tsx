@@ -21,12 +21,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'LabList'>;
 
 const PAGE_SIZE = 20;
 
-// /lab-services/search returns one row per matching service, not per lab — group them into the same
-// LabListItem shape LabCard already renders, so a category-filtered browse looks identical to the
-// default "every lab" list. `state`/`isAcceptingBookings` aren't in that response (it's a service-level
-// search, not the lab directory), so they're left blank/optimistic; the lab profile screen shows the
-// real truth once tapped. Insertion order is kept (Map preserves it): the server already ranked rows by
-// the lab's locality, so re-sorting here would undo "near you first".
 function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
   const byLab = new Map<string, LabListItem>();
   for (const row of rows) {

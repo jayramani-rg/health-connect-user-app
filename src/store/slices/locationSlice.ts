@@ -1,7 +1,3 @@
-// The user's current locality for discovery ordering ("Prahlad Nagar, Ahmedabad"). Area-level only: device
-// coordinates are used once to reverse-geocode and are never stored here or sent to the backend. Location is
-// optional — every consumer must work when `locality`/`city` are null.
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { logout } from './authSlice';
 
@@ -10,14 +6,12 @@ export type LocalitySource = 'device' | 'address';
 
 export interface LocationState {
   permission: LocationPermissionStatus;
-  /** When we last showed our own "enable location" prompt — we ask once, never on every launch. */
   promptedAt: number | null;
   locality: string | null;
   city: string | null;
   state: string | null;
   pincode: string | null;
   source: LocalitySource | null;
-  /** Saved-address id when source === 'address'. */
   addressId: string | null;
   updatedAt: number | null;
 }
@@ -74,7 +68,6 @@ const locationSlice = createSlice({
     resetLocation: () => initialState,
   },
   extraReducers: (builder) => {
-    // A locality taken from a saved address belongs to that account; a device-derived one doesn't.
     builder.addCase(logout, (state) => {
       if (state.source === 'address') {
         Object.assign(state, { ...initialState, permission: state.permission, promptedAt: state.promptedAt });

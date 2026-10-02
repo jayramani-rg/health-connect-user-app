@@ -1,17 +1,9 @@
-// State + payload helpers for AddressLocationForm. The form is controlled: screens hold an
-// AddressLocationValue and use these helpers to decide "can I save?" and to build the API payload, so the
-// Google-resolution rules live in one place instead of being re-derived per screen.
-
 import type { ResolvedLocation } from '../services/googleLocationService';
 
 export interface AddressLocationValue {
-  /** What the user typed — the only free-text field. */
   addressLine: string;
-  /** The Google result the user confirmed on the map. */
   resolved: ResolvedLocation | null;
-  /** The address text `resolved` was looked up from — editing the line afterwards makes the pin stale. */
   resolvedFor: string | null;
-  /** Used only when Google returned no postal code for the confirmed place. */
   manualPincode: string;
 }
 
@@ -43,8 +35,6 @@ export function emptyAddressLocation(addressLine = ''): AddressLocationValue {
   return { addressLine, resolved: null, resolvedFor: null, manualPincode: '' };
 }
 
-/** Rehydrates a previously saved location. A legacy record without coordinates starts unresolved, so the
- * user is asked to confirm it on the map once. */
 export function addressLocationFromSaved(saved: SavedLocationFields | null | undefined): AddressLocationValue {
   if (!saved) return emptyAddressLocation();
   const addressLine = saved.address ?? '';
@@ -75,7 +65,6 @@ export function effectivePincode(value: AddressLocationValue): string {
   return value.resolved?.pincode ?? value.manualPincode.trim();
 }
 
-/** Why the location can't be saved yet, or null when it's complete. */
 export function addressLocationProblem(value: AddressLocationValue): string | null {
   if (value.addressLine.trim().length < 3) return 'Enter your address.';
   if (!value.resolved) return 'Tap "Find on map" to confirm the address.';

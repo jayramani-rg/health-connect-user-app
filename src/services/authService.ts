@@ -29,9 +29,6 @@ export const authService = {
   verifyOtp: (mobileNumber: string, purpose: OtpPurpose, code: string): Promise<ApiResponse<OtpVerifiedResult>> =>
     API.request<OtpVerifiedResult>('/otp/verify', { method: 'POST', body: { mobileNumber, purpose, code }, skipAuth: true }),
 
-  // The backend auto-authenticates the reset account when it can resolve it unambiguously (Role given,
-  // which it always is here since this app only ever resets PATIENT accounts) — the response carries a
-  // full login session, so no separate login call is needed after this succeeds.
   resetPassword: (verificationToken: string, newPassword: string, role: AuthRole = 'PATIENT'): Promise<ApiResponse<LoginResult>> =>
     API.request<LoginResult>('/password-reset', { method: 'POST', body: { verificationToken, newPassword, role }, skipAuth: true }),
 };

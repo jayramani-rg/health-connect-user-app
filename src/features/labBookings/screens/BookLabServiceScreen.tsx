@@ -128,9 +128,6 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
     [laboratoryId],
   );
 
-  // Refetch on every focus so an address added/edited in AddressEditor (pushed on top of this screen) shows up;
-  // a newly created one is auto-selected. Each address is checked against the lab's pincode whitelist by the
-  // backend — the same rule the booking request itself enforces.
   const loadAddresses = useCallback(async () => {
     setLoadingAddresses(true);
     setAddressError(null);
@@ -189,7 +186,6 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       });
       navigation.replace('LabBookingConfirmation', { bookingId: response.data.id });
     } catch (error) {
-      // The backend is the final authority (pincode whitelist, address ownership, slot capacity) — show its reason.
       setSubmitError(error instanceof Error ? error.message : 'Could not send this request. Please try again.');
     } finally {
       setSubmitting(false);
@@ -220,8 +216,6 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
   const canContinueStep2 = !!selectedSlot;
   const canContinueStep3 = collectionMethod !== 'HOME_COLLECTION' || (!!addressId && selectedEligible);
 
-  // Home collection confirms the address (and that the lab collects there) BEFORE a slot is picked, so nobody
-  // chooses a time only to learn the address isn't serviceable. Lab visits skip the address step entirely.
   const stepSequence = collectionMethod === 'HOME_COLLECTION' ? [1, 3, 2, 4] : [1, 2, 4];
   const stepPosition = stepSequence.indexOf(step) + 1;
 

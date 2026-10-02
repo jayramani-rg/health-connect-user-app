@@ -82,9 +82,6 @@ const RootNavigator: React.FC = () => {
       >
         {isAuthenticated ? (
           <Stack.Group>
-            {/* ProfileBasics is always registered (the profile-completion gate can navigate to it from
-                anywhere), but only declared FIRST — making it the initial route — right after registration,
-                so a brand-new user sees it before the main app. */}
             {justRegistered && <Stack.Screen name="ProfileBasics" component={ProfileBasicsScreen} />}
             <Stack.Screen name="MainTabs" component={TabNavigator} />
             {!justRegistered && <Stack.Screen name="ProfileBasics" component={ProfileBasicsScreen} />}

@@ -1,8 +1,3 @@
-// src/navigation/TabNavigator.tsx
-// Handbook Sec 13.1 — MainTabs is registered as a single RootStackParamList
-// screen, giving the root stack full control over presenting modals over
-// the tab bar without nested-navigator complexity.
-
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 

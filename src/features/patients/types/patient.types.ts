@@ -23,7 +23,6 @@ export interface PatientAddress {
   city: string;
   state: string;
   pincode: string;
-  /** Google-resolved fields — null only on addresses saved before geocoding existed. */
   googleAddress: string | null;
   locality: string | null;
   latitude: number | null;

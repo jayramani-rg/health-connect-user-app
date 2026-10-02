@@ -1,24 +1,17 @@
-// features/doctors/types/doctor.types.ts
-// Mirrors HealthConnect.Application.Dtos.Doctors on the backend — keep in sync with GET /doctors.
-
 export interface DoctorListItem {
   doctorProfileId: string;
   fullName: string;
   specialization: string;
   subSpecialization: string | null;
   experienceYears: number;
-  /** The lowest fee among this doctor's enabled, priced consultation types — null when none are
-   * configured yet. Never assume a single "the" fee; show "Fee not available" when null. */
   minConsultationFee: number | null;
   profilePhotoUrl: string | null;
   inClinicEnabled: boolean;
   videoEnabled: boolean;
   voiceEnabled: boolean;
   isAcceptingAppointments: boolean;
-  /** Area-level clinic location for display ("Prahlad Nagar", "Ahmedabad"). */
   clinicLocality: string | null;
   clinicCity: string | null;
-  /** Relative to the nearLocality/nearCity sent with the request; null when none was sent. */
   localityMatch: LocalityMatch | null;
 }
 
@@ -31,13 +24,11 @@ export interface Qualification {
 }
 
 export interface ScheduleRange {
-  /** "HH:mm" 24-hour, IST wall-clock. */
   startTime: string;
   endTime: string;
 }
 
 export interface DaySchedule {
-  /** Sunday..Saturday. */
   day: string;
   ranges: ScheduleRange[];
 }
@@ -46,7 +37,6 @@ export interface ConsultationTypeSchedule {
   enabled: boolean;
   fee: number | null;
   durationMinutes: number | null;
-  /** Only days with at least one configured range are included. */
   schedule: DaySchedule[];
 }
 
@@ -75,7 +65,6 @@ export interface DoctorListQuery {
   specialization?: string;
   search?: string;
   consultationType?: ConsultationType;
-  /** Ordering only — same locality first, then same city, then everyone else. */
   nearLocality?: string;
   nearCity?: string;
   page?: number;

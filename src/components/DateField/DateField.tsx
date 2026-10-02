@@ -7,7 +7,6 @@ import { styles } from '../TextField/styles/TextField.styles';
 
 interface DateFieldProps {
   label: string;
-  /** ISO date string 'YYYY-MM-DD', or '' when unset. */
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;

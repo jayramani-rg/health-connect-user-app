@@ -37,8 +37,6 @@ export default function ProfileBasicsScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // A gate-triggered visit (booking/chat blocked on an incomplete profile) must not offer a way out —
-  // "Skip" only makes sense for the optional post-registration onboarding visit.
   const canSkip = !hasPendingProfileAction();
   const valid = firstName.trim().length > 0 && lastName.trim().length > 0;
 

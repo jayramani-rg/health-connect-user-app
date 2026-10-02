@@ -4,7 +4,6 @@ import { SkeletonBlock } from '../../../../components/SkeletonLoader/SkeletonLoa
 import { radius, spacing } from '../../../../theme';
 import { styles } from './styles/LabCard.styles';
 
-/** Mirrors LabCard's box and rows (shared styles): logo · name · area + service count · collection chips. */
 export function LabCardSkeleton() {
   return (
     <View style={styles.card} accessibilityLabel="Loading laboratory">

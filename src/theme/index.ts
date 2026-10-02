@@ -1,7 +1,3 @@
-// Design system tokens. Existing flat keys (colors.brand, typography.h1, etc.) are kept as
-// stable aliases so screens migrate incrementally — new work should prefer the richer
-// palette/semantic/motion tokens added alongside them.
-
 const fontFamily = {
   regular: 'PlusJakartaSans-Regular',
   medium: 'PlusJakartaSans-Medium',
@@ -38,7 +34,6 @@ const palette = {
 };
 
 export const colors = {
-  // new semantic surface
   primary: palette.primary,
   primaryStrong: palette.primaryStrong,
   primarySoft: palette.primarySoft,
@@ -50,7 +45,6 @@ export const colors = {
   inkFaint: palette.inkFaint,
   surfaceSunken: palette.surfaceSunken,
 
-  // legacy aliases kept so unmigrated screens keep compiling + inherit the new palette
   brand: palette.primary,
   brandStrong: palette.primaryStrong,
   brandSoft: palette.primarySoft,

@@ -27,8 +27,6 @@ export default function MobileNumberScreen({ navigation }: Props) {
     setError('');
     setLoading(true);
     try {
-      // The backend is the source of truth for whether this number already has a patient account —
-      // never guess client-side which screen to show next.
       const { data } = await authService.checkAccount(mobileNumber, 'PATIENT');
       if (data.exists) {
         navigation.navigate('LoginPassword', { mobileNumber });

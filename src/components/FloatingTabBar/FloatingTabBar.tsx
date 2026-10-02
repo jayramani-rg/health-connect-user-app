@@ -17,8 +17,6 @@ const TAB_ICONS: Record<string, { active: IoniconsIconName; inactive: IoniconsIc
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-/** Module-scope function component invoked via JSX (`tabBar={(props) => <FloatingTabBar {...props} />}`)
- * rather than passed as a bare reference — passing it directly breaks the hooks below. */
 export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const barWidth = SCREEN_WIDTH - BAR_SIDE_INSET * 2;

@@ -28,12 +28,6 @@ function ReadOnlyField({ label, value }: { label: string; value: string | null }
   );
 }
 
-/**
- * The shared "type an address → Google resolves it → confirm on the map" control used by doctor/lab
- * registration, provider location edits and patient saved addresses. Layout: map on top, the single editable
- * address line below, then the Google-derived fields as read-only values. Latitude/longitude are carried in
- * `value.resolved` for the API but never rendered.
- */
 export function AddressLocationForm({
   value,
   onChange,

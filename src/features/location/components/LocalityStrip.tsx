@@ -5,15 +5,11 @@ import { colors, radius, spacing, typography } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
 
 interface LocalityStripProps {
-  /** "Prahlad Nagar, Ahmedabad", or null when no locality is known yet. */
   label: string | null;
-  /** e.g. "doctors" / "labs". */
   noun: string;
   onPress: () => void;
 }
 
-/** Tells the user why the list is ordered the way it is, and where to change it. With no locality it's a quiet
- * invitation — never an error, never blocking. */
 export function LocalityStrip({ label, noun, onPress }: LocalityStripProps) {
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={[styles.strip, !label && styles.stripMuted]} onPress={onPress}>

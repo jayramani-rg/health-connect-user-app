@@ -24,8 +24,6 @@ const authSlice = createSlice({
         state.tokens.refreshToken = action.payload.refreshToken;
       }
     },
-    // Merges freshly-saved profile fields (firstName/lastName/isProfileComplete) into the current
-    // session without a full re-login — used right after PatientProfile.updateMyProfile succeeds.
     updateUserProfile: (state, action: PayloadAction<{ firstName: string | null; lastName: string | null; isProfileComplete: boolean }>) => {
       if (state.user) {
         state.user.firstName = action.payload.firstName;

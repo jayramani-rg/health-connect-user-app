@@ -7,13 +7,6 @@ import { setPendingProfileAction } from '../profileGate';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-/**
- * Centralized guard for actions that require a completed profile (doctor/lab chat, doctor appointment
- * booking, lab slot booking). The backend's `isProfileComplete` flag — never derived locally — decides
- * whether the action runs immediately or a "Complete your profile" dialog interrupts it first. Accepting
- * the dialog resumes the exact same action once ProfileBasicsScreen saves successfully, so the caller
- * never has to be re-tapped manually.
- */
 export function useProfileGate() {
   const isProfileComplete = useAppSelector((state) => state.authData.user?.isProfileComplete ?? false);
   const navigation = useNavigation<Nav>();

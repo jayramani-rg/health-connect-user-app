@@ -28,7 +28,6 @@ export interface LabListItem {
   isAcceptingBookings: boolean;
   serviceCount: number;
   localityMatch: LocalityMatch | null;
-  /** Whether this lab home-collects at the pincode sent with the request; null when none was sent. */
   homeCollectionAvailableAtPincode: boolean | null;
 }
 
@@ -52,7 +51,6 @@ export interface LabDetail {
 
 export interface LabListQuery {
   search?: string;
-  /** Exact-match filter. For "near me first" ordering use nearLocality/nearCity. */
   city?: string;
   homeCollectionOnly?: boolean;
   nearLocality?: string;

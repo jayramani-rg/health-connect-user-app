@@ -6,12 +6,6 @@ import { staticMapUrl } from '../../services/googleLocationService';
 import { styles } from './styles/LocationMapPreview.styles';
 import type { LocationMapPreviewProps } from './types/LocationMapPreview.types';
 
-/**
- * Map confirmation card: a Google Static Maps render of the resolved point with a branded pin and a caption
- * strip. Deliberately an image, not a native map view — it needs no native SDK/manifest key, can't crash on
- * devices without Play Services, and is all a "confirm this is the right place" step needs.
- * Degrades to a calm placeholder when there's no point yet, no key, or the image fails to load.
- */
 export function LocationMapPreview({ latitude, longitude, caption, height = 180, loading = false, placeholder }: LocationMapPreviewProps) {
   const [width, setWidth] = useState(0);
   const [failed, setFailed] = useState(false);

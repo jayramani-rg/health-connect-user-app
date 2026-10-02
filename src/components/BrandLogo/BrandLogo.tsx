@@ -2,10 +2,6 @@ import React from 'react';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { colors } from '../../theme';
 
-// Carova logo artwork. Geometry is copied from brand/logo/build.js (the source of truth) — never
-// redraw it, and never stand a <Text>"Carova"</Text> in for the wordmark.
-// Ink: colors.primary on light grounds, colors.white on teal / dark grounds. The dot stays coral.
-
 type WordmarkProps = { width?: number; color?: string; dotColor?: string };
 type SymbolProps = { size?: number; color?: string; dotColor?: string };
 

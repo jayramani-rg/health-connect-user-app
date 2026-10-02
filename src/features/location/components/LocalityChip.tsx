@@ -5,7 +5,6 @@ import { colors } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
 import { styles } from '../styles/Location.styles';
 
-/** "📍 Prahlad Nagar, Ahmedabad ▾" under the Home greeting — tap to change. */
 export function LocalityChip({ label, onPress }: { label: string | null; onPress: () => void }) {
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={styles.chip} onPress={onPress} accessibilityRole="button" accessibilityLabel="Change your area">
