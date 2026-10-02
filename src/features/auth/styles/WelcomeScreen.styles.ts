@@ -12,6 +12,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxl,
     gap: spacing.md,
   },
+  heroSpacer: {
+    flex: 0.3,
+    minHeight: spacing.xxl,
+  },
   headline: {
     ...typography.display,
     fontSize: 32,
