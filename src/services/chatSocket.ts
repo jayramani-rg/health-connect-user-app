@@ -2,11 +2,14 @@ import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } fro
 import { SIGNALR_HUB_URL } from '../config/env';
 import type { ChatInvitation, ChatMessage, MessagesReadEvent } from '../features/chat/types/chat.types';
 import type { AppNotification } from '../features/notifications/types/notification.types';
+import type { Call } from '../features/calls/types/call.types';
 
 type MessageHandler = (message: ChatMessage) => void;
 type InvitationHandler = (invitation: ChatInvitation) => void;
 type ReadHandler = (event: MessagesReadEvent) => void;
 type NotificationHandler = (notification: AppNotification) => void;
+type CallHandler = (call: Call) => void;
+type ReconnectedHandler = () => void;
 
 class ChatSocket {
   private connection: HubConnection | null = null;
@@ -15,6 +18,9 @@ class ChatSocket {
   private invitationHandlers = new Set<InvitationHandler>();
   private readHandlers = new Set<ReadHandler>();
   private notificationHandlers = new Set<NotificationHandler>();
+  private callIncomingHandlers = new Set<CallHandler>();
+  private callUpdatedHandlers = new Set<CallHandler>();
+  private reconnectedHandlers = new Set<ReconnectedHandler>();
 
   configure(getToken: () => string | null): void {
     this.getToken = getToken;
@@ -37,6 +43,10 @@ class ChatSocket {
     connection.on('InvitationRejected', (invitation: ChatInvitation) => this.invitationHandlers.forEach((h) => h(invitation)));
     connection.on('MessagesRead', (event: MessagesReadEvent) => this.readHandlers.forEach((h) => h(event)));
     connection.on('NotificationReceived', (notification: AppNotification) => this.notificationHandlers.forEach((h) => h(notification)));
+
+    connection.on('CallIncoming', (call: Call) => this.callIncomingHandlers.forEach((h) => h(call)));
+    connection.on('CallUpdated', (call: Call) => this.callUpdatedHandlers.forEach((h) => h(call)));
+    connection.onreconnected(() => this.reconnectedHandlers.forEach((h) => h()));
 
     this.connection = connection;
 
@@ -92,6 +102,21 @@ class ChatSocket {
   onNotification(handler: NotificationHandler): () => void {
     this.notificationHandlers.add(handler);
     return () => this.notificationHandlers.delete(handler);
+  }
+
+  onCallIncoming(handler: CallHandler): () => void {
+    this.callIncomingHandlers.add(handler);
+    return () => this.callIncomingHandlers.delete(handler);
+  }
+
+  onCallUpdated(handler: CallHandler): () => void {
+    this.callUpdatedHandlers.add(handler);
+    return () => this.callUpdatedHandlers.delete(handler);
+  }
+
+  onReconnected(handler: ReconnectedHandler): () => void {
+    this.reconnectedHandlers.add(handler);
+    return () => this.reconnectedHandlers.delete(handler);
   }
 }
 

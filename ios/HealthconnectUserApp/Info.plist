@@ -36,6 +36,14 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Carova uses your approximate location to show doctors and labs in your area first. You can keep using the app without it.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Carova uses your camera for video calls with your care team. You decide when to turn it on.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Carova uses your microphone so the other person can hear you during voice and video calls.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

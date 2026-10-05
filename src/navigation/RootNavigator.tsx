@@ -4,6 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NetInfo from '@react-native-community/netinfo';
 
 import type { RootStackParamList } from './types';
+import { navigationRef } from './navigationRef';
+import { CallProvider } from '../features/calls/context/CallProvider';
+import CallingScreen from '../features/calls/screens/CallingScreen';
+import CallHistoryScreen from '../features/calls/screens/CallHistoryScreen';
+import IncomingCallScreen from '../features/calls/screens/IncomingCallScreen';
 import { useAppDispatch, useAppSelector, setIsConnected, setUnreadCount } from '../store';
 import { chatSocket } from '../services/chatSocket';
 import { colors, fontFamily } from '../theme';
@@ -68,7 +73,8 @@ const RootNavigator: React.FC = () => {
   }, [isAuthenticated, dispatch]);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
+      <CallProvider>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -101,6 +107,9 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="ChatList" component={ChatListScreen} options={{ headerShown: true, title: 'Chats' }} />
             <Stack.Screen name="ChatConversation" component={ConversationScreen} options={{ headerShown: true, title: 'Chat' }} />
             <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} options={{ headerShown: true, title: 'Notifications' }} />
+            <Stack.Screen name="IncomingCall" component={IncomingCallScreen} options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }} />
+            <Stack.Screen name="Calling" component={CallingScreen} options={{ animation: 'fade', gestureEnabled: false }} />
+            <Stack.Screen name="CallHistory" component={CallHistoryScreen} options={{ headerShown: true, title: 'Call history' }} />
             <Stack.Screen name="EditProfile" component={ProfileScreen} options={{ headerShown: true, title: 'Edit profile' }} />
             <Stack.Screen name="FamilyMembers" component={FamilyMembersScreen} options={{ headerShown: true, title: 'Family members' }} />
             <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: true, title: 'Settings' }} />
@@ -120,6 +129,7 @@ const RootNavigator: React.FC = () => {
         )}
         <Stack.Screen name="NoInternet" component={NoInternetScreen} />
       </Stack.Navigator>
+      </CallProvider>
     </NavigationContainer>
   );
 };

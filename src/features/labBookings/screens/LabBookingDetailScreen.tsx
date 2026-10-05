@@ -11,6 +11,7 @@ import { ScreenContainer } from '../../../components/ScreenContainer/ScreenConta
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { activeopacity } from '../../../utils/helpers';
+import { ContextCallCard } from '../../calls/components/ContextCallCard';
 import { labBookingService } from '../../../services/labBookingService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabBookingDetail } from '../types/labBooking.types';
@@ -20,6 +21,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'LabBookingDetail'>;
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
+
+const CALLABLE_STATUSES = ['CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY', 'COLLECTION_FAILED', 'SAMPLE_COLLECTED', 'PROCESSING'];
 
 const TRACKING_STEPS: { status: string; label: string }[] = [
   { status: 'CONFIRMED', label: 'Booking confirmed' },
@@ -102,6 +105,13 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
 
       {actionError && <Banner variant="error" message={actionError} />}
+      {CALLABLE_STATUSES.includes(booking.status) && (
+        <ContextCallCard
+          context={{ labBookingId: booking.id }}
+          title={booking.status === 'COLLECTOR_ASSIGNED' || booking.status === 'ON_THE_WAY' ? 'Call your collector' : 'Call the lab'}
+          hint="Ask about your booking, timing or preparation."
+        />
+      )}
       {booking.status === 'COLLECTION_FAILED' && (
         <Banner variant="warning" message="The last collection attempt was unsuccessful — the lab will reassign a new time." />
       )}

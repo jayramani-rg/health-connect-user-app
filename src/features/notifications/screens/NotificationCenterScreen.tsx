@@ -21,6 +21,7 @@ const CATEGORY_ICON: Record<string, IoniconsIconName> = {
   APPOINTMENT: 'calendar',
   LAB: 'flask',
   PROFILE: 'person-circle',
+  CALL: 'call',
 };
 
 function iconFor(type: NotificationType): IoniconsIconName {
@@ -87,6 +88,8 @@ const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
       navigation.navigate('LabBookingDetail', { bookingId: item.entityId });
     } else if (item.entityType === 'ChatConversation') {
       navigation.navigate('ChatConversation', { conversationId: item.entityId });
+    } else if (item.entityType === 'Call') {
+      navigation.navigate('CallHistory');
     } else if (item.entityType === 'ChatInvitation') {
       navigation.navigate('ChatList');
     }

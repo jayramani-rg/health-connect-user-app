@@ -15,6 +15,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Icon } from '../../../components/Icon/Icon';
 import { MessageBubble } from '../../../components/MessageBubble/MessageBubble';
+import { callHeaderRight } from '../../calls/components/CallButtons';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
@@ -84,7 +85,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
 
         const conversation = conversationRes.data;
         const title = conversation.providerType === 'DOCTOR' ? conversation.doctorName ?? 'Doctor' : conversation.laboratoryName ?? 'Laboratory';
-        navigation.setOptions({ title });
+        navigation.setOptions({ title, headerRight: callHeaderRight({ conversationId }) });
 
         setMessages(messagesRes.data.items);
         setHasMore(messagesRes.data.hasMore);

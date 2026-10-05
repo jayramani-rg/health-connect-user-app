@@ -9,6 +9,7 @@ import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { StatusBadge } from '../../../components/StatusBadge/StatusBadge';
+import { ContextCallCard } from '../../calls/components/ContextCallCard';
 import { appointmentService } from '../../../services/appointmentService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { AppointmentDetail } from '../types/appointment.types';
@@ -99,6 +100,15 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
         <Banner variant="info" message="You'll be notified here when it's time to join this consultation." />
       )}
       {appointment.status === 'IN_PROGRESS' && <Banner variant="success" message="Your consultation is currently in progress." />}
+
+      {appointment.consultationType !== 'IN_CLINIC' && (appointment.status === 'CONFIRMED' || appointment.status === 'IN_PROGRESS') && (
+        <ContextCallCard
+          context={{ appointmentId: appointment.id }}
+          title="Join your consultation"
+          hint="Calls open 15 minutes before your appointment time."
+          allowVideo={appointment.consultationType === 'VIDEO'}
+        />
+      )}
 
       <View style={styles.card}>
         <View style={styles.row}>

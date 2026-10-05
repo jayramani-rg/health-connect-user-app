@@ -112,6 +112,12 @@ export default function ProfileHomeScreen() {
       subtitle: 'Home, work and more for home collection',
       onPress: () => navigation.navigate('SavedAddresses'),
     },
+    {
+      icon: 'call-outline',
+      title: 'Call history',
+      subtitle: 'Voice and video calls with your care team',
+      onPress: () => navigation.navigate('CallHistory'),
+    },
     { icon: 'settings-outline', title: 'Settings', onPress: () => navigation.navigate('Settings') },
     { icon: 'help-circle-outline', title: 'Help & support', onPress: () => navigation.navigate('HelpSupport') },
   ];

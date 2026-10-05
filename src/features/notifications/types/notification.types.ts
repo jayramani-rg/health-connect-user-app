@@ -22,7 +22,9 @@ export type NotificationType =
   | 'LAB_SAMPLE_COLLECTED'
   | 'LAB_REPORT_UPLOADED'
   | 'PROFILE_VERIFICATION_STATUS'
-  | 'PROFILE_REVERIFICATION_REQUIRED';
+  | 'PROFILE_REVERIFICATION_REQUIRED'
+  | 'CALL_MISSED'
+  | 'CALL_REJECTED';
 
 export interface AppNotification {
   id: string;

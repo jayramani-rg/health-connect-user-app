@@ -31,6 +31,9 @@ export type RootStackParamList = {
   ChatConversation: { conversationId: string };
 
   NotificationCenter: undefined;
+  IncomingCall: undefined;
+  Calling: undefined;
+  CallHistory: undefined;
   EditProfile: undefined;
   FamilyMembers: undefined;
 
