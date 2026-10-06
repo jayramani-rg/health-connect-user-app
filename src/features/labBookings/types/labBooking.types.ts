@@ -12,7 +12,8 @@ export type LabBookingStatus =
   | 'REJECTED'
   | 'CANCELLED'
   | 'EXPIRED'
-  | 'NO_SHOW';
+  | 'NO_SHOW'
+  | 'PAYMENT_PENDING';
 
 export interface LabBookingListItem {
   id: string;
@@ -140,7 +141,7 @@ export type LabBookingTab = 'upcoming' | 'pending' | 'processing' | 'reports' | 
 
 export const LAB_STATUS_BY_TAB: Record<LabBookingTab, LabBookingStatus[]> = {
   upcoming: ['CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY'],
-  pending: ['PENDING'],
+  pending: ['PAYMENT_PENDING', 'PENDING'],
   processing: ['SAMPLE_COLLECTED', 'PROCESSING'],
   reports: ['REPORT_READY'],
   cancelled: ['CANCELLED', 'REJECTED', 'EXPIRED', 'NO_SHOW', 'COLLECTION_FAILED'],

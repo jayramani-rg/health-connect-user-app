@@ -36,6 +36,21 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Carova uses your approximate location to show doctors and labs in your area first. You can keep using the app without it.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tez</string>
+		<string>gpay</string>
+		<string>phonepe</string>
+		<string>paytmmp</string>
+		<string>paytm</string>
+		<string>credpay</string>
+		<string>mobikwik</string>
+		<string>in.fampay.app</string>
+		<string>bhim</string>
+		<string>amazonpay</string>
+		<string>super</string>
+		<string>popclubapp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Carova uses your camera for video calls with your care team. You decide when to turn it on.</string>
 	<key>NSMicrophoneUsageDescription</key>

@@ -26,6 +26,7 @@ import DoctorListScreen from '../features/doctors/screens/DoctorListScreen';
 import DoctorProfileScreen from '../features/doctors/screens/DoctorProfileScreen';
 import BookAppointmentScreen from '../features/appointments/screens/BookAppointmentScreen';
 import AppointmentConfirmationScreen from '../features/appointments/screens/AppointmentConfirmationScreen';
+import PaymentSummaryScreen from '../features/payments/screens/PaymentSummaryScreen';
 import AppointmentDetailScreen from '../features/appointments/screens/AppointmentDetailScreen';
 import LabCategoriesScreen from '../features/labs/screens/LabCategoriesScreen';
 import LabListScreen from '../features/labs/screens/LabListScreen';
@@ -95,6 +96,7 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="DoctorList" component={DoctorListScreen} options={{ headerShown: true, title: 'Find a doctor' }} />
             <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} options={{ headerShown: true, title: 'Doctor profile' }} />
             <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="PaymentSummary" component={PaymentSummaryScreen} options={{ headerShown: true, title: 'Payment', gestureEnabled: false }} />
             <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="AppointmentDetail" component={AppointmentDetailScreen} options={{ headerShown: true, title: 'Appointment' }} />
             <Stack.Screen name="LabCategories" component={LabCategoriesScreen} options={{ headerShown: true, title: 'Book a lab test' }} />

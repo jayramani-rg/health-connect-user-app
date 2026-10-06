@@ -22,6 +22,7 @@ import type { RootStackParamList } from '../../../navigation/types';
 import type { ConsultationType, DoctorDetail } from '../../doctors/types/doctor.types';
 import type { AvailableSlot } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
+import { routeAfterBooking } from '../../payments/utils/routeAfterBooking';
 import { styles } from '../styles/BookAppointmentScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookAppointment'>;
@@ -215,7 +216,12 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         scheduledStartAtUtc: selectedSlot.startAtUtc,
         reason: reason.trim() || undefined,
       });
-      navigation.replace('AppointmentConfirmation', { appointmentId: response.data.id });
+      const next = routeAfterBooking('APPOINTMENT', response.data.id, response.data.status);
+      if (next.name === 'PaymentSummary') {
+        navigation.replace('PaymentSummary', next.params);
+      } else if (next.name === 'AppointmentConfirmation') {
+        navigation.replace('AppointmentConfirmation', next.params);
+      }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Could not send this request. Please try again.');
     } finally {

@@ -24,7 +24,11 @@ export type NotificationType =
   | 'PROFILE_VERIFICATION_STATUS'
   | 'PROFILE_REVERIFICATION_REQUIRED'
   | 'CALL_MISSED'
-  | 'CALL_REJECTED';
+  | 'CALL_REJECTED'
+  | 'PAYMENT_SUCCESS'
+  | 'PAYMENT_FAILED'
+  | 'REFUND_PROCESSED'
+  | 'SETTLEMENT_PAID';
 
 export interface AppNotification {
   id: string;

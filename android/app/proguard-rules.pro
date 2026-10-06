@@ -11,3 +11,11 @@
 
 -keep class io.agora.** { *; }
 -dontwarn io.agora.**
+
+-keepattributes *Annotation*
+-keepattributes JavascriptInterface
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keep class com.cashfree.** { *; }
+-dontwarn com.cashfree.**

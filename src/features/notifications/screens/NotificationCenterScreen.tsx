@@ -22,6 +22,9 @@ const CATEGORY_ICON: Record<string, IoniconsIconName> = {
   LAB: 'flask',
   PROFILE: 'person-circle',
   CALL: 'call',
+  PAYMENT: 'card',
+  REFUND: 'card',
+  SETTLEMENT: 'wallet',
 };
 
 function iconFor(type: NotificationType): IoniconsIconName {

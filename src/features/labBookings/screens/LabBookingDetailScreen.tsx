@@ -89,7 +89,8 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const isHomeCollection = booking.collectionMethod === 'HOME_COLLECTION';
-  const canCancel = ['PENDING', 'CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY'].includes(booking.status);
+  const canCancel = ['PENDING', 'CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY', 'PAYMENT_PENDING'].includes(booking.status);
+  const awaitingPayment = booking.status === 'PAYMENT_PENDING';
   const currentTrackingIndex = TRACKING_STEPS.findIndex((s) => s.status === booking.status);
 
   return (
@@ -105,6 +106,15 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
 
       {actionError && <Banner variant="error" message={actionError} />}
+
+      {awaitingPayment && (
+        <>
+          <Banner variant="warning" message="Payment is pending. Pay to send this booking to the lab before it is released." />
+          <View style={{ marginBottom: spacing.md }}>
+            <Button label="Pay now" onPress={() => navigation.navigate('PaymentSummary', { kind: 'LAB_BOOKING', bookingId })} />
+          </View>
+        </>
+      )}
       {CALLABLE_STATUSES.includes(booking.status) && (
         <ContextCallCard
           context={{ labBookingId: booking.id }}

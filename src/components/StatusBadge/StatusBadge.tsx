@@ -15,6 +15,7 @@ const STATUS_META: Record<AppointmentStatus, { label: string; bg: string; fg: st
   CANCELLED: { label: 'Cancelled', bg: colors.errorSoft, fg: colors.error },
   EXPIRED: { label: 'Expired', bg: colors.errorSoft, fg: colors.error },
   NO_SHOW: { label: 'No-show', bg: colors.errorSoft, fg: colors.error },
+  PAYMENT_PENDING: { label: 'Awaiting payment', bg: colors.warningSoft, fg: colors.warning },
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {

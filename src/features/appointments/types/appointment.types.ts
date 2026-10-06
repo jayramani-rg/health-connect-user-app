@@ -11,7 +11,8 @@ export type AppointmentStatus =
   | 'REJECTED'
   | 'CANCELLED'
   | 'EXPIRED'
-  | 'NO_SHOW';
+  | 'NO_SHOW'
+  | 'PAYMENT_PENDING';
 
 export interface AppointmentListItem {
   id: string;
@@ -118,7 +119,7 @@ export type AppointmentTab = 'upcoming' | 'pending' | 'past' | 'cancelled';
 
 export const STATUS_BY_TAB: Record<AppointmentTab, AppointmentStatus[]> = {
   upcoming: ['CONFIRMED', 'IN_PROGRESS'],
-  pending: ['PENDING', 'RESCHEDULE_PROPOSED'],
+  pending: ['PAYMENT_PENDING', 'PENDING', 'RESCHEDULE_PROPOSED'],
   past: ['COMPLETED', 'NO_SHOW'],
   cancelled: ['CANCELLED', 'REJECTED', 'EXPIRED'],
 };

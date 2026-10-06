@@ -22,6 +22,7 @@ import type { RootStackParamList } from '../../../navigation/types';
 import type { LabDetail } from '../../labs/types/lab.types';
 import type { Dependent, PatientAddress } from '../../patients/types/patient.types';
 import type { AvailableLabSlot, CollectionMethod, HomeCollectionEligibility } from '../types/labBooking.types';
+import { routeAfterBooking } from '../../payments/utils/routeAfterBooking';
 import { styles } from '../styles/BookLabServiceScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookLabService'>;
@@ -184,7 +185,12 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
         patientAddressId: collectionMethod === 'HOME_COLLECTION' ? addressId : undefined,
         notes: notes.trim() || undefined,
       });
-      navigation.replace('LabBookingConfirmation', { bookingId: response.data.id });
+      const next = routeAfterBooking('LAB_BOOKING', response.data.id, response.data.status);
+      if (next.name === 'PaymentSummary') {
+        navigation.replace('PaymentSummary', next.params);
+      } else if (next.name === 'LabBookingConfirmation') {
+        navigation.replace('LabBookingConfirmation', next.params);
+      }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Could not send this request. Please try again.');
     } finally {

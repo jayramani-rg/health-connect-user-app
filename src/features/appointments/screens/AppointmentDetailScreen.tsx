@@ -22,7 +22,7 @@ function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
+const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { appointmentId } = route.params;
   const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +81,8 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
     );
   }
 
-  const canCancel = ['PENDING', 'CONFIRMED', 'RESCHEDULE_PROPOSED'].includes(appointment.status);
+  const canCancel = ['PENDING', 'CONFIRMED', 'RESCHEDULE_PROPOSED', 'PAYMENT_PENDING'].includes(appointment.status);
+  const awaitingPayment = appointment.status === 'PAYMENT_PENDING';
   const isRescheduleProposed = appointment.status === 'RESCHEDULE_PROPOSED';
 
   return (
@@ -95,6 +96,15 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route }) => {
       </View>
 
       {actionError && <Banner variant="error" message={actionError} />}
+
+      {awaitingPayment && (
+        <>
+          <Banner variant="warning" message="Payment is pending. Pay to send this request to the doctor before the booking is released." />
+          <View style={styles.actions}>
+            <Button label="Pay now" onPress={() => navigation.navigate('PaymentSummary', { kind: 'APPOINTMENT', bookingId: appointmentId })} />
+          </View>
+        </>
+      )}
 
       {appointment.consultationType !== 'IN_CLINIC' && appointment.status === 'CONFIRMED' && (
         <Banner variant="info" message="You'll be notified here when it's time to join this consultation." />
