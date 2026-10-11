@@ -9,6 +9,7 @@ import notificationsReducer, { notificationsDataName, incrementUnread } from './
 import locationReducer, { locationDataName } from './slices/locationSlice';
 import { API } from '../api';
 import { chatSocket } from '../services/chatSocket';
+import { callSocket } from '../services/callSocket';
 
 const rootReducer = combineReducers({
   [authDataName]: authReducer,
@@ -54,6 +55,7 @@ API.configure({
 });
 
 chatSocket.configure(() => store.getState().authData.tokens?.accessToken ?? null);
+callSocket.configure(() => store.getState().authData.tokens?.accessToken ?? null);
 chatSocket.onNotification(() => store.dispatch(incrementUnread()));
 
 export type AppDispatch = typeof store.dispatch;

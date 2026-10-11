@@ -1,26 +1,23 @@
-import type { Call, CallRole, CallSession, CallStage, CallStatus, RtcSession } from '../types/call.types';
+import type { Call, CallRole, CallStage, CallStatus } from '../types/call.types';
 
 export interface CallState {
   stage: CallStage;
   role: CallRole | null;
   call: Call | null;
-  rtc: RtcSession | null;
 }
 
 export type CallAction =
   | { type: 'incoming'; call: Call }
-  | { type: 'outgoingStarted'; session: CallSession }
-  | { type: 'accepted'; session: CallSession }
-  | { type: 'resumed'; session: CallSession; userId: string }
+  | { type: 'outgoingStarted'; call: Call }
+  | { type: 'accepted'; call: Call }
+  | { type: 'resumed'; call: Call; userId: string }
   | { type: 'callUpdated'; call: Call }
-  | { type: 'tokenRefreshed'; rtc: RtcSession }
   | { type: 'reset' };
 
 export const initialCallState: CallState = {
   stage: 'idle',
   role: null,
   call: null,
-  rtc: null,
 };
 
 const TERMINAL_STATUSES: CallStatus[] = ['ENDED', 'REJECTED', 'CANCELLED', 'MISSED', 'FAILED'];
@@ -45,29 +42,29 @@ export function callReducer(state: CallState, action: CallAction): CallState {
       if (state.stage !== 'idle' || action.call.status !== 'RINGING') {
         return state;
       }
-      return { stage: 'incoming', role: 'RECEIVER', call: action.call, rtc: null };
+      return { stage: 'incoming', role: 'RECEIVER', call: action.call };
     }
 
     case 'outgoingStarted': {
       if (state.stage !== 'idle') {
         return state;
       }
-      return { stage: stageFor(action.session.call, 'CALLER'), role: 'CALLER', call: action.session.call, rtc: action.session.rtc };
+      return { stage: stageFor(action.call, 'CALLER'), role: 'CALLER', call: action.call };
     }
 
     case 'accepted': {
-      if (state.stage !== 'incoming' || state.call?.id !== action.session.call.id) {
+      if (state.stage !== 'incoming' || state.call?.id !== action.call.id) {
         return state;
       }
-      return { stage: stageFor(action.session.call, 'RECEIVER'), role: 'RECEIVER', call: action.session.call, rtc: action.session.rtc };
+      return { stage: stageFor(action.call, 'RECEIVER'), role: 'RECEIVER', call: action.call };
     }
 
     case 'resumed': {
       if (state.stage !== 'idle') {
         return state;
       }
-      const role: CallRole = action.session.call.caller.userId === action.userId ? 'CALLER' : 'RECEIVER';
-      return { stage: stageFor(action.session.call, role), role, call: action.session.call, rtc: action.session.rtc };
+      const role: CallRole = action.call.caller.userId === action.userId ? 'CALLER' : 'RECEIVER';
+      return { stage: stageFor(action.call, role), role, call: action.call };
     }
 
     case 'callUpdated': {
@@ -78,13 +75,6 @@ export function callReducer(state: CallState, action: CallAction): CallState {
         return state;
       }
       return { ...state, stage: stageFor(action.call, state.role), call: action.call };
-    }
-
-    case 'tokenRefreshed': {
-      if (!state.rtc || state.rtc.callId !== action.rtc.callId) {
-        return state;
-      }
-      return { ...state, rtc: action.rtc };
     }
 
     case 'reset':

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, shadow, spacing, typography } from '../../../theme';
+import { colors, radius, spacing, typography } from '../../../theme';
 import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
 
 export const styles = StyleSheet.create({
@@ -7,19 +7,28 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.canvas,
   },
-  greetingRow: {
+  content: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+  },
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
-  greetingTextWrap: {
-    marginLeft: spacing.md,
+  headerText: {
     flex: 1,
+    gap: spacing.xs,
+  },
+  greeting: {
+    ...typography.title,
+    color: colors.text,
   },
   bellButton: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.pill,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -43,139 +52,78 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.white,
   },
-  greeting: {
-    ...typography.h2,
-    color: colors.text,
-  },
-  subGreeting: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 12,
-    marginBottom: spacing.xl,
-    ...shadow.card,
-  },
-  searchPlaceholder: {
-    ...typography.body,
-    color: colors.textTertiary,
-    marginLeft: spacing.sm,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
+  searchWrap: {
     marginBottom: spacing.xl,
   },
-  actionRow: {
+  serviceRow: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xxxl,
   },
-  actionCard: {
+  serviceTile: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadow.card,
-  },
-  actionIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
+    minHeight: 132,
+    padding: spacing.lg,
+    borderRadius: radius.xl,
     backgroundColor: colors.brandSoft,
+  },
+  serviceTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  serviceIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
   },
-  actionTitle: {
-    ...typography.bodyStrong,
-    color: colors.text,
+  serviceTitle: {
+    ...typography.subtitle,
+    color: colors.brandStrong,
   },
-  actionSubtitle: {
+  serviceSubtitle: {
     ...typography.caption,
     color: colors.textSecondary,
     marginTop: 2,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
     ...typography.title,
     color: colors.text,
-    marginBottom: spacing.sm,
   },
-  sectionHeaderRow: {
+  categorySkeleton: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    rowGap: spacing.lg,
+  },
+  categorySkeletonTile: {
+    width: '25%',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    gap: spacing.sm,
   },
-  linkText: {
-    ...typography.label,
-    color: colors.brand,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  cardTitle: {
-    ...typography.bodyStrong,
-    color: colors.text,
-  },
-  cardSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  emptyCard: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  chatListCard: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-  },
-  chatSeparator: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginLeft: spacing.lg + 44 + spacing.md,
-  },
-  categoryStrip: {
-    marginBottom: spacing.xl,
-  },
-  reportCard: {
+  viewAllButton: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  reportIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    backgroundColor: colors.successSoft,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    gap: spacing.xs,
+    marginTop: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.brand,
+  },
+  viewAllText: {
+    ...typography.label,
+    color: colors.brand,
   },
   offlineBanner: {
     position: 'absolute',

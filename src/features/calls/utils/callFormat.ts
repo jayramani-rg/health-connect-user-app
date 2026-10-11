@@ -32,6 +32,7 @@ export function describeHistoryStatus(call: Call, userId: string): CallStatusPre
   const byStatus: Record<CallStatus, CallStatusPresentation> = {
     RINGING: { label: 'Ringing', tone: 'neutral' },
     ACCEPTED: { label: 'Connecting', tone: 'neutral' },
+    CONNECTING: { label: 'Connecting', tone: 'neutral' },
     CONNECTED: { label: 'In progress', tone: 'success' },
     ENDED: { label: outgoing ? 'Outgoing' : 'Incoming', tone: 'success' },
     REJECTED: { label: outgoing ? 'Declined' : 'You declined', tone: 'warning' },

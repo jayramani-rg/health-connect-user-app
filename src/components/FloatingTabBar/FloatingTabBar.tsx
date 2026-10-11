@@ -1,65 +1,114 @@
-import React from 'react';
-import { Dimensions, Pressable, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { Pressable, Text, View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { colors, motion } from '../../theme';
+import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { Icon, type IoniconsIconName } from '../Icon/Icon';
-import { BAR_BOTTOM_INSET, BAR_SIDE_INSET, ITEM_INNER_INSET, styles } from './styles/FloatingTabBar.styles';
+import { BAR_BOTTOM_INSET, INDICATOR_SIZE, INDICATOR_SPRING, PRESS_SPRING, styles } from './styles/FloatingTabBar.styles';
 
-const TAB_ICONS: Record<string, { active: IoniconsIconName; inactive: IoniconsIconName }> = {
-  Home: { active: 'home', inactive: 'home-outline' },
-  Book: { active: 'search', inactive: 'search-outline' },
-  Appointments: { active: 'calendar', inactive: 'calendar-outline' },
-  Profile: { active: 'person', inactive: 'person-outline' },
-};
+export type FloatingTabIcons = Record<string, { active: IoniconsIconName; inactive: IoniconsIconName }>;
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+interface FloatingTabBarProps extends BottomTabBarProps {
+  icons: FloatingTabIcons;
+  badges?: Record<string, number>;
+}
 
-export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const insets = useSafeAreaInsets();
-  const barWidth = SCREEN_WIDTH - BAR_SIDE_INSET * 2;
-  const segmentWidth = barWidth / state.routes.length;
+interface TabItemProps {
+  focused: boolean;
+  icon: { active: IoniconsIconName; inactive: IoniconsIconName };
+  badge: number;
+  label: string;
+  onPress: () => void;
+}
 
-  const indicatorX = useSharedValue(state.index * segmentWidth);
-  indicatorX.value = withSpring(state.index * segmentWidth, motion.spring.pill);
-
-  const indicatorStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: indicatorX.value + ITEM_INNER_INSET }],
-    width: segmentWidth - ITEM_INNER_INSET * 2,
-  }));
+function TabItem({ focused, icon, badge, label, onPress }: TabItemProps) {
+  const scale = useSharedValue(1);
+  const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <View style={[styles.wrapper, { bottom: BAR_BOTTOM_INSET + insets.bottom, width: barWidth }]} pointerEvents="box-none">
-      <Animated.View style={[styles.indicator, indicatorStyle]} />
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const focused = state.index === index;
-        const icons = TAB_ICONS[route.name] ?? TAB_ICONS.Home;
-        const label = typeof options.tabBarLabel === 'string' ? options.tabBarLabel : (options.title ?? route.name);
+    <Pressable
+      onPress={() => {
+        haptics.selection();
+        onPress();
+      }}
+      onPressIn={() => {
+        scale.value = withSpring(0.86, PRESS_SPRING);
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, PRESS_SPRING);
+      }}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: focused }}
+      style={styles.item}
+    >
+      <Animated.View style={[styles.iconWrap, iconStyle]}>
+        <Icon name={focused ? icon.active : icon.inactive} size={22} color={focused ? colors.brandStrong : colors.textTertiary} />
+        {badge > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{badge > 9 ? '9+' : badge}</Text>
+          </View>
+        )}
+      </Animated.View>
+    </Pressable>
+  );
+}
 
-        function onPress() {
-          haptics.selection();
-          const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (!focused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+export function FloatingTabBar({ state, descriptors, navigation, icons, badges }: FloatingTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const barWidth = useSharedValue(0);
+  const activeIndex = useSharedValue(state.index);
+  const routeCount = state.routes.length;
+
+  useEffect(() => {
+    activeIndex.value = withSpring(state.index, INDICATOR_SPRING);
+  }, [state.index, activeIndex]);
+
+  function handleLayout(event: LayoutChangeEvent) {
+    barWidth.value = event.nativeEvent.layout.width;
+  }
+
+  const indicatorStyle = useAnimatedStyle(() => {
+    const segment = barWidth.value / Math.max(routeCount, 1);
+    return {
+      opacity: barWidth.value > 0 ? 1 : 0,
+      transform: [{ translateX: activeIndex.value * segment + (segment - INDICATOR_SIZE) / 2 }],
+    };
+  });
+
+  return (
+    <View pointerEvents="box-none" style={[styles.wrapper, { bottom: insets.bottom + BAR_BOTTOM_INSET }]}>
+      <View style={styles.bar} onLayout={handleLayout} accessibilityRole="tablist">
+        <Animated.View pointerEvents="none" style={[styles.indicator, indicatorStyle]} />
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const focused = state.index === index;
+          const iconSet = icons[route.name];
+          if (!iconSet) return null;
+
+          function onPress() {
+            const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            if (!focused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
           }
-        }
 
-        return (
-          <Pressable
-            key={route.key}
-            onPress={onPress}
-            style={styles.item}
-            accessibilityRole="button"
-            accessibilityLabel={label}
-            accessibilityState={focused ? { selected: true } : {}}
-          >
-            <Icon name={focused ? icons.active : icons.inactive} size={22} color={focused ? colors.primaryStrong : colors.inkFaint} />
-          </Pressable>
-        );
-      })}
+          return (
+            <TabItem
+              key={route.key}
+              focused={focused}
+              icon={iconSet}
+              badge={badges?.[route.name] ?? 0}
+              label={typeof options.tabBarLabel === 'string' ? options.tabBarLabel : (options.title ?? route.name)}
+              onPress={onPress}
+            />
+          );
+        })}
+      </View>
     </View>
   );
 }
+
+export { TAB_BAR_CLEARANCE } from './styles/FloatingTabBar.styles';

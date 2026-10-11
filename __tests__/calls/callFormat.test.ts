@@ -15,12 +15,12 @@ function makeCall(status: CallStatus, overrides: Partial<Call> = {}): Call {
     id: 'call-1',
     callType: 'VOICE',
     status,
-    conversationId: 'conversation-1',
-    appointmentId: null,
-    labBookingId: null,
+    appointmentId: 'appointment-1',
+    meetingId: 'meeting-1',
     caller: { userId: 'u1', role: 'USER', name: 'Patient One', subtitle: null, photoUrl: null },
     receiver: { userId: 'u2', role: 'DOCTOR', name: 'Dr. Rao', subtitle: 'Cardiology', photoUrl: '/profile-photos/a.jpg' },
     startedAt: '2026-10-04T10:00:00Z',
+    ringingAt: '2026-10-04T10:00:00Z',
     ringExpiresAt: '2026-10-04T10:00:45Z',
     acceptedAt: null,
     connectedAt: null,
@@ -101,8 +101,8 @@ describe('resolvePhotoUrl', () => {
 
 describe('call messages', () => {
   it('never leaks technical details to the user', () => {
-    expect(issueMessage('connection_failed')).not.toMatch(/agora|error code|token/i);
-    expect(issueMessage('token_failed')).not.toMatch(/agora|jwt|expired/i);
+    expect(issueMessage('connection_failed')).not.toMatch(/webrtc|ice|sdp|error code|token/i);
+    expect(issueMessage('signaling_failed')).not.toMatch(/signalr|hub|jwt|expired/i);
     expect(issueMessage('permission_denied')).toMatch(/microphone/i);
   });
 

@@ -1,6 +1,15 @@
 export type CallType = 'VOICE' | 'VIDEO';
 
-export type CallStatus = 'RINGING' | 'ACCEPTED' | 'CONNECTED' | 'ENDED' | 'REJECTED' | 'CANCELLED' | 'MISSED' | 'FAILED';
+export type CallStatus =
+  | 'RINGING'
+  | 'ACCEPTED'
+  | 'CONNECTING'
+  | 'CONNECTED'
+  | 'ENDED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'MISSED'
+  | 'FAILED';
 
 export type CallEndReason =
   | 'HANGUP'
@@ -11,11 +20,17 @@ export type CallEndReason =
   | 'NETWORK_FAILURE'
   | 'MEDIA_FAILURE'
   | 'PERMISSION_DENIED'
-  | 'TOKEN_FAILURE'
+  | 'SIGNALING_FAILURE'
   | 'JOIN_TIMEOUT'
   | 'MAX_DURATION';
 
-export type CallClientEndReason = 'HANGUP' | 'REMOTE_LEFT' | 'NETWORK_FAILURE' | 'MEDIA_FAILURE' | 'PERMISSION_DENIED' | 'TOKEN_FAILURE';
+export type CallClientEndReason =
+  | 'HANGUP'
+  | 'REMOTE_LEFT'
+  | 'NETWORK_FAILURE'
+  | 'MEDIA_FAILURE'
+  | 'PERMISSION_DENIED'
+  | 'SIGNALING_FAILURE';
 
 export type CallParticipantRole = 'USER' | 'DOCTOR' | 'LABORATORIAN';
 
@@ -29,14 +44,14 @@ export interface CallParticipant {
 
 export interface Call {
   id: string;
+  appointmentId: string;
+  meetingId: string;
   callType: CallType;
   status: CallStatus;
-  conversationId: string | null;
-  appointmentId: string | null;
-  labBookingId: string | null;
   caller: CallParticipant;
   receiver: CallParticipant;
   startedAt: string;
+  ringingAt: string;
   ringExpiresAt: string;
   acceptedAt: string | null;
   connectedAt: string | null;
@@ -47,22 +62,22 @@ export interface Call {
   updatedAt: string;
 }
 
-export interface RtcSession {
+export interface IceServer {
+  urls: string[];
+  username?: string | null;
+  credential?: string | null;
+}
+
+export interface IceConfig {
   callId: string;
-  callType: CallType;
-  appId: string;
-  channelName: string;
-  token: string;
-  uid: number;
+  iceServers: IceServer[];
   expiresAtUtc: string;
+  relayAvailable: boolean;
 }
 
-export interface CallSession {
-  call: Call;
-  rtc: RtcSession | null;
+export interface CallContextRef {
+  appointmentId: string;
 }
-
-export type CallContextRef = { conversationId: string } | { appointmentId: string } | { labBookingId: string };
 
 export interface StartCallInput {
   callType: CallType;
@@ -80,8 +95,13 @@ export type CallRole = 'CALLER' | 'RECEIVER';
 
 export type CallStage = 'idle' | 'incoming' | 'outgoing' | 'active' | 'ended';
 
-export type NetworkQualityLevel = 'unknown' | 'good' | 'poor' | 'bad';
+export type NetworkQualityLevel = 'unknown' | 'good' | 'poor';
 
-export type MediaConnectionState = 'idle' | 'joining' | 'connected' | 'reconnecting' | 'failed';
+export type MediaConnectionState = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'failed';
 
-export type CallIssue = 'permission_denied' | 'microphone_unavailable' | 'camera_unavailable' | 'connection_failed' | 'token_failed';
+export type CallIssue =
+  | 'permission_denied'
+  | 'microphone_unavailable'
+  | 'camera_unavailable'
+  | 'connection_failed'
+  | 'signaling_failed';

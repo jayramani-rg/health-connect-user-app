@@ -7,5 +7,5 @@ export interface CategoryGridItem {
 export interface CategoryGridProps {
   categories: CategoryGridItem[];
   onSelect: (category: CategoryGridItem) => void;
-  variant?: 'grid' | 'strip';
+  variant?: 'grid' | 'strip' | 'compact';
 }

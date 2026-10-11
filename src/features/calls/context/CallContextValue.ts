@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { AgoraCallControls, AgoraCallMedia } from '../hooks/useAgoraCall';
+import type { CallControls, CallMedia } from '../hooks/useWebRTCCall';
 import type { CallState } from '../state/callReducer';
 import type { CallClientEndReason, StartCallInput } from '../types/call.types';
 
@@ -8,8 +8,8 @@ export type StartCallOutcome = { ok: true } | { ok: false; message: string | nul
 export interface CallContextValue {
   state: CallState;
   userId: string | null;
-  media: AgoraCallMedia;
-  controls: AgoraCallControls;
+  media: CallMedia;
+  controls: CallControls;
   startCall: (input: StartCallInput) => Promise<StartCallOutcome>;
   acceptCall: () => Promise<void>;
   declineCall: () => Promise<void>;

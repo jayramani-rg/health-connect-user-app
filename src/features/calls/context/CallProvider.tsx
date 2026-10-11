@@ -3,13 +3,13 @@ import { AppState, Vibration } from 'react-native';
 import { StackActions } from '@react-navigation/native';
 
 import { callService } from '../../../services/callService';
-import { chatSocket } from '../../../services/chatSocket';
+import { callSocket } from '../../../services/callSocket';
 import { navigationRef } from '../../../navigation/navigationRef';
 import { useAppSelector } from '../../../store';
-import { useAgoraCall } from '../hooks/useAgoraCall';
+import { useWebRTCCall } from '../hooks/useWebRTCCall';
 import { ensureCallReadiness } from '../permissions/callPermissions';
 import { callReducer, initialCallState, isTerminalStatus } from '../state/callReducer';
-import type { Call, CallClientEndReason, CallStatus, RtcSession, StartCallInput } from '../types/call.types';
+import type { Call, CallClientEndReason, CallStatus, StartCallInput } from '../types/call.types';
 import { startFailureMessage } from '../utils/callMessages';
 import { CallContext, type CallContextValue, type StartCallOutcome } from './CallContextValue';
 import { ActiveCallBanner } from '../components/ActiveCallBanner';
@@ -74,12 +74,11 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
   }, []);
 
-  const { media, controls } = useAgoraCall({
+  const { media, controls } = useWebRTCCall({
     call: state.call,
-    rtc: state.rtc,
-    active: state.stage === 'outgoing' || state.stage === 'active',
+    role: state.role,
+    active: state.stage === 'active',
     cameraAllowed,
-    onTokenRefreshed: (rtc: RtcSession) => dispatch({ type: 'tokenRefreshed', rtc }),
     onRequestEnd: endCall,
   });
 
@@ -90,15 +89,15 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       const response = await callService.getActive();
-      const session = response.data;
+      const activeCall = response.data;
       const current = stateRef.current;
 
-      if (session) {
+      if (activeCall) {
         if (current.stage === 'idle') {
-          setCameraAllowed(session.call.callType === 'VIDEO');
-          dispatch({ type: 'resumed', session, userId: currentUserId });
-        } else if (current.call?.id === session.call.id) {
-          dispatch({ type: 'callUpdated', call: session.call });
+          setCameraAllowed(activeCall.callType === 'VIDEO');
+          dispatch({ type: 'resumed', call: activeCall, userId: currentUserId });
+        } else if (current.call?.id === activeCall.id) {
+          dispatch({ type: 'callUpdated', call: activeCall });
         }
         return;
       }
@@ -127,7 +126,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCameraAllowed(readiness.cameraAllowed);
       const response = await callService.start(input.callType, input.context);
       endRequestedRef.current = null;
-      dispatch({ type: 'outgoingStarted', session: response.data });
+      dispatch({ type: 'outgoingStarted', call: response.data });
       return { ok: true };
     } catch (error) {
       return { ok: false, message: startFailureMessage(error) };
@@ -152,7 +151,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCameraAllowed(readiness.cameraAllowed);
       endRequestedRef.current = null;
       const response = await callService.accept(call.id);
-      dispatch({ type: 'accepted', session: response.data });
+      dispatch({ type: 'accepted', call: response.data });
     } catch {
       try {
         const detail = await callService.get(call.id);
@@ -182,16 +181,17 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return undefined;
     }
 
-    const offIncoming = chatSocket.onCallIncoming((call) => {
+    const offIncoming = callSocket.onIncoming((call) => {
       if (call.receiver.userId === userIdRef.current) {
         dispatch({ type: 'incoming', call });
       }
     });
-    const offUpdated = chatSocket.onCallUpdated((call) => dispatch({ type: 'callUpdated', call }));
-    const offReconnected = chatSocket.onReconnected(() => {
+    const offUpdated = callSocket.onStateChanged((call) => dispatch({ type: 'callUpdated', call }));
+    const offReconnected = callSocket.onReconnected(() => {
       syncActive();
     });
 
+    callSocket.connect();
     syncActive();
 
     const appStateSubscription = AppState.addEventListener('change', (next) => {
@@ -207,6 +207,12 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       appStateSubscription.remove();
     };
   }, [isAuthenticated, syncActive]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      callSocket.disconnect();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated && stateRef.current.stage !== 'idle') {

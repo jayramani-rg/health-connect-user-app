@@ -7,25 +7,11 @@ import { Icon } from '../../../components/Icon/Icon';
 import { ASSETS_BASE_URL } from '../../../config/env';
 import { callService } from '../../../services/callService';
 import { colors, fontFamily, radius, spacing } from '../../../theme';
-import { CallButtons } from '../components/CallButtons';
 import { useCall } from '../context/CallContextValue';
-import type { Call, CallContextRef } from '../types/call.types';
-import { describeHistoryStatus, formatCallTimestamp, formatDuration, isOutgoing, otherParticipant, resolvePhotoUrl } from '../utils/callFormat';
+import type { Call } from '../types/call.types';
+import { callTypeLabel, describeHistoryStatus, formatCallTimestamp, formatDuration, isOutgoing, otherParticipant, resolvePhotoUrl } from '../utils/callFormat';
 
 const PAGE_SIZE = 20;
-
-function contextOf(call: Call): CallContextRef | null {
-  if (call.conversationId) {
-    return { conversationId: call.conversationId };
-  }
-  if (call.appointmentId) {
-    return { appointmentId: call.appointmentId };
-  }
-  if (call.labBookingId) {
-    return { labBookingId: call.labBookingId };
-  }
-  return null;
-}
 
 const TONE_COLORS = {
   success: colors.success,
@@ -91,7 +77,6 @@ const CallHistoryScreen: React.FC = () => {
       }
       const other = otherParticipant(item, userId);
       const presentation = describeHistoryStatus(item, userId);
-      const context = contextOf(item);
       const outgoing = isOutgoing(item, userId);
       const meta = [formatCallTimestamp(item.startedAt), item.durationSeconds > 0 ? formatDuration(item.durationSeconds) : null]
         .filter(Boolean)
@@ -106,14 +91,13 @@ const CallHistoryScreen: React.FC = () => {
             </Text>
             <View style={styles.statusLine}>
               <Icon name={item.callType === 'VIDEO' ? 'videocam' : 'call'} size={13} color={TONE_COLORS[presentation.tone]} />
-              <Text style={[styles.statusText, { color: TONE_COLORS[presentation.tone] }]}>{presentation.label}</Text>
+              <Text style={[styles.statusText, { color: TONE_COLORS[presentation.tone] }]}>{`${callTypeLabel(item.callType)} · ${presentation.label}`}</Text>
               <Icon name={outgoing ? 'arrow-up' : 'arrow-down'} size={12} color={colors.textTertiary} />
             </View>
             <Text style={styles.meta} numberOfLines={1}>
               {meta}
             </Text>
           </View>
-          {context ? <CallButtons context={context} variant="inline" /> : null}
         </View>
       );
     },

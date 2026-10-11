@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { colors, radius, shadow, spacing, typography } from '../../../theme';
 
+export const ROUND_AVATAR_SIZE = 60;
+
 export const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
@@ -10,6 +12,12 @@ export const styles = StyleSheet.create({
   strip: {
     flexDirection: 'row',
     gap: spacing.md,
+  },
+  compactGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -spacing.xs,
+    rowGap: spacing.lg,
   },
   tile: {
     width: '48%',
@@ -27,6 +35,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
   },
+  compactTile: {
+    width: '25%',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.xs,
+  },
   avatar: {
     width: 44,
     height: 44,
@@ -35,15 +49,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.md,
     overflow: 'hidden',
+    backgroundColor: colors.brandSoft,
   },
-  stripAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  roundAvatar: {
+    width: ROUND_AVATAR_SIZE,
+    height: ROUND_AVATAR_SIZE,
+    borderRadius: ROUND_AVATAR_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 0,
     overflow: 'hidden',
+    backgroundColor: colors.brandSoft,
   },
   avatarImage: {
     width: '100%',
@@ -51,12 +66,13 @@ export const styles = StyleSheet.create({
   },
   avatarInitial: {
     ...typography.title,
+    color: colors.brand,
   },
   name: {
     ...typography.bodyStrong,
     color: colors.ink,
   },
-  stripName: {
+  roundName: {
     ...typography.caption,
     color: colors.ink,
     textAlign: 'center',

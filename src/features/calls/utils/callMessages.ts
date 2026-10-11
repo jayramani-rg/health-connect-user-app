@@ -8,8 +8,8 @@ export function issueMessage(issue: CallIssue): string {
       return 'We could not use your microphone. Check that no other app is using it.';
     case 'camera_unavailable':
       return 'Your camera is unavailable right now. You can continue with audio only.';
-    case 'token_failed':
-      return 'We could not keep this call secure. Please start the call again.';
+    case 'signaling_failed':
+      return 'We could not set up the call. Please check your connection and try again.';
     default:
       return 'We could not connect the call. Please check your connection and try again.';
   }

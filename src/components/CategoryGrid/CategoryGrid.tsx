@@ -1,55 +1,42 @@
 import React, { useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { activeopacity } from '../../utils/helpers';
-import { colors } from '../../theme';
 import { ASSETS_BASE_URL } from '../../config/env';
 import { styles } from './styles/CategoryGrid.styles';
 import type { CategoryGridItem, CategoryGridProps } from './types/CategoryGrid.types';
 
-const PALETTE = [
-  { bg: colors.primarySoft, fg: colors.primary },
-  { bg: colors.successSoft, fg: colors.success },
-  { bg: colors.pendingSoft, fg: colors.pending },
-  { bg: colors.warningSoft, fg: colors.warning },
-];
+type TileVariant = NonNullable<CategoryGridProps['variant']>;
 
 export function CategoryGrid({ categories, onSelect, variant = 'grid' }: CategoryGridProps) {
+  const tiles = categories.map((category) => (
+    <CategoryTile key={category.id} category={category} variant={variant} onPress={() => onSelect(category)} />
+  ));
+
   if (variant === 'strip') {
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
-        {categories.map((category, index) => (
-          <CategoryTile key={category.id} category={category} tint={PALETTE[index % PALETTE.length]} onPress={() => onSelect(category)} strip />
-        ))}
+        {tiles}
       </ScrollView>
     );
   }
 
-  return (
-    <View style={styles.grid}>
-      {categories.map((category, index) => (
-        <CategoryTile key={category.id} category={category} tint={PALETTE[index % PALETTE.length]} onPress={() => onSelect(category)} />
-      ))}
-    </View>
-  );
+  return <View style={variant === 'compact' ? styles.compactGrid : styles.grid}>{tiles}</View>;
 }
 
-function CategoryTile({
-  category,
-  tint,
-  onPress,
-  strip,
-}: {
-  category: CategoryGridItem;
-  tint: { bg: string; fg: string };
-  onPress: () => void;
-  strip?: boolean;
-}) {
+const TILE_STYLES: Record<TileVariant, { tile: object; avatar: object; name: object }> = {
+  grid: { tile: styles.tile, avatar: styles.avatar, name: styles.name },
+  strip: { tile: styles.stripTile, avatar: styles.roundAvatar, name: styles.roundName },
+  compact: { tile: styles.compactTile, avatar: styles.roundAvatar, name: styles.roundName },
+};
+
+function CategoryTile({ category, variant, onPress }: { category: CategoryGridItem; variant: TileVariant; onPress: () => void }) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = !!category.imageUrl && !imageFailed;
+  const look = TILE_STYLES[variant];
 
   return (
-    <TouchableOpacity activeOpacity={activeopacity} style={strip ? styles.stripTile : styles.tile} onPress={onPress}>
-      <View style={[strip ? styles.stripAvatar : styles.avatar, { backgroundColor: tint.bg }]}>
+    <TouchableOpacity activeOpacity={activeopacity} style={look.tile} onPress={onPress} accessibilityRole="button" accessibilityLabel={category.name}>
+      <View style={look.avatar}>
         {showImage ? (
           <Image
             source={{ uri: `${ASSETS_BASE_URL}${category.imageUrl}` }}
@@ -58,10 +45,10 @@ function CategoryTile({
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <Text style={[styles.avatarInitial, { color: tint.fg }]}>{category.name.trim().charAt(0).toUpperCase() || '?'}</Text>
+          <Text style={styles.avatarInitial}>{category.name.trim().charAt(0).toUpperCase() || '?'}</Text>
         )}
       </View>
-      <Text style={strip ? styles.stripName : styles.name} numberOfLines={2}>
+      <Text style={look.name} numberOfLines={2}>
         {category.name}
       </Text>
     </TouchableOpacity>

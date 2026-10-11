@@ -15,6 +15,8 @@ export const REQUEST_TIMEOUT_MS = 20000;
 
 export const SIGNALR_HUB_URL = `${API_BASE_URL.replace(/\/api\/?$/, '')}/hubs/chat`;
 
+export const CALL_HUB_URL = `${API_BASE_URL.replace(/\/api\/?$/, '')}/hubs/calls`;
+
 export const ASSETS_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 
 export const GOOGLE_API_KEY: string = (CONFIGURED_GOOGLE_API_KEY ?? '').trim();
