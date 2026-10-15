@@ -16,6 +16,7 @@ import type { RootStackParamList } from '../../../navigation/types';
 import type { AppointmentDetail } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
 import { styles } from '../styles/AppointmentDetailScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AppointmentDetail'>;
 
@@ -36,7 +37,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       const response = await appointmentService.getById(appointmentId);
       setAppointment(response.data);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Could not load this appointment.');
+      setActionError(getErrorMessage(error, 'Could not load this appointment.'));
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       const response = await action();
       setAppointment(response.data);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'This action could not be completed.');
+      setActionError(getErrorMessage(error, 'This action could not be completed.'));
     } finally {
       setActionLoading(false);
     }
@@ -68,7 +69,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={3} />
       </ScreenContainer>
     );
@@ -76,7 +77,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!appointment) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={actionError ?? 'Appointment not found.'} />
       </ScreenContainer>
     );
@@ -87,7 +88,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const isRescheduleProposed = appointment.status === 'RESCHEDULE_PROPOSED';
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.doctorName}>{appointment.doctorName}</Text>
@@ -153,7 +154,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           <Banner
             variant="warning"
             message={`${appointment.doctorName} proposed ${formatDateTime(appointment.rescheduleProposedStartAtUtc)}${
-              appointment.rescheduleNote ? ` — "${appointment.rescheduleNote}"` : ''
+              appointment.rescheduleNote ? `: "${appointment.rescheduleNote}"` : ''
             }`}
           />
           <View style={[styles.rescheduleRow, { marginTop: 12 }]}>

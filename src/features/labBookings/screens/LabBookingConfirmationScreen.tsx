@@ -8,6 +8,7 @@ import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader'
 import { labBookingService } from '../../../services/labBookingService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabBookingDetail } from '../types/labBooking.types';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabBookingConfirmation'>;
 
@@ -24,7 +25,7 @@ const LabBookingConfirmationScreen: React.FC<Props> = ({ route, navigation }) =>
       const response = await labBookingService.getById(bookingId);
       setBooking(response.data);
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not load your booking.');
+      setErrorText(getErrorMessage(error, 'Could not load your booking.'));
     } finally {
       setLoading(false);
     }
@@ -36,7 +37,7 @@ const LabBookingConfirmationScreen: React.FC<Props> = ({ route, navigation }) =>
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={2} />
       </ScreenContainer>
     );
@@ -44,7 +45,7 @@ const LabBookingConfirmationScreen: React.FC<Props> = ({ route, navigation }) =>
 
   if (!booking) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <EmptyState title="Something went wrong" description={errorText ?? 'Could not load your booking.'} actionLabel="Try again" onActionPress={load} />
       </ScreenContainer>
     );

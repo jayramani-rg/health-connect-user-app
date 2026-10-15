@@ -1,14 +1,13 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, typography } from '../../../theme';
-import { getHeight } from '../../../utils/helpers';
+import { colors, layout, radius, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    height: getHeight(52),
-    paddingHorizontal: getHeight(16),
+    height: 48,
+    paddingHorizontal: layout.gutter,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceSunken,
   },

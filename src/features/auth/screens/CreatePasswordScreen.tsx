@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { fadeUpEntering } from '../../../utils/motion';
 import { Button } from '../../../components/Button/Button';
 import { PasswordField, isPasswordValid } from '../../../components/PasswordField/PasswordField';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -72,7 +73,7 @@ export default function CreatePasswordScreen({ navigation, route }: Props) {
 
   return (
     <ScreenContainer>
-      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+      <Animated.View entering={fadeUpEntering()} style={{ gap: 4 }}>
         <Text style={styles.title}>{mode === 'register' ? 'Create a password' : 'Set a new password'}</Text>
         <Text style={styles.subtitle}>
           {mode === 'register'

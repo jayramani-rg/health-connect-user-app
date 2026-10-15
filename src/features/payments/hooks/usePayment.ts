@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { paymentService } from '../../../services/paymentService';
 import { openCheckout } from '../cashfree/CashfreeCheckout';
 import type { PaymentBookingKind, PaymentQuote } from '../types/payment.types';
+import { getErrorMessage } from '../../../utils/errors';
 
 const VERIFY_ATTEMPTS = 3;
 const VERIFY_DELAY_MS = 1500;
@@ -44,7 +45,7 @@ export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
       }
     } catch (error) {
       if (mounted.current) {
-        setLoadError(error instanceof Error ? error.message : 'Could not load the payment summary.');
+        setLoadError(getErrorMessage(error, 'Could not load the payment summary.'));
       }
     } finally {
       if (mounted.current) {
@@ -75,8 +76,8 @@ export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
             if (mounted.current) {
               setConfirmationPending(true);
               setPayError(
-                error instanceof Error && statusCode !== undefined && statusCode < 500
-                  ? error.message
+                statusCode !== undefined && statusCode >= 400 && statusCode < 500
+                  ? getErrorMessage(error, 'We received your payment but could not confirm it yet. Check again in a moment.')
                   : 'We received your payment but could not confirm it yet. Check again in a moment.',
               );
             }
@@ -116,7 +117,7 @@ export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
       unconfirmed.current = order.data.paymentId;
       await confirm(order.data.paymentId);
     } catch (error) {
-      setPayError(error instanceof Error ? error.message : 'Could not start the payment. Please try again.');
+      setPayError(getErrorMessage(error, 'Could not start the payment. Please try again.'));
     } finally {
       if (mounted.current) {
         setPaying(false);

@@ -23,6 +23,7 @@ import {
 import { outcomeMessage } from '../../location/hooks/useUserLocality';
 import type { RootStackParamList } from '../../../navigation/types';
 import { styles } from '../styles/Addresses.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddressEditor'>;
 
@@ -59,7 +60,7 @@ const AddressEditorScreen: React.FC<Props> = ({ route, navigation }) => {
         setIsDefault(existing.isDefault);
         setLocation(addressLocationFromSaved({ ...existing, address: existing.line1 }));
       })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load this address.'))
+      .catch((err) => setError(getErrorMessage(err, 'Could not load this address.')))
       .finally(() => setLoading(false));
   }, [addressId, navigation]);
 
@@ -117,7 +118,7 @@ const AddressEditorScreen: React.FC<Props> = ({ route, navigation }) => {
       }
       navigation.goBack();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save this address. Please try again.');
+      setError(getErrorMessage(err, 'Could not save this address. Please try again.'));
     } finally {
       setSaving(false);
     }
@@ -133,7 +134,7 @@ const AddressEditorScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <View style={styles.screen}>
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <AddressLocationForm
           value={location}
           onChange={(next) => {

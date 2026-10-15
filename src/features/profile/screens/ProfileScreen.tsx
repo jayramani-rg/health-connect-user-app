@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from '../../../components/KeyboardAware/KeyboardAwareScrollView';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
@@ -13,6 +14,8 @@ import { profileService } from '../../../services/profileService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { PatientGender } from '../../patients/types/patient.types';
 import { styles } from '../styles/ProfileScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
+import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -29,6 +32,7 @@ const MAX_DOB = new Date();
 const MIN_DOB = new Date(MAX_DOB.getFullYear() - 120, MAX_DOB.getMonth(), MAX_DOB.getDate());
 
 const ProfileScreen: React.FC<Props> = () => {
+  const bottomInset = useScreenBottomInset();
   const dispatch = useAppDispatch();
 
   const [loading, setLoading] = useState(true);
@@ -57,7 +61,7 @@ const ProfileScreen: React.FC<Props> = () => {
         setAllergyDetails(p.allergyDetails ?? '');
         setChronicConditions(p.chronicConditions ?? '');
       } catch (error) {
-        setErrorText(error instanceof Error ? error.message : 'Could not load your profile.');
+        setErrorText(getErrorMessage(error, 'Could not load your profile.'));
       } finally {
         setLoading(false);
       }
@@ -90,7 +94,7 @@ const ProfileScreen: React.FC<Props> = () => {
       );
       setSuccessText('Profile updated.');
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not save your profile.');
+      setErrorText(getErrorMessage(error, 'Could not save your profile.'));
     } finally {
       setSaving(false);
     }
@@ -105,7 +109,7 @@ const ProfileScreen: React.FC<Props> = () => {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAwareScrollView containerStyle={styles.container} contentContainerStyle={[styles.content, { paddingBottom: bottomInset }]}>
       {errorText && <Banner variant="error" message={errorText} />}
       {successText && <Banner variant="success" message={successText} />}
 
@@ -133,7 +137,7 @@ const ProfileScreen: React.FC<Props> = () => {
       <View style={styles.saveBar}>
         <Button label="Save changes" onPress={handleSave} loading={saving} disabled={!valid} />
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

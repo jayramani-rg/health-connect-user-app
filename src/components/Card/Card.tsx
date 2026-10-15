@@ -1,7 +1,8 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { motion, shadow } from '../../theme';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { pressFeedback } from '../../utils/motion';
+import { shadow } from '../../theme';
 import { styles } from './styles/Card.styles';
 import type { CardProps } from './types/Card.types';
 
@@ -26,10 +27,10 @@ export function Card({ children, onPress, variant = 'surface', elevation = 'card
     <AnimatedPressable
       onPress={onPress}
       onPressIn={() => {
-        scale.value = withSpring(0.98, motion.spring.press);
+        scale.value = withTiming(pressFeedback.scale, pressFeedback.timing);
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, motion.spring.press);
+        scale.value = withTiming(1, pressFeedback.timing);
       }}
       style={[styles.base, VARIANT_STYLE[variant], elevationStyle, animatedStyle, style]}
     >

@@ -68,7 +68,7 @@ export function effectivePincode(value: AddressLocationValue): string {
 export function addressLocationProblem(value: AddressLocationValue): string | null {
   if (value.addressLine.trim().length < 3) return 'Enter your address.';
   if (!value.resolved) return 'Tap "Find on map" to confirm the address.';
-  if (isAddressLocationStale(value)) return 'You edited the address — tap "Find on map" again to confirm it.';
+  if (isAddressLocationStale(value)) return 'You edited the address. Tap "Find on map" again to confirm it.';
   if (!value.resolved.city || !value.resolved.state) return 'Google could not identify the city for this address. Try adding the area and city.';
   if (!PINCODE_PATTERN.test(effectivePincode(value))) return 'Enter a valid 6-digit pincode.';
   return null;

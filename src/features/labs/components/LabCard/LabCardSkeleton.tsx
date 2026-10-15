@@ -1,20 +1,27 @@
 import React from 'react';
 import { View } from 'react-native';
 import { SkeletonBlock } from '../../../../components/SkeletonLoader/SkeletonLoader';
-import { radius, spacing } from '../../../../theme';
-import { styles } from './styles/LabCard.styles';
+import { radius } from '../../../../theme';
+import { LOGO_SIZE, styles } from './styles/LabCard.styles';
 
 export function LabCardSkeleton() {
   return (
     <View style={styles.card} accessibilityLabel="Loading laboratory">
-      <SkeletonBlock width={56} height={56} radius={radius.md} />
-      <View style={[styles.info, { gap: spacing.xs + 2 }]}>
-        <SkeletonBlock width="58%" height={15} />
-        <SkeletonBlock width="72%" height={12} />
-        <View style={[styles.metaRow, { marginTop: spacing.xs }]}>
-          <SkeletonBlock width={58} height={18} radius={radius.pill} />
-          <SkeletonBlock width={104} height={18} radius={radius.pill} />
+      <View style={styles.top}>
+        <SkeletonBlock width={LOGO_SIZE} height={LOGO_SIZE} radius={radius.md} />
+        <View style={styles.skeletonLines}>
+          <SkeletonBlock width="60%" height={16} />
+          <SkeletonBlock width="72%" height={12} />
+          <SkeletonBlock width="40%" height={12} />
         </View>
+      </View>
+      <View style={styles.options}>
+        <SkeletonBlock width="48%" height={52} radius={radius.md} />
+        <SkeletonBlock width="48%" height={52} radius={radius.md} />
+      </View>
+      <View style={styles.footer}>
+        <SkeletonBlock width={90} height={30} />
+        <SkeletonBlock width={112} height={44} radius={radius.pill} />
       </View>
     </View>
   );

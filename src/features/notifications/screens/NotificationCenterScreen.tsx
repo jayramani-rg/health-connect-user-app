@@ -13,6 +13,7 @@ import { chatSocket } from '../../../services/chatSocket';
 import { useAppDispatch, setUnreadCount } from '../../../store';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { AppNotification, NotificationType } from '../types/notification.types';
+import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'NotificationCenter'>;
 
@@ -46,6 +47,7 @@ function formatRelativeTime(iso: string): string {
 }
 
 const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
+  const bottomInset = useScreenBottomInset();
   const dispatch = useAppDispatch();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
         <FlatList
           data={notifications}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: spacing.lg, flexGrow: 1 }}
+          contentContainerStyle={[{ padding: spacing.lg, flexGrow: 1 }, { paddingBottom: bottomInset }]}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
           ListEmptyComponent={<EmptyState title="No notifications yet" description="Updates about your appointments, lab bookings, and chats will show up here." />}
           renderItem={({ item }) => (

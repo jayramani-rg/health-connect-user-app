@@ -24,6 +24,7 @@ import type { Dependent, PatientAddress } from '../../patients/types/patient.typ
 import type { AvailableLabSlot, CollectionMethod, HomeCollectionEligibility } from '../types/labBooking.types';
 import { routeAfterBooking } from '../../payments/utils/routeAfterBooking';
 import { styles } from '../styles/BookLabServiceScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookLabService'>;
 
@@ -78,7 +79,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
         setLab(labRes.data);
         setDependents(depRes.data);
       } catch (error) {
-        setLoadError(error instanceof Error ? error.message : 'Could not load booking details.');
+        setLoadError(getErrorMessage(error, 'Could not load booking details.'));
       } finally {
         setLoadingLab(false);
       }
@@ -103,7 +104,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       if (response.data.slots.length === 0) setSlotsMessage(response.message || 'No slots available on this day.');
     } catch (error) {
       setSlots([]);
-      setSlotsMessage(error instanceof Error ? error.message : 'Could not load available slots.');
+      setSlotsMessage(getErrorMessage(error, 'Could not load available slots.'));
     } finally {
       setLoadingSlots(false);
     }
@@ -122,7 +123,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       } catch (error) {
         setEligibility((prev) => ({
           ...prev,
-          [id]: { status: 'error', message: error instanceof Error ? error.message : "Couldn't check this address." },
+          [id]: { status: 'error', message: getErrorMessage(error, "Couldn't check this address.") },
         }));
       }
     },
@@ -146,7 +147,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       });
       list.forEach((a) => checkEligibility(a.id));
     } catch (error) {
-      setAddressError(error instanceof Error ? error.message : 'Could not load your saved addresses.');
+      setAddressError(getErrorMessage(error, 'Could not load your saved addresses.'));
     } finally {
       setLoadingAddresses(false);
     }
@@ -167,7 +168,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       setShowAddDependent(false);
       setNewDependent({ firstName: '', lastName: '', relation: '' });
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Could not add family member.');
+      setLoadError(getErrorMessage(error, 'Could not add family member.'));
     }
   }
 
@@ -192,7 +193,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
         navigation.replace('LabBookingConfirmation', next.params);
       }
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Could not send this request. Please try again.');
+      setSubmitError(getErrorMessage(error, 'Could not send this request. Please try again.'));
     } finally {
       setSubmitting(false);
     }
@@ -200,7 +201,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loadingLab) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={4} />
       </ScreenContainer>
     );
@@ -208,7 +209,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!lab) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={loadError ?? 'Lab not found.'} />
       </ScreenContainer>
     );
@@ -247,7 +248,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
       return (
         <TouchableOpacity activeOpacity={activeopacity} style={styles.eligibilityRow} onPress={() => checkEligibility(id)}>
           <Icon name="refresh" size={14} color={colors.warning} />
-          <Text style={styles.eligibilityWarn}>Couldn't check — tap to retry</Text>
+          <Text style={styles.eligibilityWarn}>Couldn't check. Tap to try again</Text>
         </TouchableOpacity>
       );
     }
@@ -264,13 +265,34 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
+  const footer = (
+    <View style={styles.footer}>
+      {stepPosition > 1 && (
+        <View style={styles.footerButton}>
+          <Button label="Back" variant="secondary" onPress={() => goToStep(-1)} disabled={submitting} />
+        </View>
+      )}
+      <View style={styles.footerButton}>
+        {stepPosition < stepSequence.length ? (
+          <Button
+            label="Continue"
+            onPress={() => goToStep(1)}
+            disabled={step === 1 ? !canContinueStep1 : step === 2 ? !canContinueStep2 : !canContinueStep3}
+          />
+        ) : (
+          <Button label="Confirm booking" onPress={handleSubmit} loading={submitting} />
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
       <View style={styles.stepperWrapper}>
         <ProgressStepper currentStep={stepPosition} totalSteps={stepSequence.length} stepLabel={STEP_LABELS[step]} />
       </View>
 
-      <ScreenContainer>
+      <ScreenContainer footer={footer} variant="page">
         {step === 1 && (
           <>
             <Text style={styles.sectionTitle}>Who is this for?</Text>
@@ -466,25 +488,6 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
           </>
         )}
       </ScreenContainer>
-
-      <View style={styles.footer}>
-        {stepPosition > 1 && (
-          <View style={styles.footerButton}>
-            <Button label="Back" variant="secondary" onPress={() => goToStep(-1)} disabled={submitting} />
-          </View>
-        )}
-        <View style={styles.footerButton}>
-          {stepPosition < stepSequence.length ? (
-            <Button
-              label="Continue"
-              onPress={() => goToStep(1)}
-              disabled={step === 1 ? !canContinueStep1 : step === 2 ? !canContinueStep2 : !canContinueStep3}
-            />
-          ) : (
-            <Button label="Confirm booking" onPress={handleSubmit} loading={submitting} />
-          )}
-        </View>
-      </View>
     </View>
   );
 };

@@ -156,8 +156,40 @@ export const motion = {
   listStagger: 40,
 };
 
+export const layout = {
+  gutter: 16,
+  sectionGap: 20,
+  blockGap: 12,
+  inlineGap: 8,
+  cardPadding: 14,
+  cardPaddingCompact: 12,
+  cardRadius: 16,
+  hairline: 1,
+  touchTarget: 44,
+  iconButton: 44,
+  iconTile: 40,
+  rowMinHeight: 52,
+  chipHeight: 36,
+  headerMinHeight: 48,
+  bottomBreathing: 16,
+};
+
+export const textRole = {
+  pageTitle: { fontFamily: fontFamily.bold, fontSize: 22, lineHeight: 28, letterSpacing: -0.3 },
+  sectionTitle: { fontFamily: fontFamily.semiBold, fontSize: 16, lineHeight: 22, letterSpacing: 0 },
+  cardTitle: { fontFamily: fontFamily.semiBold, fontSize: 15, lineHeight: 21, letterSpacing: 0 },
+  body: { fontFamily: fontFamily.regular, fontSize: 15, lineHeight: 22, letterSpacing: 0 },
+  meta: { fontFamily: fontFamily.regular, fontSize: 13, lineHeight: 18, letterSpacing: 0.1 },
+  metaStrong: { fontFamily: fontFamily.semiBold, fontSize: 13, lineHeight: 18, letterSpacing: 0.1 },
+  eyebrow: { fontFamily: fontFamily.medium, fontSize: 13, lineHeight: 18, letterSpacing: 0.1 },
+  control: { fontFamily: fontFamily.semiBold, fontSize: 14, lineHeight: 18, letterSpacing: 0.1 },
+  badge: { fontFamily: fontFamily.semiBold, fontSize: 12, lineHeight: 16, letterSpacing: 0.2 },
+  metric: { fontFamily: fontFamily.bold, fontSize: 22, lineHeight: 28, letterSpacing: -0.3 },
+  groupLabel: { fontFamily: fontFamily.semiBold, fontSize: 12, lineHeight: 16, letterSpacing: 0.6, textTransform: 'uppercase' as const },
+};
+
 export { fontFamily };
 
-export const theme = { colors, semantic, spacing, radius, typography, shadow, iconSize, motion, fontFamily };
+export const theme = { colors, semantic, spacing, radius, typography, shadow, iconSize, motion, fontFamily, layout, textRole };
 
 export default theme;

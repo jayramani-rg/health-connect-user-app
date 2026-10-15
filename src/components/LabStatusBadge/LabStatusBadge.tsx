@@ -25,7 +25,8 @@ export function LabStatusBadge({ status }: LabStatusBadgeProps) {
   const meta = STATUS_META[status];
   return (
     <View style={[styles.base, { backgroundColor: meta.bg }]}>
-      <Text style={[styles.text, { color: meta.fg }]}>{meta.label}</Text>
+      <View style={[styles.dot, { backgroundColor: meta.fg }]} />
+      <Text style={[styles.text, { color: meta.fg }]} numberOfLines={1}>{meta.label}</Text>
     </View>
   );
 }

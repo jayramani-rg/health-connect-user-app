@@ -11,7 +11,7 @@ export default function SettingsScreen() {
   const authUser = useAppSelector((state) => state.authData.user);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={{ gap: spacing.xs }}>
         <Text style={[typography.label, { color: colors.inkFaint }]}>ACCOUNT</Text>
         <Card variant="outline" elevation="none">

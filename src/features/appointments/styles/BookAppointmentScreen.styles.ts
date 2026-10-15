@@ -189,12 +189,8 @@ export const styles = StyleSheet.create({
     color: colors.brand,
   },
   footer: {
-    padding: spacing.lg,
     flexDirection: 'row',
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   footerButton: {
     flex: 1,

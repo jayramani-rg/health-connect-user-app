@@ -11,6 +11,7 @@ import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader'
 import { colors, spacing, typography } from '../../../theme';
 import { labTestCategoryService, type ApprovedLabTestCategory } from '../../../services/labTestCategoryService';
 import type { RootStackParamList } from '../../../navigation/types';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabCategories'>;
 
@@ -26,7 +27,7 @@ const LabCategoriesScreen: React.FC<Props> = ({ navigation }) => {
       const response = await labTestCategoryService.getApproved();
       setCategories(response.data);
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not load categories.');
+      setErrorText(getErrorMessage(error, 'Could not load categories.'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ const LabCategoriesScreen: React.FC<Props> = ({ navigation }) => {
   }, [load]);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <Text style={typography.h2}>What are you testing for?</Text>
       <Text style={{ ...typography.body, color: colors.inkSoft, marginTop: spacing.xs, marginBottom: spacing.md }}>
         Pick a category to see every lab that offers it, or browse the full list.

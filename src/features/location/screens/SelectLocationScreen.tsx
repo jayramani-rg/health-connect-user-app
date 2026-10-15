@@ -58,7 +58,7 @@ const SelectLocationScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={styles.currentCard}>
         <View style={styles.currentIcon}>
           <Icon name="navigate" size={18} color={colors.primary} />
@@ -82,7 +82,7 @@ const SelectLocationScreen: React.FC<Props> = ({ navigation }) => {
         loading={detecting}
         icon={<Icon name="locate" size={16} color={colors.white} />}
       />
-      <Text style={styles.privacyNote}>We only use your approximate area — your exact location is never stored.</Text>
+      <Text style={styles.privacyNote}>We only use your approximate area. Your exact location is never stored.</Text>
 
       {message ? <Banner variant="info" message={message} /> : null}
       {showSettings ? <Button label="Open settings" variant="secondary" onPress={() => Linking.openSettings()} /> : null}

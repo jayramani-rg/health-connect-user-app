@@ -10,6 +10,7 @@ import { useAppSelector } from '../../../store';
 import { labBookingService } from '../../../services/labBookingService';
 import { downloadToLocalFile, fetchAsDataUri } from '../../../utils/authenticatedFile';
 import type { RootStackParamList } from '../../../navigation/types';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ReportViewer'>;
 
@@ -40,7 +41,7 @@ const ReportViewerScreen: React.FC<Props> = ({ route }) => {
           if (active) setDataUri(uri);
         }
       } catch (error) {
-        if (active) setErrorText(error instanceof Error ? error.message : 'Could not load this report.');
+        if (active) setErrorText(getErrorMessage(error, 'Could not load this report.'));
       } finally {
         if (active) setLoading(false);
       }
@@ -75,7 +76,7 @@ const ReportViewerScreen: React.FC<Props> = ({ route }) => {
         <Pdf
           source={{ uri: pdfPath }}
           style={{ flex: 1, width: '100%' }}
-          onError={(error) => setErrorText(error instanceof Error ? error.message : 'Could not open this PDF.')}
+          onError={(error) => setErrorText(getErrorMessage(error, 'Could not open this PDF.'))}
         />
       )}
 

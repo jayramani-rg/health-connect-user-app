@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { fadeUpEntering } from '../../../utils/motion';
 import { Button } from '../../../components/Button/Button';
 import { TextField } from '../../../components/TextField/TextField';
 import { DateField } from '../../../components/DateField/DateField';
@@ -81,7 +82,7 @@ export default function ProfileBasicsScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <Animated.View entering={FadeInUp.duration(300)}>
+      <Animated.View entering={fadeUpEntering()}>
         <View style={styles.header}>
           <Text style={styles.title}>A few details</Text>
           {canSkip && (
@@ -93,7 +94,7 @@ export default function ProfileBasicsScreen({ navigation }: Props) {
         <Text style={styles.subtitle}>
           {canSkip
             ? 'Helps doctors and labs address you correctly. You can do this later in your profile.'
-            : 'Please add your first and last name to continue — this is required before booking or starting a chat.'}
+            : 'Add your first and last name to continue. This is required before booking or starting a chat.'}
         </Text>
       </Animated.View>
       <TextField label="First name" value={firstName} onChangeText={setFirstName} placeholder="Ananya" autoCapitalize="words" />

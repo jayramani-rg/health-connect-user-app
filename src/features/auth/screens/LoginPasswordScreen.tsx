@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { fadeUpEntering } from '../../../utils/motion';
 import { BackButton } from '../../../components/BackButton/BackButton';
 import { Button } from '../../../components/Button/Button';
 import { PasswordField } from '../../../components/PasswordField/PasswordField';
@@ -71,7 +72,7 @@ export default function LoginPasswordScreen({ navigation, route }: Props) {
   return (
     <ScreenContainer>
       <BackButton onPress={() => navigation.goBack()} />
-      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+      <Animated.View entering={fadeUpEntering()} style={{ gap: 4 }}>
         <Text style={styles.title}>Welcome back</Text>
         <Text style={styles.subtitle}>
           Enter your password to sign in as <Text style={styles.subtitleBold}>+91 {mobileNumber}</Text>.

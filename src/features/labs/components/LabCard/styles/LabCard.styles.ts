@@ -1,94 +1,165 @@
 import { StyleSheet } from 'react-native';
 import { colors, radius, spacing, typography } from '../../../../../theme';
 
+export const LOGO_SIZE = 56;
+
 export const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    gap: spacing.md,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: spacing.md,
+    padding: spacing.lg,
     marginBottom: spacing.md,
+    gap: spacing.md,
   },
-  avatar: {
-    width: 56,
-    height: 56,
+  cardPressed: {
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.canvas,
+  },
+  top: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'center',
+  },
+  logo: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
     borderRadius: radius.md,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.surfaceSunken,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  logoImage: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+  },
   info: {
     flex: 1,
+    gap: 2,
+    minWidth: 0,
   },
-  titleRow: {
+  nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   name: {
-    ...typography.bodyStrong,
+    ...typography.subtitle,
     color: colors.text,
     flexShrink: 1,
   },
-  meta: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.xs,
-    flexWrap: 'wrap',
-  },
-  metaChip: {
-    ...typography.label,
-    fontSize: 11,
-    color: colors.primaryStrong,
-    backgroundColor: colors.primarySoft,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  servesChip: {
-    ...typography.label,
-    fontSize: 11,
-    color: colors.success,
-    backgroundColor: colors.successSoft,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  pausedText: {
-    ...typography.caption,
-    color: colors.error,
-    marginTop: spacing.xs,
-  },
-  nearBadge: {
+  areaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
+    gap: spacing.xs,
   },
-  nearBadgeCity: {
-    backgroundColor: colors.primarySoft,
+  areaText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    flexShrink: 1,
   },
-  nearBadgeText: {
+  nearText: {
     ...typography.label,
-    fontSize: 10,
-    lineHeight: 13,
-    color: colors.white,
+    color: colors.brand,
   },
-  nearBadgeTextCity: {
-    color: colors.primary,
+  serviceText: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    flexShrink: 1,
+  },
+  options: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  option: {
+    flex: 1,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.canvas,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    gap: 2,
+    minWidth: 0,
+  },
+  optionOff: {
+    backgroundColor: colors.surface,
+    borderStyle: 'dashed',
+  },
+  optionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  optionTitle: {
+    ...typography.label,
+    color: colors.text,
+    flexShrink: 1,
+  },
+  optionTitleOff: {
+    color: colors.textTertiary,
+  },
+  optionDetail: {
+    ...typography.caption,
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.textSecondary,
+  },
+  optionDetailGood: {
+    color: colors.success,
+  },
+  optionDetailWarn: {
+    color: colors.warning,
+  },
+  optionDetailOff: {
+    color: colors.textTertiary,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: spacing.md,
+  },
+  priceLabel: {
+    ...typography.caption,
+    color: colors.textTertiary,
+  },
+  priceValue: {
+    ...typography.subtitle,
+    color: colors.text,
+  },
+  pausedText: {
+    ...typography.label,
+    color: colors.textSecondary,
+  },
+  action: {
+    minHeight: 44,
+    minWidth: 112,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.brand,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionPressed: {
+    backgroundColor: colors.brandSoft,
+  },
+  actionText: {
+    ...typography.label,
+    fontSize: 14,
+    color: colors.brand,
+  },
+  skeletonLines: {
+    flex: 1,
+    gap: spacing.sm,
   },
 });

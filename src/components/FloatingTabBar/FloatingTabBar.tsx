@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Pressable, Text, View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { pressFeedback } from '../../utils/motion';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { Icon, type IoniconsIconName } from '../Icon/Icon';
-import { BAR_BOTTOM_INSET, INDICATOR_SIZE, INDICATOR_SPRING, PRESS_SPRING, styles } from './styles/FloatingTabBar.styles';
+import { BAR_BOTTOM_INSET, INDICATOR_SIZE, INDICATOR_TIMING, TAB_PRESS_SCALE, styles } from './styles/FloatingTabBar.styles';
 
 export type FloatingTabIcons = Record<string, { active: IoniconsIconName; inactive: IoniconsIconName }>;
 
@@ -34,10 +35,10 @@ function TabItem({ focused, icon, badge, label, onPress }: TabItemProps) {
         onPress();
       }}
       onPressIn={() => {
-        scale.value = withSpring(0.86, PRESS_SPRING);
+        scale.value = withTiming(TAB_PRESS_SCALE, pressFeedback.timing);
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, PRESS_SPRING);
+        scale.value = withTiming(1, pressFeedback.timing);
       }}
       accessibilityRole="tab"
       accessibilityLabel={label}
@@ -63,7 +64,7 @@ export function FloatingTabBar({ state, descriptors, navigation, icons, badges }
   const routeCount = state.routes.length;
 
   useEffect(() => {
-    activeIndex.value = withSpring(state.index, INDICATOR_SPRING);
+    activeIndex.value = withTiming(state.index, INDICATOR_TIMING);
   }, [state.index, activeIndex]);
 
   function handleLayout(event: LayoutChangeEvent) {
@@ -111,4 +112,3 @@ export function FloatingTabBar({ state, descriptors, navigation, icons, badges }
   );
 }
 
-export { TAB_BAR_CLEARANCE } from './styles/FloatingTabBar.styles';

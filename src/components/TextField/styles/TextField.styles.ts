@@ -21,6 +21,11 @@ export const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: colors.surface,
   },
+  fieldRowMultiline: {
+    height: undefined,
+    alignItems: 'flex-start',
+    paddingVertical: getHeight(12),
+  },
   fieldRowFocused: {
     borderColor: colors.primary,
   },
@@ -45,6 +50,18 @@ export const styles = StyleSheet.create({
     color: colors.ink,
     padding: 0,
   },
+  inputMultiline: {
+    minHeight: getHeight(96),
+    maxHeight: getHeight(240),
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  message: {
+    flex: 1,
+  },
   errorText: {
     ...typography.caption,
     color: colors.error,
@@ -52,5 +69,10 @@ export const styles = StyleSheet.create({
   helperText: {
     ...typography.caption,
     color: colors.inkFaint,
+  },
+  counter: {
+    ...typography.caption,
+    color: colors.inkFaint,
+    fontVariant: ['tabular-nums'],
   },
 });

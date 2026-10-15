@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Icon } from '../../../components/Icon/Icon';
+import { KeyboardAvoidingContainer } from '../../../components/KeyboardAware/KeyboardAvoidingContainer';
 import { MessageBubble } from '../../../components/MessageBubble/MessageBubble';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { chatService } from '../../../services/chatService';
@@ -194,7 +193,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+      <KeyboardAvoidingContainer style={styles.flex}>
         <FlatList
           data={displayRows}
           inverted
@@ -240,7 +239,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
             <Icon name="send" size={18} color={colors.white} />
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingContainer>
     </SafeAreaView>
   );
 };

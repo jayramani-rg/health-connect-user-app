@@ -1,9 +1,10 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { listItemEntering } from '../../utils/motion';
 
 import { Icon, type IoniconsIconName } from '../Icon/Icon';
-import { motion } from '../../theme';
+
 import { styles } from './StatCard.styles';
 
 export interface StatCardProps {
@@ -17,7 +18,7 @@ export interface StatCardProps {
 
 export function StatCard({ icon, tint, tintSoft, value, label, index = 0 }: StatCardProps) {
   return (
-    <Animated.View entering={FadeInDown.delay(Math.min(index, 6) * motion.listStagger).duration(220).springify().damping(18)} style={styles.card}>
+    <Animated.View entering={listItemEntering(index)} style={styles.card}>
       <View style={[styles.iconBadge, { backgroundColor: tintSoft }]}>
         <Icon name={icon} size={18} color={tint} />
       </View>

@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { listItemEntering } from '../../../utils/motion';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
-import { colors, spacing } from '../../../theme';
+import { colors } from '../../../theme';
 import { labService } from '../../../services/labService';
 import { usePaginatedList } from '../../../hooks/usePaginatedList';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { PaginatedResponse } from '../../../types/common.types';
+import { listScreenStyles } from '../../common/styles/ListScreen.styles';
 import { LocalityStrip } from '../../location/components/LocalityStrip';
 import { useUserLocality } from '../../location/hooks/useUserLocality';
 import { LabCard } from '../components/LabCard/LabCard';
@@ -25,9 +27,11 @@ function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
   const byLab = new Map<string, LabListItem>();
   for (const row of rows) {
     const existing = byLab.get(row.laboratoryId);
+    const price = row.discountPrice ?? row.price;
     if (existing) {
       existing.serviceCount += 1;
       existing.homeCollectionEnabled = existing.homeCollectionEnabled || row.homeCollectionEnabled;
+      existing.startingPrice = Math.min(existing.startingPrice ?? price, price);
     } else {
       byLab.set(row.laboratoryId, {
         laboratoryId: row.laboratoryId,
@@ -37,10 +41,11 @@ function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
         locality: row.locality,
         photoUrl: null,
         homeCollectionEnabled: row.homeCollectionEnabled,
-        isAcceptingBookings: true,
+        isAcceptingBookings: null,
         serviceCount: 1,
         localityMatch: row.localityMatch,
         homeCollectionAvailableAtPincode: null,
+        startingPrice: price,
       });
     }
   }
@@ -79,18 +84,18 @@ const LabListScreen: React.FC<Props> = ({ route, navigation }) => {
   const header = <LocalityStrip label={localityLabel} noun="labs" onPress={() => navigation.navigate('SelectLocation')} />;
 
   return (
-    <ScreenContainer scroll={false} style={{ padding: 0 }}>
-      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm }}>
+    <ScreenContainer scroll={false} variant="list">
+      <View style={listScreenStyles.header}>
         <SearchBar
           value={searchText}
           onChangeText={setSearchText}
-          placeholder={category ? `Search within ${category}` : 'Lab name, area or city'}
+          placeholder={category ? `Search within ${category}` : 'Search labs'}
           onSubmitEditing={() => setAppliedSearch(searchText.trim())}
         />
       </View>
 
       {list.loading ? (
-        <View style={{ padding: spacing.lg }}>
+        <View style={listScreenStyles.listContent}>
           {header}
           <LabListSkeleton count={6} />
         </View>
@@ -98,12 +103,16 @@ const LabListScreen: React.FC<Props> = ({ route, navigation }) => {
         <FlatList
           data={list.items}
           keyExtractor={(item) => item.laboratoryId}
-          contentContainerStyle={{ padding: spacing.lg }}
+          contentContainerStyle={listScreenStyles.listContent}
           refreshControl={<RefreshControl refreshing={list.refreshing} onRefresh={list.refresh} tintColor={colors.primary} />}
           ListHeaderComponent={header}
-          renderItem={({ item }) => (
-            <Animated.View entering={FadeIn.duration(220)}>
-              <LabCard lab={item} onPress={() => navigation.navigate('LabProfile', { laboratoryId: item.laboratoryId })} />
+          renderItem={({ item, index }) => (
+            <Animated.View entering={listItemEntering(index)}>
+              <LabCard
+                lab={item}
+                serviceNoun={category ? (item.serviceCount === 1 ? 'matching test' : 'matching tests') : undefined}
+                onPress={() => navigation.navigate('LabProfile', { laboratoryId: item.laboratoryId })}
+              />
             </Animated.View>
           )}
           onEndReached={list.loadMore}

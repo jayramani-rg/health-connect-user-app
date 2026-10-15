@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import type { ScrollViewProps } from 'react-native';
 
 import { Avatar } from '../../../components/Avatar/Avatar';
 import { Banner } from '../../../components/Banner/Banner';
@@ -8,18 +9,26 @@ import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import { DateField } from '../../../components/DateField/DateField';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { Icon } from '../../../components/Icon/Icon';
+import { KeyboardAwareScrollView } from '../../../components/KeyboardAware/KeyboardAwareScrollView';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { TextField } from '../../../components/TextField/TextField';
 import { colors, spacing } from '../../../theme';
 import { dependentService } from '../../../services/dependentService';
 import type { Dependent, SaveDependentRequest } from '../../patients/types/patient.types';
 import { styles } from '../styles/FamilyMembersScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
+import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 const EMPTY_FORM: SaveDependentRequest = { firstName: '', lastName: '', relation: '', dob: undefined, gender: undefined };
 const MAX_DOB = new Date();
 const MIN_DOB = new Date(MAX_DOB.getFullYear() - 120, MAX_DOB.getMonth(), MAX_DOB.getDate());
 
+function renderKeyboardAwareScroll(props: ScrollViewProps) {
+  return <KeyboardAwareScrollView {...props} />;
+}
+
 const FamilyMembersScreen: React.FC = () => {
+  const bottomInset = useScreenBottomInset();
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -36,7 +45,7 @@ const FamilyMembersScreen: React.FC = () => {
       const response = await dependentService.listMine();
       setDependents(response.data);
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not load family members.');
+      setErrorText(getErrorMessage(error, 'Could not load family members.'));
     } finally {
       setLoading(false);
     }
@@ -76,7 +85,7 @@ const FamilyMembersScreen: React.FC = () => {
       setShowForm(false);
       await load();
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not save this family member.');
+      setErrorText(getErrorMessage(error, 'Could not save this family member.'));
     } finally {
       setSaving(false);
     }
@@ -90,7 +99,7 @@ const FamilyMembersScreen: React.FC = () => {
       await dependentService.remove(dependent.id);
       await load();
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not remove this family member.');
+      setErrorText(getErrorMessage(error, 'Could not remove this family member.'));
     }
   }
 
@@ -107,7 +116,9 @@ const FamilyMembersScreen: React.FC = () => {
       <FlatList
         data={dependents}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomInset }]}
+        keyboardShouldPersistTaps="handled"
+        renderScrollComponent={renderKeyboardAwareScroll}
         ListHeaderComponent={
           <>
             {errorText && <Banner variant="error" message={errorText} />}

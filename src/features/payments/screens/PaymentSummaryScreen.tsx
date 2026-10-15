@@ -41,7 +41,7 @@ const PaymentSummaryScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loadingQuote) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={2} />
       </ScreenContainer>
     );
@@ -49,7 +49,7 @@ const PaymentSummaryScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!quote) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <EmptyState
           title="Payment unavailable"
           description={loadError ?? 'This booking is not waiting for payment.'}
@@ -64,7 +64,7 @@ const PaymentSummaryScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <Text style={styles.heading}>Payment summary</Text>
       <Text style={styles.subheading}>Pay to send your request. {quote.providerName} sees it as soon as your payment is confirmed.</Text>
 

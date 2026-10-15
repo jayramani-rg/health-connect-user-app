@@ -17,6 +17,7 @@ import { useChatCta } from '../../chat/hooks/useChatCta';
 import { useProfileGate } from '../../profile/hooks/useProfileGate';
 import { ProfileGateDialog } from '../../profile/components/ProfileGateDialog';
 import { styles } from '../styles/LabProfileScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabProfile'>;
 
@@ -37,7 +38,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         const response = await labService.getById(laboratoryId);
         if (active) setLab(response.data);
       } catch (error) {
-        if (active) setErrorText(error instanceof Error ? error.message : 'Could not load this lab.');
+        if (active) setErrorText(getErrorMessage(error, 'Could not load this lab.'));
       } finally {
         if (active) setLoading(false);
       }
@@ -58,7 +59,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={4} />
       </ScreenContainer>
     );
@@ -66,7 +67,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!lab) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={errorText ?? 'Lab not found.'} />
       </ScreenContainer>
     );
@@ -79,7 +80,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const showImage = !!lab.photoUrl && !imageFailed;
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={styles.headerRow}>
         <View style={styles.avatar}>
           {showImage ? (
@@ -149,7 +150,7 @@ const LabProfileScreen: React.FC<Props> = ({ route, navigation }) => {
           <Button label="Chat with laboratory" variant="secondary" onPress={() => runWithProfileGate(chatCta.sendInvitation)} />
         )}
         {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} />}
-        {chatCta.state.kind === 'pending' && <Button label="Invitation sent — waiting for reply" variant="ghost" disabled onPress={() => {}} />}
+        {chatCta.state.kind === 'pending' && <Button label="Invitation sent. Waiting for a reply" variant="ghost" disabled onPress={() => {}} />}
         {chatConversationId && (
           <Button label="Open chat" variant="secondary" onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })} />
         )}

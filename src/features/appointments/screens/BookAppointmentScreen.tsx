@@ -24,6 +24,7 @@ import type { AvailableSlot } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
 import { routeAfterBooking } from '../../payments/utils/routeAfterBooking';
 import { styles } from '../styles/BookAppointmentScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookAppointment'>;
 
@@ -121,7 +122,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
           if (preselectedType) setStep(1);
         }
       } catch (error) {
-        if (active) setLoadError(error instanceof Error ? error.message : 'Could not load this doctor.');
+        if (active) setLoadError(getErrorMessage(error, 'Could not load this doctor.'));
       } finally {
         if (active) setLoadingDoctor(false);
       }
@@ -145,7 +146,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
       }
     } catch (error) {
       setSlots([]);
-      setSlotsError(error instanceof Error ? error.message : 'Could not load available slots.');
+      setSlotsError(getErrorMessage(error, 'Could not load available slots.'));
     } finally {
       setLoadingSlots(false);
     }
@@ -223,7 +224,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         navigation.replace('AppointmentConfirmation', next.params);
       }
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Could not send this request. Please try again.');
+      setSubmitError(getErrorMessage(error, 'Could not send this request. Please try again.'));
     } finally {
       setSubmitting(false);
     }
@@ -231,7 +232,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loadingDoctor) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={4} />
       </ScreenContainer>
     );
@@ -239,7 +240,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!doctor) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={loadError ?? 'Doctor not found.'} />
       </ScreenContainer>
     );
@@ -248,6 +249,27 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const availableModes = MODE_ORDER.filter((mode) => modeEnabled(doctor, mode));
   const canContinueFromMode = !!consultationType;
   const canContinueFromDateTime = !!selectedSlot;
+
+  const footer = (
+    <View style={styles.footer}>
+      {step > 1 && (
+        <View style={styles.footerButton}>
+          <Button label="Back" variant="secondary" onPress={() => setStep(step - 1)} disabled={submitting} />
+        </View>
+      )}
+      <View style={styles.footerButton}>
+        {step < 3 ? (
+          <Button
+            label="Continue"
+            onPress={() => setStep(step + 1)}
+            disabled={step === 1 ? !canContinueFromMode : !canContinueFromDateTime}
+          />
+        ) : (
+          <Button label="Send request" onPress={handleSubmit} loading={submitting} />
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
@@ -278,7 +300,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         <ProgressStepper currentStep={step} totalSteps={3} stepLabel={STEP_LABELS[step - 1]} />
       </View>
 
-      <ScreenContainer>
+      <ScreenContainer footer={footer} variant="page">
         {step === 1 && (
           <>
             <Text style={styles.sectionTitle}>How would you like to consult {doctor.fullName}?</Text>
@@ -406,25 +428,6 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
           </>
         )}
       </ScreenContainer>
-
-      <View style={styles.footer}>
-        {step > 1 && (
-          <View style={styles.footerButton}>
-            <Button label="Back" variant="secondary" onPress={() => setStep(step - 1)} disabled={submitting} />
-          </View>
-        )}
-        <View style={styles.footerButton}>
-          {step < 3 ? (
-            <Button
-              label="Continue"
-              onPress={() => setStep(step + 1)}
-              disabled={step === 1 ? !canContinueFromMode : !canContinueFromDateTime}
-            />
-          ) : (
-            <Button label="Send request" onPress={handleSubmit} loading={submitting} />
-          )}
-        </View>
-      </View>
     </View>
   );
 };

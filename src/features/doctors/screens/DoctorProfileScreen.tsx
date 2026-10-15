@@ -16,6 +16,7 @@ import { useChatCta } from '../../chat/hooks/useChatCta';
 import { useProfileGate } from '../../profile/hooks/useProfileGate';
 import { ProfileGateDialog } from '../../profile/components/ProfileGateDialog';
 import { styles } from '../styles/DoctorProfileScreen.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DoctorProfile'>;
 
@@ -40,7 +41,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         const firstEnabled = MODE_ORDER.find((mode) => modeEnabled(response.data, mode));
         setSelectedMode(firstEnabled ?? null);
       } catch (error) {
-        if (active) setErrorText(error instanceof Error ? error.message : 'Could not load this doctor.');
+        if (active) setErrorText(getErrorMessage(error, 'Could not load this doctor.'));
       } finally {
         if (active) setLoading(false);
       }
@@ -52,7 +53,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={4} />
       </ScreenContainer>
     );
@@ -60,7 +61,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!doctor) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={errorText ?? 'Doctor not found.'} />
       </ScreenContainer>
     );
@@ -82,7 +83,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={styles.headerRow}>
         <Avatar name={doctor.fullName} imageUrl={doctor.profilePhotoUrl} size={72} />
         <View>
@@ -117,7 +118,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.sectionTitle}>Qualifications</Text>
           {doctor.qualifications.map((q, index) => (
             <Text key={`${q.degree}-${index}`} style={styles.qualificationRow}>
-              {q.degree} — {q.institution} ({q.passingYear})
+              {q.degree}, {q.institution} ({q.passingYear})
             </Text>
           ))}
         </>
@@ -159,7 +160,7 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
         {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} style={styles.chatButton} />}
         {chatCta.state.kind === 'pending' && (
-          <Button label="Invitation sent — waiting for reply" variant="ghost" disabled onPress={() => {}} style={styles.chatButton} />
+          <Button label="Invitation sent. Waiting for a reply" variant="ghost" disabled onPress={() => {}} style={styles.chatButton} />
         )}
         {chatConversationId && (
           <Button

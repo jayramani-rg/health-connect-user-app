@@ -25,10 +25,12 @@ export interface LabListItem {
   locality: string | null;
   photoUrl: string | null;
   homeCollectionEnabled: boolean;
-  isAcceptingBookings: boolean;
+  isAcceptingBookings: boolean | null;
   serviceCount: number;
   localityMatch: LocalityMatch | null;
   homeCollectionAvailableAtPincode: boolean | null;
+  startingPrice?: number | null;
+  nextLabVisitAtUtc?: string | null;
 }
 
 export interface LabDetail {

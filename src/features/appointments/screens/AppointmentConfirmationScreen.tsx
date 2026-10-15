@@ -9,6 +9,7 @@ import type { RootStackParamList } from '../../../navigation/types';
 import type { AppointmentDetail } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AppointmentConfirmation'>;
 
@@ -25,7 +26,7 @@ const AppointmentConfirmationScreen: React.FC<Props> = ({ route, navigation }) =
       const response = await appointmentService.getById(appointmentId);
       setAppointment(response.data);
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not load your appointment.');
+      setErrorText(getErrorMessage(error, 'Could not load your appointment.'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ const AppointmentConfirmationScreen: React.FC<Props> = ({ route, navigation }) =
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={2} />
       </ScreenContainer>
     );
@@ -45,7 +46,7 @@ const AppointmentConfirmationScreen: React.FC<Props> = ({ route, navigation }) =
 
   if (!appointment) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <EmptyState title="Something went wrong" description={errorText ?? 'Could not load your appointment.'} actionLabel="Try again" onActionPress={load} />
       </ScreenContainer>
     );

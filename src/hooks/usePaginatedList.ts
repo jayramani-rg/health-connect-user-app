@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PaginatedResponse } from '../types/common.types';
+import { getErrorMessage } from '../utils/errors';
 
 export interface PaginatedListState<T> {
   items: T[];
@@ -48,7 +49,7 @@ export function usePaginatedList<T>(
       setError(null);
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      const message = err instanceof Error ? err.message : 'Something went wrong.';
+      const message = getErrorMessage(err, 'Something went wrong.');
       if (mode === 'more') {
         setHasMore(false);
         setError(message);

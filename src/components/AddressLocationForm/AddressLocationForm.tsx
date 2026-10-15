@@ -111,7 +111,7 @@ export function AddressLocationForm({
 
       {footerAction}
 
-      {stale ? <Banner variant="warning" message='You edited the address — tap "Find on map" again to update the pin.' /> : null}
+      {stale ? <Banner variant="warning" message='You edited the address. Tap "Find on map" again to update the pin.' /> : null}
       {lookupError ? <Banner variant="error" message={lookupError} /> : null}
 
       {candidates.length > 1 && !stale ? (
@@ -169,10 +169,10 @@ export function AddressLocationForm({
             )}
           </View>
           {!resolved.pincode ? (
-            <Text style={styles.note}>Google didn't return a pincode for this address — please enter it.</Text>
+            <Text style={styles.note}>We could not find a pincode for this address. Please enter it.</Text>
           ) : null}
           {!resolved.locality ? (
-            <Text style={styles.note}>No locality found for this address — the city will be used for nearby matching.</Text>
+            <Text style={styles.note}>No locality found for this address. The city will be used for nearby matching.</Text>
           ) : null}
           <Text style={styles.footnote}>These details come from Google Maps and can't be edited. To change them, edit the address line and find it again.</Text>
         </View>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { fadeUpEntering } from '../../../utils/motion';
 import { BackButton } from '../../../components/BackButton/BackButton';
 import { Button } from '../../../components/Button/Button';
 import { OtpInput } from '../../../components/OtpInput/OtpInput';
@@ -68,7 +69,7 @@ export default function OtpScreen({ navigation, route }: Props) {
   return (
     <ScreenContainer>
       <BackButton onPress={() => navigation.goBack()} />
-      <Animated.View entering={FadeInUp.duration(300)} style={{ gap: 4 }}>
+      <Animated.View entering={fadeUpEntering()} style={{ gap: 4 }}>
         <Text style={styles.title}>Enter the code</Text>
         <Text style={styles.subtitle}>Sent to +91 {mobileNumber}</Text>
       </Animated.View>

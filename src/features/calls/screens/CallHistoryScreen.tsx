@@ -10,6 +10,7 @@ import { colors, fontFamily, radius, spacing } from '../../../theme';
 import { useCall } from '../context/CallContextValue';
 import type { Call } from '../types/call.types';
 import { callTypeLabel, describeHistoryStatus, formatCallTimestamp, formatDuration, isOutgoing, otherParticipant, resolvePhotoUrl } from '../utils/callFormat';
+import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 const PAGE_SIZE = 20;
 
@@ -21,6 +22,7 @@ const TONE_COLORS = {
 };
 
 const CallHistoryScreen: React.FC = () => {
+  const bottomInset = useScreenBottomInset();
   const { userId } = useCall();
   const [items, setItems] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ const CallHistoryScreen: React.FC = () => {
   return (
     <FlatList
       style={styles.list}
-      contentContainerStyle={items.length === 0 ? styles.emptyContent : styles.content}
+      contentContainerStyle={[items.length === 0 ? styles.emptyContent : styles.content, { paddingBottom: bottomInset }]}
       data={items}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
@@ -124,7 +126,7 @@ const CallHistoryScreen: React.FC = () => {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       ListEmptyComponent={
         failed ? (
-          <EmptyState title="Could not load your calls" description="Pull down to try again." />
+          <EmptyState title="Couldn't load your calls" description="Pull down to try again." />
         ) : (
           <EmptyState title="No calls yet" description="Voice and video calls you make or receive will appear here." />
         )

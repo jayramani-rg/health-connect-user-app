@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     question: 'How do I cancel or reschedule an appointment?',
-    answer: 'Open the appointment from the Appointments tab — you can cancel a pending or confirmed appointment, or respond to a reschedule offer, from its detail screen.',
+    answer: 'Open the appointment from the Appointments tab. You can cancel a pending or confirmed appointment, or respond to a reschedule offer, from its detail screen.',
   },
   {
     question: 'How do I add a family member?',
@@ -33,7 +33,7 @@ export default function HelpSupportScreen() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <Text style={[typography.label, { color: colors.inkFaint }]}>FREQUENTLY ASKED QUESTIONS</Text>
       <View style={{ gap: spacing.sm }}>
         {FAQS.map((faq, index) => {

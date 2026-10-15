@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector, clearLocality } from '../../../store';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { PatientAddress } from '../../patients/types/patient.types';
 import { styles } from '../styles/Addresses.styles';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SavedAddresses'>;
 
@@ -41,7 +42,7 @@ const SavedAddressesScreen: React.FC<Props> = ({ navigation }) => {
       const res = await patientAddressService.listMine();
       setAddresses(res.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load your addresses.');
+      setError(getErrorMessage(err, 'Could not load your addresses.'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ const SavedAddressesScreen: React.FC<Props> = ({ navigation }) => {
       });
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not update this address.');
+      setError(getErrorMessage(err, 'Could not update this address.'));
     } finally {
       setBusyId(null);
     }
@@ -90,7 +91,7 @@ const SavedAddressesScreen: React.FC<Props> = ({ navigation }) => {
             if (selectedAddressId === address.id) dispatch(clearLocality());
             await load();
           } catch (err) {
-            setError(err instanceof Error ? err.message : 'Could not remove this address.');
+            setError(getErrorMessage(err, 'Could not remove this address.'));
           } finally {
             setBusyId(null);
           }
@@ -101,7 +102,7 @@ const SavedAddressesScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         {error ? <Banner variant="error" message={error} /> : null}
         {loading ? (
           <View style={styles.skeletonStack}>

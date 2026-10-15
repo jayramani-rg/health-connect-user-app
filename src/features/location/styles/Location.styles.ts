@@ -118,6 +118,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
+    maxWidth: '100%',
     gap: spacing.xs,
     backgroundColor: colors.surface,
     borderRadius: radius.pill,
@@ -131,10 +132,12 @@ export const styles = StyleSheet.create({
     ...typography.label,
     color: colors.ink,
     maxWidth: 240,
+    flexShrink: 1,
   },
   chipTextMuted: {
     ...typography.label,
     color: colors.inkSoft,
+    flexShrink: 1,
   },
   flex1: {
     flex: 1,

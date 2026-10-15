@@ -5,26 +5,31 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Avatar } from '../../../components/Avatar/Avatar';
-import { Card } from '../../../components/Card/Card';
 import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
 import type { ConfirmSheetAction } from '../../../components/ConfirmSheet/types/ConfirmSheet.types';
-import { Icon, type IoniconsIconName } from '../../../components/Icon/Icon';
+import { Icon } from '../../../components/Icon/Icon';
+import { ListGroup, ListRow } from '../../../components/ListGroup/ListGroup';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
-import { colors, spacing, typography } from '../../../theme';
+import { colors } from '../../../theme';
 import { ASSETS_BASE_URL } from '../../../config/env';
 import { useAppDispatch, useAppSelector, logout } from '../../../store';
 import { authService } from '../../../services/authService';
 import { dependentService } from '../../../services/dependentService';
 import { profileService } from '../../../services/profileService';
 import type { RootStackParamList } from '../../../navigation/types';
+import { styles } from '../styles/ProfileHomeScreen.styles';
 
 type Sheet = 'none' | 'photo' | 'logout';
 
 export default function ProfileHomeScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
-  const authUser = useAppSelector((state) => state.authData.user);
-  const refreshToken = useAppSelector((state) => state.authData.tokens?.refreshToken ?? null);
+  const authUser = useAppSelector(state => state.authData.user);
+  const refreshToken = useAppSelector(
+    state => state.authData.tokens?.refreshToken ?? null,
+  );
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
@@ -34,18 +39,25 @@ export default function ProfileHomeScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const [profileRes, dependentsRes] = await Promise.all([profileService.getMyProfile(), dependentService.listMine()]);
+        const [profileRes, dependentsRes] = await Promise.all([
+          profileService.getMyProfile(),
+          dependentService.listMine(),
+        ]);
         setPhotoUrl(profileRes.data.profilePhotoUrl ?? null);
         setFamilyCount(dependentsRes.data.length);
-      } catch {
-      }
+      } catch {}
     })();
   }, []);
 
   async function handlePickPhoto() {
     setActiveSheet('none');
-    const picked = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 1, quality: 0.8 });
-    if (picked.didCancel || !picked.assets || picked.assets.length === 0) return;
+    const picked = await launchImageLibrary({
+      mediaType: 'photo',
+      selectionLimit: 1,
+      quality: 0.8,
+    });
+    if (picked.didCancel || !picked.assets || picked.assets.length === 0)
+      return;
     const asset = picked.assets[0];
     if (!asset?.uri) return;
 
@@ -90,94 +102,156 @@ export default function ProfileHomeScreen() {
     dispatch(logout());
   }
 
-  const fullName = [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ') || 'Your profile';
+  const fullName =
+    [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ') ||
+    'Your profile';
 
   const photoActions: ConfirmSheetAction[] = [
-    { label: 'Choose new photo', variant: 'secondary', onPress: handlePickPhoto },
-    { label: 'Remove photo', variant: 'destructive', onPress: handleRemovePhoto },
-    { label: 'Cancel', variant: 'ghost', onPress: () => setActiveSheet('none') },
+    {
+      label: 'Choose new photo',
+      variant: 'secondary',
+      onPress: handlePickPhoto,
+    },
+    {
+      label: 'Remove photo',
+      variant: 'destructive',
+      onPress: handleRemovePhoto,
+    },
+    {
+      label: 'Cancel',
+      variant: 'ghost',
+      onPress: () => setActiveSheet('none'),
+    },
   ];
 
-  const menu: { icon: IoniconsIconName; title: string; subtitle?: string; onPress: () => void }[] = [
-    { icon: 'person-outline', title: 'Edit profile', subtitle: 'Personal & health information', onPress: () => navigation.navigate('EditProfile') },
-    {
-      icon: 'people-outline',
-      title: 'Family members',
-      subtitle: familyCount > 0 ? `${familyCount} added` : 'Book on behalf of family',
-      onPress: () => navigation.navigate('FamilyMembers'),
-    },
-    {
-      icon: 'location-outline',
-      title: 'Saved addresses',
-      subtitle: 'Home, work and more for home collection',
-      onPress: () => navigation.navigate('SavedAddresses'),
-    },
-    {
-      icon: 'call-outline',
-      title: 'Call history',
-      subtitle: 'Voice and video calls with your care team',
-      onPress: () => navigation.navigate('CallHistory'),
-    },
-    { icon: 'settings-outline', title: 'Settings', onPress: () => navigation.navigate('Settings') },
-    { icon: 'help-circle-outline', title: 'Help & support', onPress: () => navigation.navigate('HelpSupport') },
-  ];
+  const verified = !!authUser?.isPhoneVerified;
+  const profileComplete = authUser?.isProfileComplete ?? true;
 
   return (
-    <ScreenContainer tabBarInset>
-      <View style={{ alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.sm }}>
-        <Pressable onPress={handleAvatarPress} disabled={photoBusy} style={{ position: 'relative' }}>
-          <Avatar name={fullName} imageUrl={photoUrl ? `${ASSETS_BASE_URL}${photoUrl}` : null} size={84} />
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: 28,
-              height: 28,
-              borderRadius: 14,
-              backgroundColor: colors.primary,
-              borderWidth: 2,
-              borderColor: colors.surface,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+    <ScreenContainer tabBarInset variant="page" style={styles.screen}>
+      <View style={styles.top}>
+        <PageHeader title="Profile" />
+
+        <View style={styles.identityCard}>
+          <Pressable
+            onPress={handleAvatarPress}
+            disabled={photoBusy}
+            accessibilityRole="button"
+            accessibilityLabel={
+              photoUrl ? 'Change profile photo' : 'Add profile photo'
+            }
+            style={styles.avatarWrap}
           >
-            {photoBusy ? <ActivityIndicator size="small" color={colors.white} /> : <Icon name="camera" size={14} color={colors.white} />}
-          </View>
-        </Pressable>
-        <Text style={typography.h2}>{fullName}</Text>
-        {authUser?.phone && <Text style={[typography.body, { color: colors.inkSoft }]}>{authUser.phone}</Text>}
-        {authUser?.isPhoneVerified && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.successSoft, paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: 999 }}>
-            <Icon name="checkmark-circle" size={13} color={colors.success} />
-            <Text style={[typography.label, { color: colors.success }]}>Verified</Text>
-          </View>
-        )}
-      </View>
-
-      <View style={{ gap: spacing.sm }}>
-        {menu.map((item) => (
-          <Card key={item.title} variant="outline" elevation="none" onPress={item.onPress}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name={item.icon} size={19} color={colors.primary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={typography.bodyStrong}>{item.title}</Text>
-                {item.subtitle && <Text style={[typography.caption, { color: colors.inkFaint }]}>{item.subtitle}</Text>}
-              </View>
-              <Icon name="chevron-forward" size={18} color={colors.inkFaint} />
+            <Avatar
+              name={fullName}
+              imageUrl={photoUrl ? `${ASSETS_BASE_URL}${photoUrl}` : null}
+              size={64}
+            />
+            <View style={styles.avatarBadge}>
+              {photoBusy ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Icon name="camera" size={13} color={colors.white} />
+              )}
             </View>
-          </Card>
-        ))}
-
-        <Card variant="outline" elevation="none" onPress={() => setActiveSheet('logout')} style={{ marginTop: spacing.sm }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
-            <Icon name="log-out-outline" size={18} color={colors.error} />
-            <Text style={[typography.bodyStrong, { color: colors.error }]}>Log out</Text>
+          </Pressable>
+          <View style={styles.identityText}>
+            <Text style={styles.name} numberOfLines={2}>
+              {fullName}
+            </Text>
+            {authUser?.phone ? (
+              <View style={styles.phoneRow}>
+                <Text style={styles.phone} numberOfLines={1}>
+                  {authUser.phone}
+                </Text>
+                {verified ? (
+                  <Icon
+                    name="checkmark-circle"
+                    size={15}
+                    color={colors.success}
+                  />
+                ) : null}
+              </View>
+            ) : null}
           </View>
-        </Card>
+          <Pressable
+            onPress={() => navigation.navigate('EditProfile')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
+            style={({ pressed }) => [
+              styles.editButton,
+              pressed && styles.editButtonPressed,
+            ]}
+          >
+            <Text style={styles.editText}>Edit</Text>
+          </Pressable>
+        </View>
       </View>
+
+      {!profileComplete ? (
+        <ListGroup>
+          <ListRow
+            icon="alert-circle-outline"
+            title="Complete your profile"
+            subtitle="Add your basic details to book doctors and lab tests."
+            onPress={() => navigation.navigate('ProfileBasics')}
+          />
+        </ListGroup>
+      ) : null}
+
+      <ListGroup title="Personal">
+        <ListRow
+          icon="person-outline"
+          title="Personal information"
+          subtitle="Name, date of birth and health details"
+          onPress={() => navigation.navigate('EditProfile')}
+        />
+        <ListRow
+          icon="people-outline"
+          title="Family members"
+          subtitle={
+            familyCount > 0
+              ? `${familyCount} added`
+              : 'Book on behalf of family'
+          }
+          onPress={() => navigation.navigate('FamilyMembers')}
+        />
+        <ListRow
+          icon="location-outline"
+          title="Saved addresses"
+          subtitle="Used for lab home collection"
+          onPress={() => navigation.navigate('SavedAddresses')}
+        />
+      </ListGroup>
+
+      <ListGroup title="Activity">
+        <ListRow
+          icon="call-outline"
+          title="Call history"
+          subtitle="Voice and video calls with your care team"
+          onPress={() => navigation.navigate('CallHistory')}
+        />
+      </ListGroup>
+
+      <ListGroup title="Account">
+        <ListRow
+          icon="settings-outline"
+          title="Settings"
+          onPress={() => navigation.navigate('Settings')}
+        />
+        <ListRow
+          icon="help-circle-outline"
+          title="Help & support"
+          onPress={() => navigation.navigate('HelpSupport')}
+        />
+        <ListRow
+          icon="log-out-outline"
+          title="Log out"
+          tone="danger"
+          onPress={() => setActiveSheet('logout')}
+        />
+      </ListGroup>
 
       <ConfirmSheet
         visible={activeSheet === 'photo'}
@@ -191,7 +265,11 @@ export default function ProfileHomeScreen() {
         title="Log out"
         message="Are you sure you want to log out?"
         actions={[
-          { label: 'Cancel', variant: 'secondary', onPress: () => setActiveSheet('none') },
+          {
+            label: 'Cancel',
+            variant: 'secondary',
+            onPress: () => setActiveSheet('none'),
+          },
           { label: 'Log out', variant: 'destructive', onPress: handleLogout },
         ]}
         onRequestClose={() => setActiveSheet('none')}

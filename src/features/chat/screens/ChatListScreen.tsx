@@ -6,14 +6,15 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Button } from '../../../components/Button/Button';
 import { ChatListItem } from '../../../components/ChatListItem/ChatListItem';
-import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { SegmentedControl } from '../../../components/SegmentedControl/SegmentedControl';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
 import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { ChatConversationListItem, ChatInvitation } from '../types/chat.types';
+import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 type ChatTab = 'chats' | 'pending';
 
@@ -27,6 +28,7 @@ const TAB_OPTIONS: { label: string; value: ChatTab }[] = [
 ];
 
 const ChatListScreen: React.FC = () => {
+  const bottomInset = useScreenBottomInset();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [tab, setTab] = useState<ChatTab>('chats');
   const [conversations, setConversations] = useState<ChatConversationListItem[]>([]);
@@ -77,7 +79,12 @@ const ChatListScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <ChipGroup options={TAB_OPTIONS} value={tab} onChange={(v) => setTab(v as ChatTab)} />
+        <SegmentedControl
+          accessibilityLabel="Conversations"
+          options={TAB_OPTIONS.map((option) => (option.value === 'pending' ? { ...option, badge: invitations.length } : option))}
+          value={tab}
+          onChange={(v) => setTab(v as ChatTab)}
+        />
       </View>
 
       {loading ? (
@@ -93,7 +100,7 @@ const ChatListScreen: React.FC = () => {
             <ChatListItem conversation={item} onPress={() => navigation.navigate('ChatConversation', { conversationId: item.id })} />
           )}
           ItemSeparatorComponent={ItemSeparator}
-          contentContainerStyle={conversations.length === 0 ? styles.emptyContent : undefined}
+          contentContainerStyle={[conversations.length === 0 ? styles.emptyContent : undefined, { paddingBottom: bottomInset }]}
           ListEmptyComponent={
             <EmptyState title="No chats yet" description="Accepted chat invitations with your doctors and labs will show up here." />
           }
@@ -103,7 +110,7 @@ const ChatListScreen: React.FC = () => {
           data={invitations}
           keyExtractor={(item) => item.id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
-          contentContainerStyle={invitations.length === 0 ? styles.emptyContent : styles.listContent}
+          contentContainerStyle={[invitations.length === 0 ? styles.emptyContent : styles.listContent, { paddingBottom: bottomInset }]}
           renderItem={({ item }) => {
             const name = item.providerType === 'DOCTOR' ? item.doctorName ?? 'Doctor' : item.laboratoryName ?? 'Laboratory';
             return (
@@ -135,11 +142,9 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingTop: spacing.xs,
     paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    gap: spacing.sm,
   },
   loadingWrapper: {
     padding: spacing.lg,

@@ -1,44 +1,55 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../../../theme';
+import { colors, layout, textRole } from '../../../../../theme';
 
 export const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
     borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    padding: layout.cardPadding,
+    gap: layout.blockGap,
+    marginBottom: layout.blockGap,
+  },
+  cardPressed: {
+    backgroundColor: colors.surfaceSunken,
   },
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    gap: layout.blockGap,
   },
-  doctorName: {
-    ...typography.bodyStrong,
+  identity: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  title: {
+    ...textRole.cardTitle,
     color: colors.text,
   },
-  specialization: {
-    ...typography.caption,
+  subtitle: {
+    ...textRole.meta,
     color: colors.textSecondary,
-    marginTop: 2,
   },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.sm,
-  },
-  detailRow: {
+  facts: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    columnGap: layout.gutter,
+    rowGap: 6,
+    paddingTop: layout.blockGap,
+    borderTopWidth: layout.hairline,
+    borderTopColor: colors.border,
   },
-  detailLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
+  fact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    maxWidth: '100%',
   },
-  detailValue: {
-    ...typography.bodyStrong,
+  factText: {
+    ...textRole.metaStrong,
     color: colors.text,
+    flexShrink: 1,
   },
 });

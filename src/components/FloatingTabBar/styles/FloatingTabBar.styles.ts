@@ -1,13 +1,13 @@
 import { StyleSheet } from 'react-native';
+import { Easing, ReduceMotion } from 'react-native-reanimated';
 import { colors, fontFamily, shadow, spacing } from '../../../theme';
 
 export const BAR_HEIGHT = 64;
 export const INDICATOR_SIZE = 48;
 export const BAR_SIDE_INSET = spacing.lg;
 export const BAR_BOTTOM_INSET = spacing.sm;
-export const TAB_BAR_CLEARANCE = BAR_HEIGHT + BAR_BOTTOM_INSET + spacing.xxxl;
-export const INDICATOR_SPRING = { damping: 19, stiffness: 220, mass: 1 };
-export const PRESS_SPRING = { damping: 15, stiffness: 400, mass: 1 };
+export const INDICATOR_TIMING = { duration: 240, easing: Easing.out(Easing.cubic), reduceMotion: ReduceMotion.System };
+export const TAB_PRESS_SCALE = 0.94;
 
 export const styles = StyleSheet.create({
   wrapper: {

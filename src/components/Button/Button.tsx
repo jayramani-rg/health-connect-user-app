@@ -1,7 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { colors, motion } from '../../theme';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { pressFeedback } from '../../utils/motion';
+import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { styles } from './styles/Button.styles';
 import type { ButtonProps } from './types/Button.types';
@@ -56,10 +57,10 @@ export function Button({
       }}
       disabled={isDisabled}
       onPressIn={() => {
-        scale.value = withSpring(0.96, motion.spring.press);
+        scale.value = withTiming(pressFeedback.scale, pressFeedback.timing);
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, motion.spring.press);
+        scale.value = withTiming(1, pressFeedback.timing);
       }}
       style={[styles.base, VARIANT_STYLE[variant], fullWidth && styles.fullWidth, isDisabled && styles.disabled, animatedStyle, style]}
     >

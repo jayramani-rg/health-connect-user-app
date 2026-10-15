@@ -1,97 +1,48 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Card } from '../../../components/Card/Card';
-import { Icon } from '../../../components/Icon/Icon';
+import { ListGroup, ListRow } from '../../../components/ListGroup/ListGroup';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
-import { SegmentedControl } from '../../../components/SegmentedControl/SegmentedControl';
-import { colors, spacing, typography } from '../../../theme';
+import { layout } from '../../../theme';
 import type { RootStackParamList } from '../../../navigation/types';
-
-type Mode = 'DOCTORS' | 'LABS';
-
-const COPY: Record<Mode, { placeholder: string; heading: string; body: string; browseLabel: string; allLabel: string }> = {
-  DOCTORS: {
-    placeholder: 'Search doctors or specialties',
-    heading: 'Find the right doctor',
-    body: 'Browse by specialty or search directly for a doctor.',
-    browseLabel: 'Browse by specialty',
-    allLabel: 'Browse all doctors',
-  },
-  LABS: {
-    placeholder: 'Search labs or tests',
-    heading: 'Book a lab test',
-    body: 'Browse by test category or search directly for a lab.',
-    browseLabel: 'Browse by category',
-    allLabel: 'Browse all labs',
-  },
-};
+import { ServiceTile } from '../../home/components/CareCards';
 
 export default function BookHomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [mode, setMode] = useState<Mode>('DOCTORS');
   const [search, setSearch] = useState('');
-  const copy = COPY[mode];
 
   function submitSearch() {
-    if (mode === 'DOCTORS') {
-      navigation.navigate('DoctorList', search ? { search } : undefined);
-    } else {
-      navigation.navigate('LabList', undefined);
-    }
+    const query = search.trim();
+    navigation.navigate('DoctorList', query ? { search: query } : undefined);
     setSearch('');
   }
 
   return (
-    <ScreenContainer tabBarInset>
-      <Text style={typography.h1}>Book care</Text>
+    <ScreenContainer tabBarInset variant="page">
+      <PageHeader title="Book care" />
 
-      <SegmentedControl
-        options={[
-          { label: 'Doctors', value: 'DOCTORS' },
-          { label: 'Labs', value: 'LABS' },
-        ]}
-        value={mode}
-        onChange={(value) => setMode(value as Mode)}
-      />
-
-      <SearchBar value={search} onChangeText={setSearch} placeholder={copy.placeholder} onSubmitEditing={submitSearch} />
-
-      <View style={{ gap: spacing.md, marginTop: spacing.sm }}>
-        <Text style={[typography.title, { color: colors.ink }]}>{copy.heading}</Text>
-        <Text style={[typography.body, { color: colors.inkSoft }]}>{copy.body}</Text>
-
-        <Card onPress={() => navigation.navigate(mode === 'DOCTORS' ? 'DoctorCategories' : 'LabCategories')}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-              <View
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: colors.primarySoft,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon name="grid-outline" size={20} color={colors.primary} />
-              </View>
-              <Text style={typography.bodyStrong}>{copy.browseLabel}</Text>
-            </View>
-            <Icon name="chevron-forward" size={18} color={colors.inkFaint} />
-          </View>
-        </Card>
-
-        <Card variant="outline" elevation="none" onPress={() => navigation.navigate(mode === 'DOCTORS' ? 'DoctorList' : 'LabList', undefined)}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={typography.bodyStrong}>{copy.allLabel}</Text>
-            <Icon name="chevron-forward" size={18} color={colors.inkFaint} />
-          </View>
-        </Card>
+      <View style={styles.cards}>
+        <ServiceTile tone="doctor" title="Find a doctor" onPress={() => navigation.navigate('DoctorCategories')} />
+        <ServiceTile tone="lab" title="Book a lab test" onPress={() => navigation.navigate('LabCategories')} />
       </View>
+
+      <SearchBar value={search} onChangeText={setSearch} placeholder="Search doctors" onSubmitEditing={submitSearch} />
+
+      <ListGroup title="Browse">
+        <ListRow icon="medkit-outline" title="All doctors" onPress={() => navigation.navigate('DoctorList', undefined)} />
+        <ListRow icon="flask-outline" title="All labs" onPress={() => navigation.navigate('LabList', undefined)} />
+      </ListGroup>
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  cards: {
+    flexDirection: 'row',
+    gap: layout.blockGap,
+  },
+});

@@ -11,6 +11,7 @@ import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader'
 import { colors, spacing, typography } from '../../../theme';
 import { specializationCategoryService, type ApprovedSpecializationCategory } from '../../../services/specializationCategoryService';
 import type { RootStackParamList } from '../../../navigation/types';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DoctorCategories'>;
 
@@ -26,7 +27,7 @@ const DoctorCategoriesScreen: React.FC<Props> = ({ navigation }) => {
       const response = await specializationCategoryService.getApproved();
       setCategories(response.data);
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : 'Could not load specializations.');
+      setErrorText(getErrorMessage(error, 'Could not load specializations.'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ const DoctorCategoriesScreen: React.FC<Props> = ({ navigation }) => {
   }, [load]);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <Text style={typography.h2}>What do you need care for?</Text>
       <Text style={{ ...typography.body, color: colors.inkSoft, marginTop: spacing.xs, marginBottom: spacing.md }}>
         Pick a specialization to see matching doctors, or browse the full list.

@@ -14,6 +14,7 @@ import { activeopacity } from '../../../utils/helpers';
 import { labBookingService } from '../../../services/labBookingService';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { LabBookingDetail } from '../types/labBooking.types';
+import { getErrorMessage } from '../../../utils/errors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabBookingDetail'>;
 
@@ -43,7 +44,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       const response = await labBookingService.getById(bookingId);
       setBooking(response.data);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Could not load this booking.');
+      setActionError(getErrorMessage(error, 'Could not load this booking.'));
     } finally {
       setLoading(false);
     }
@@ -63,7 +64,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       const response = await labBookingService.cancel(bookingId);
       setBooking(response.data);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'This action could not be completed.');
+      setActionError(getErrorMessage(error, 'This action could not be completed.'));
     } finally {
       setActionLoading(false);
     }
@@ -71,7 +72,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <SkeletonList count={3} />
       </ScreenContainer>
     );
@@ -79,7 +80,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (!booking) {
     return (
-      <ScreenContainer>
+      <ScreenContainer variant="page">
         <Banner variant="error" message={actionError ?? 'Booking not found.'} />
       </ScreenContainer>
     );
@@ -91,7 +92,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const currentTrackingIndex = TRACKING_STEPS.findIndex((s) => s.status === booking.status);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer variant="page">
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.md }}>
         <View style={{ flex: 1 }}>
           <Text style={typography.h2}>{booking.laboratoryName}</Text>
@@ -113,7 +114,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </>
       )}
       {booking.status === 'COLLECTION_FAILED' && (
-        <Banner variant="warning" message="The last collection attempt was unsuccessful — the lab will reassign a new time." />
+        <Banner variant="warning" message="The last collection attempt was unsuccessful. The lab will arrange a new time." />
       )}
 
       {currentTrackingIndex >= 0 && isHomeCollection && (
@@ -150,7 +151,7 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={sectionTitle}>Tests</Text>
           {booking.items.map((item, i) => (
             <Text key={i} style={typography.body}>
-              {item.serviceName}{booking.totalAmount !== null ? ` — ₹${item.price}` : ''}
+              {item.serviceName}{booking.totalAmount !== null ? ` · ₹${item.price}` : ''}
             </Text>
           ))}
         </>

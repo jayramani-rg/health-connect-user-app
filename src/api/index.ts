@@ -75,7 +75,7 @@ class ApiSingleton {
       if (error instanceof Error && error.name === 'AbortError') {
         throw normalizeError('Request timed out. Please try again.', 0);
       }
-      throw normalizeError('Network error — check your connection.', 0);
+      throw normalizeError('Network error. Check your connection and try again.', 0);
     }
     clearTimeout(timeout);
 

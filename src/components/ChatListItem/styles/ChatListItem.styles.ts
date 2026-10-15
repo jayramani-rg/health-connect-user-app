@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    minWidth: 0,
   },
   topLine: {
     flexDirection: 'row',
@@ -26,6 +27,7 @@ export const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textTertiary,
     marginLeft: spacing.sm,
+    flexShrink: 0,
   },
   bottomLine: {
     flexDirection: 'row',

@@ -3,6 +3,8 @@ const images = {
   onboardingLogo: require('./images/Auth/onboarding_logo.png'),
 
   homeBanner: require('./images/Home/banner_placeholder.png'),
+  findDoctor: require('./images/Home/find_doctor.png'),
+  bookLabTest: require('./images/Home/book_lab_test.png'),
 
   backArrow: require('./images/back_arrow.png'),
   filterIcon: require('./images/filter.png'),

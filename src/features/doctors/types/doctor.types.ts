@@ -13,6 +13,8 @@ export interface DoctorListItem {
   clinicLocality: string | null;
   clinicCity: string | null;
   localityMatch: LocalityMatch | null;
+  nextAvailableAtUtc?: string | null;
+  nextAvailableConsultationType?: ConsultationType | null;
 }
 
 export type LocalityMatch = 'SAME_LOCALITY' | 'SAME_CITY' | 'OTHER';

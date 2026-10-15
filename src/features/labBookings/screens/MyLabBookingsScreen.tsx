@@ -1,48 +1,55 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { ChipGroup } from '../../../components/ChipGroup/ChipGroup';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { LabStatusBadge } from '../../../components/LabStatusBadge/LabStatusBadge';
-import { TAB_BAR_CLEARANCE } from '../../../components/FloatingTabBar/styles/FloatingTabBar.styles';
-import { activeopacity } from '../../../utils/helpers';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { FilterChips, type FilterOption } from '../../../components/FilterChips/FilterChips';
+import { useTabBarInset } from '../../../components/FloatingTabBar/useTabBarInset';
+import { SkeletonBlock } from '../../../components/SkeletonLoader/SkeletonLoader';
+import { colors, layout } from '../../../theme';
 import { labBookingService } from '../../../services/labBookingService';
 import type { RootStackParamList } from '../../../navigation/types';
+import { LabBookingCard } from '../components/LabBookingCard/LabBookingCard';
 import type { LabBookingListItem, LabBookingTab } from '../types/labBooking.types';
 import { LAB_STATUS_BY_TAB } from '../types/labBooking.types';
+import { styles } from '../../appointments/styles/MyAppointmentsScreen.styles';
 
-const TAB_OPTIONS: { label: string; value: LabBookingTab }[] = [
-  { label: 'Upcoming', value: 'upcoming' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Processing', value: 'processing' },
-  { label: 'Reports', value: 'reports' },
-  { label: 'Cancelled', value: 'cancelled' },
+const TABS: { label: string; value: LabBookingTab; counted: boolean }[] = [
+  { label: 'Upcoming', value: 'upcoming', counted: true },
+  { label: 'Pending', value: 'pending', counted: true },
+  { label: 'Processing', value: 'processing', counted: true },
+  { label: 'Reports', value: 'reports', counted: false },
+  { label: 'Cancelled', value: 'cancelled', counted: false },
 ];
 
-const EMPTY_COPY: Record<LabBookingTab, string> = {
-  upcoming: 'No upcoming lab bookings.',
-  pending: 'No pending requests.',
-  processing: 'No samples in processing.',
-  reports: 'No reports ready yet.',
-  cancelled: 'No cancelled, declined, or failed bookings.',
+const EMPTY_COPY: Record<LabBookingTab, { title: string; description: string }> = {
+  upcoming: { title: 'No upcoming lab tests', description: 'Confirmed lab visits and home collections show up here.' },
+  pending: { title: 'Nothing pending', description: 'Bookings waiting for the lab or for payment appear here.' },
+  processing: { title: 'No samples in processing', description: 'Collected samples being tested appear here.' },
+  reports: { title: 'No reports yet', description: 'Reports appear here as soon as the lab uploads them.' },
+  cancelled: { title: 'Nothing cancelled', description: 'Cancelled, declined or failed bookings appear here.' },
 };
 
 const MyLabBookingsScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const bottomInset = useTabBarInset();
   const [tab, setTab] = useState<LabBookingTab>('upcoming');
   const [bookings, setBookings] = useState<LabBookingListItem[]>([]);
+  const [complete, setComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
 
   const load = useCallback(async (isRefresh = false) => {
     isRefresh ? setRefreshing(true) : setLoading(true);
     try {
       const response = await labBookingService.list({ pageSize: 100 });
       setBookings(response.data.items);
+      setComplete(response.data.totalCount <= response.data.items.length);
+      setError(false);
+    } catch {
+      setError(true);
     } finally {
       isRefresh ? setRefreshing(false) : setLoading(false);
     }
@@ -51,108 +58,61 @@ const MyLabBookingsScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, []),
+    }, [load]),
   );
 
   const filtered = useMemo(() => {
     const statuses = LAB_STATUS_BY_TAB[tab];
+    const upcomingFirst = tab === 'upcoming' || tab === 'pending';
     return bookings
       .filter((b) => statuses.includes(b.status))
-      .sort((a, b) => new Date(b.scheduledAtUtc).getTime() - new Date(a.scheduledAtUtc).getTime());
+      .sort((a, b) => {
+        const diff = new Date(a.scheduledAtUtc).getTime() - new Date(b.scheduledAtUtc).getTime();
+        return upcomingFirst ? diff : -diff;
+      });
   }, [bookings, tab]);
 
+  const options: FilterOption<LabBookingTab>[] = TABS.map((option) => ({
+    label: option.label,
+    value: option.value,
+    count: complete && option.counted ? bookings.filter((b) => LAB_STATUS_BY_TAB[option.value].includes(b.status)).length : undefined,
+  }));
+
+  const empty = EMPTY_COPY[tab];
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.canvas }} edges={[]}>
-      <View style={styles.header}>
-        <ChipGroup options={TAB_OPTIONS} value={tab} onChange={(v) => setTab(v as LabBookingTab)} />
-      </View>
+    <View style={styles.container}>
+      <FilterChips options={options} value={tab} onChange={setTab} accessibilityLabel="Lab booking status" />
 
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator color={colors.brand} />
+        <View style={[styles.listContent, styles.skeleton]}>
+          {[0, 1, 2].map((key) => (
+            <SkeletonBlock key={key} width="100%" height={116} radius={layout.cardRadius} />
+          ))}
         </View>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: spacing.lg, paddingBottom: TAB_BAR_CLEARANCE }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} />}
-          renderItem={({ item }) => {
-            const scheduled = new Date(item.scheduledAtUtc);
-            return (
-              <TouchableOpacity
-                activeOpacity={activeopacity}
-                style={styles.card}
-                onPress={() => navigation.navigate('LabBookingDetail', { bookingId: item.id })}
-              >
-                <View style={styles.topRow}>
-                  <Text style={typography.bodyStrong} numberOfLines={1}>
-                    {item.laboratoryName}
-                  </Text>
-                  <LabStatusBadge status={item.status} />
-                </View>
-                <Text style={styles.services} numberOfLines={1}>
-                  {item.serviceNames.join(', ')}
-                </Text>
-                <View style={styles.divider} />
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>{item.collectionMethod === 'LAB_VISIT' ? 'Lab visit' : 'Home collection'}</Text>
-                  <Text style={styles.detailValue}>
-                    {scheduled.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ·{' '}
-                    {scheduled.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-          ListEmptyComponent={<EmptyState title={EMPTY_COPY[tab]} />}
+          contentContainerStyle={[styles.listContent, { paddingBottom: bottomInset }]}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.brand} colors={[colors.brand]} />}
+          renderItem={({ item }) => <LabBookingCard booking={item} onPress={() => navigation.navigate('LabBookingDetail', { bookingId: item.id })} />}
+          ListEmptyComponent={
+            error ? (
+              <EmptyState title="Couldn't load lab bookings" description="Check your connection and try again." actionLabel="Try again" onActionPress={() => load()} />
+            ) : (
+              <EmptyState
+                title={empty.title}
+                description={empty.description}
+                actionLabel={tab === 'upcoming' ? 'Book a lab test' : undefined}
+                onActionPress={tab === 'upcoming' ? () => navigation.navigate('LabCategories') : undefined}
+              />
+            )
+          }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  services: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.sm,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  detailLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  detailValue: {
-    ...typography.bodyStrong,
-    color: colors.text,
-  },
-});
 
 export default MyLabBookingsScreen;
