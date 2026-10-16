@@ -13,6 +13,7 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipAuth?: boolean;
   isRetry?: boolean;
   authOverride?: string;
+  timeoutMs?: number;
 }
 
 class ApiError extends Error implements NormalizedError {
@@ -51,12 +52,12 @@ class ApiSingleton {
   }
 
   async request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-    const { body, skipAuth, isRetry, authOverride, headers, ...rest } = options;
+    const { body, skipAuth, isRetry, authOverride, headers, timeoutMs, ...rest } = options;
     const token = authOverride ?? (skipAuth ? null : this.getToken());
     const formData = isFormData(body);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs ?? REQUEST_TIMEOUT_MS);
 
     let response: Response;
     try {

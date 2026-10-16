@@ -13,8 +13,8 @@ import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { colors } from '../../../theme';
 import { ASSETS_BASE_URL } from '../../../config/env';
-import { useAppDispatch, useAppSelector, logout } from '../../../store';
-import { authService } from '../../../services/authService';
+import { useAppSelector } from '../../../store';
+import { signOut } from '../../auth/utils/signOut';
 import { dependentService } from '../../../services/dependentService';
 import { profileService } from '../../../services/profileService';
 import type { RootStackParamList } from '../../../navigation/types';
@@ -25,16 +25,13 @@ type Sheet = 'none' | 'photo' | 'logout';
 export default function ProfileHomeScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const dispatch = useAppDispatch();
   const authUser = useAppSelector(state => state.authData.user);
-  const refreshToken = useAppSelector(
-    state => state.authData.tokens?.refreshToken ?? null,
-  );
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [familyCount, setFamilyCount] = useState(0);
   const [activeSheet, setActiveSheet] = useState<Sheet>('none');
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -98,8 +95,8 @@ export default function ProfileHomeScreen() {
 
   function handleLogout() {
     setActiveSheet('none');
-    authService.logout(refreshToken ?? undefined).catch(() => {});
-    dispatch(logout());
+    setLoggingOut(true);
+    signOut();
   }
 
   const fullName =
@@ -243,9 +240,10 @@ export default function ProfileHomeScreen() {
         />
         <ListRow
           icon="log-out-outline"
-          title="Log out"
+          title={loggingOut ? 'Logging out…' : 'Log out'}
           tone="danger"
           onPress={() => setActiveSheet('logout')}
+          disabled={loggingOut}
         />
       </ListGroup>
 

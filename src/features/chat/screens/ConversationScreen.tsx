@@ -18,7 +18,9 @@ import { colors, radius, spacing, typography } from '../../../theme';
 import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
 import type { RootStackParamList } from '../../../navigation/types';
+import { useAppSelector } from '../../../store';
 import type { ChatMessage, OutgoingChatMessage } from '../types/chat.types';
+import { appendOlder, mergeIncoming, mergeSent } from '../utils/mergeMessages';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ChatConversation'>;
 type Row = ChatMessage | OutgoingChatMessage;
@@ -62,6 +64,7 @@ function withDateSeparators(rows: Row[]): DisplayRow[] {
 
 const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
   const { conversationId } = route.params;
+  const myUserId = useAppSelector((state) => state.authData.user?.id ?? null);
 
   const [messages, setMessages] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,10 +111,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     const offMessage = chatSocket.onMessage((incoming) => {
       if (incoming.conversationId !== conversationId) return;
-      setMessages((prev) => {
-        if (prev.some((m) => !isOutgoing(m) && m.id === incoming.id)) return prev;
-        return [incoming, ...prev];
-      });
+      setMessages((prev) => mergeIncoming(prev, incoming, !!myUserId && incoming.senderUserId === myUserId));
       if (!incoming.isFromPatient) {
         chatService.markRead(conversationId).catch(() => {});
       }
@@ -120,7 +120,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
     const offRead = chatSocket.onMessagesRead((event) => {
       if (event.conversationId !== conversationId) return;
       setMessages((prev) =>
-        prev.map((m) => (!isOutgoing(m) && event.messageIds.includes(m.id) ? { ...m, readAtUtc: event.readAtUtc } : m)),
+        prev.map((m) => (event.messageIds.includes(m.id) ? { ...m, readAtUtc: event.readAtUtc } : m)),
       );
     });
 
@@ -128,14 +128,14 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
       offMessage();
       offRead();
     };
-  }, [conversationId]);
+  }, [conversationId, myUserId]);
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     try {
       const response = await chatService.getMessages(conversationId, { pageSize: 30, ...cursorRef.current });
-      setMessages((prev) => [...prev, ...response.data.items]);
+      setMessages((prev) => appendOlder(prev, response.data.items));
       setHasMore(response.data.hasMore);
       cursorRef.current = {
         beforeSentAtUtc: response.data.nextBeforeSentAtUtc ?? undefined,
@@ -149,7 +149,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
   async function sendMessage(body: string, clientId: string) {
     try {
       const response = await chatService.sendMessage(conversationId, body);
-      setMessages((prev) => prev.map((m) => (isOutgoing(m) && m.clientId === clientId ? { ...response.data, clientId, sendState: 'sent' as const } : m)));
+      setMessages((prev) => mergeSent(prev, response.data, clientId));
     } catch {
       setMessages((prev) => prev.map((m) => (isOutgoing(m) && m.clientId === clientId ? { ...m, sendState: 'failed' as const } : m)));
     }
