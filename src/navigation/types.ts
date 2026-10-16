@@ -28,7 +28,6 @@ export type RootStackParamList = {
   LabBookingDetail: { bookingId: string };
   ReportViewer: { bookingId: string; reportId: string; label: string; mimeType: string };
 
-  ChatList: undefined;
   ChatConversation: { conversationId: string };
 
   NotificationCenter: undefined;
@@ -50,7 +49,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Book: undefined;
   Appointments: { initialMode?: 'DOCTOR' | 'LAB' } | undefined;
+  Messages: undefined;
   Profile: undefined;
 };

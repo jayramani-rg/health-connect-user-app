@@ -35,7 +35,6 @@ import BookLabServiceScreen from '../features/labBookings/screens/BookLabService
 import LabBookingConfirmationScreen from '../features/labBookings/screens/LabBookingConfirmationScreen';
 import LabBookingDetailScreen from '../features/labBookings/screens/LabBookingDetailScreen';
 import ReportViewerScreen from '../features/labBookings/screens/ReportViewerScreen';
-import ChatListScreen from '../features/chat/screens/ChatListScreen';
 import ConversationScreen from '../features/chat/screens/ConversationScreen';
 import NotificationCenterScreen from '../features/notifications/screens/NotificationCenterScreen';
 import { notificationService } from '../services/notificationService';
@@ -106,7 +105,6 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen name="LabBookingConfirmation" component={LabBookingConfirmationScreen} options={{ gestureEnabled: false }} />
             <Stack.Screen name="LabBookingDetail" component={LabBookingDetailScreen} options={{ headerShown: true, title: 'Lab booking' }} />
             <Stack.Screen name="ReportViewer" component={ReportViewerScreen} options={{ headerShown: true, title: 'Report' }} />
-            <Stack.Screen name="ChatList" component={ChatListScreen} options={{ headerShown: true, title: 'Chats' }} />
             <Stack.Screen name="ChatConversation" component={ConversationScreen} options={{ headerShown: true, title: 'Chat' }} />
             <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} options={{ headerShown: true, title: 'Notifications' }} />
             <Stack.Screen name="IncomingCall" component={IncomingCallScreen} options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }} />

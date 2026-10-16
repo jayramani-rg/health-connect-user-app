@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Button } from '../../../components/Button/Button';
 import { ChatListItem } from '../../../components/ChatListItem/ChatListItem';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { SegmentedControl } from '../../../components/SegmentedControl/SegmentedControl';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
 import { colors, radius, spacing, typography } from '../../../theme';
@@ -14,7 +15,7 @@ import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
 import type { RootStackParamList } from '../../../navigation/types';
 import type { ChatConversationListItem, ChatInvitation } from '../types/chat.types';
-import { useScreenBottomInset } from '../../../components/FloatingTabBar/useTabBarInset';
+import { useTabBarInset } from '../../../components/FloatingTabBar/useTabBarInset';
 
 type ChatTab = 'chats' | 'pending';
 
@@ -28,7 +29,7 @@ const TAB_OPTIONS: { label: string; value: ChatTab }[] = [
 ];
 
 const ChatListScreen: React.FC = () => {
-  const bottomInset = useScreenBottomInset();
+  const bottomInset = useTabBarInset();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [tab, setTab] = useState<ChatTab>('chats');
   const [conversations, setConversations] = useState<ChatConversationListItem[]>([]);
@@ -54,7 +55,7 @@ const ChatListScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, []),
+    }, [load]),
   );
 
   useEffect(() => {
@@ -64,7 +65,7 @@ const ChatListScreen: React.FC = () => {
       offMessage();
       offInvitation();
     };
-  }, []);
+  }, [load]);
 
   async function handleCancel(invitationId: string) {
     setCancellingId(invitationId);
@@ -79,6 +80,7 @@ const ChatListScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
+        <PageHeader title="Messages" />
         <SegmentedControl
           accessibilityLabel="Conversations"
           options={TAB_OPTIONS.map((option) => (option.value === 'pending' ? { ...option, badge: invitations.length } : option))}

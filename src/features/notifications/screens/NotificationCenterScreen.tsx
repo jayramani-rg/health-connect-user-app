@@ -96,7 +96,7 @@ const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
     } else if (item.entityType === 'Call') {
       navigation.navigate('CallHistory');
     } else if (item.entityType === 'ChatInvitation') {
-      navigation.navigate('ChatList');
+      navigation.navigate('MainTabs', { screen: 'Messages' });
     }
   }
 
