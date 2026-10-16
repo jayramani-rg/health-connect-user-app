@@ -5,6 +5,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { CategoryGrid } from '../../../components/CategoryGrid/CategoryGrid';
+import { ROUND_AVATAR_OUTER } from '../../../components/CategoryGrid/styles/CategoryGrid.styles';
 import { EmptyCard } from '../../../components/EmptyCard/EmptyCard';
 import { Icon } from '../../../components/Icon/Icon';
 import { IconButton } from '../../../components/IconButton/IconButton';
@@ -25,6 +26,7 @@ import { LocationPromptCard } from '../../location/components/LocationPromptCard
 import { useUserLocality } from '../../location/hooks/useUserLocality';
 import { CareRow, ServiceTile, UpNextCard } from '../components/CareCards';
 import { summarizeCare, type CareItem, type CareSummary } from '../utils/careActivity';
+import { CARE_SEARCH_HINTS } from '../utils/careSearchHints';
 import { styles } from '../styles/HomeScreen.styles';
 
 const HOME_CATEGORY_LIMIT = 8;
@@ -157,7 +159,6 @@ const HomeScreen: React.FC = () => {
         <EmptyCard
           icon="calendar-clear-outline"
           title="No upcoming visits"
-          description="Your doctor appointments and lab tests will appear here once you book them."
         />
       );
     }
@@ -241,7 +242,7 @@ const HomeScreen: React.FC = () => {
           <LocationPromptCard loading={locality.detecting} onEnable={() => locality.enableAndDetect()} onDismiss={locality.dismissPrompt} />
         )}
 
-        <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors" onPress={() => navigation.navigate('DoctorList', {})} />
+        <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onPress={() => navigation.navigate('DoctorList', {})} />
 
         <View style={styles.section}>
           <SectionHeader title="Book care" />
@@ -257,7 +258,7 @@ const HomeScreen: React.FC = () => {
             <View style={styles.categorySkeleton}>
               {Array.from({ length: HOME_CATEGORY_LIMIT }).map((_, index) => (
                 <View key={index} style={styles.categorySkeletonTile}>
-                  <SkeletonBlock width={60} height={60} radius={30} />
+                  <SkeletonBlock width={ROUND_AVATAR_OUTER} height={ROUND_AVATAR_OUTER} radius={ROUND_AVATAR_OUTER / 2} />
                   <SkeletonBlock width={52} height={10} />
                 </View>
               ))}

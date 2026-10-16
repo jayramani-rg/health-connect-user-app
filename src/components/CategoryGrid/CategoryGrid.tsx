@@ -23,10 +23,10 @@ export function CategoryGrid({ categories, onSelect, variant = 'grid' }: Categor
   return <View style={variant === 'compact' ? styles.compactGrid : styles.grid}>{tiles}</View>;
 }
 
-const TILE_STYLES: Record<TileVariant, { tile: object; avatar: object; name: object }> = {
-  grid: { tile: styles.tile, avatar: styles.avatar, name: styles.name },
-  strip: { tile: styles.stripTile, avatar: styles.roundAvatar, name: styles.roundName },
-  compact: { tile: styles.compactTile, avatar: styles.roundAvatar, name: styles.roundName },
+const TILE_STYLES: Record<TileVariant, { tile: object; avatar: object; image: object; name: object }> = {
+  grid: { tile: styles.tile, avatar: styles.avatar, image: styles.avatarImage, name: styles.name },
+  strip: { tile: styles.stripTile, avatar: styles.roundAvatar, image: [styles.avatarImage, styles.roundAvatarImage], name: styles.roundName },
+  compact: { tile: styles.compactTile, avatar: styles.roundAvatar, image: [styles.avatarImage, styles.roundAvatarImage], name: styles.roundName },
 };
 
 function CategoryTile({ category, variant, onPress }: { category: CategoryGridItem; variant: TileVariant; onPress: () => void }) {
@@ -40,7 +40,7 @@ function CategoryTile({ category, variant, onPress }: { category: CategoryGridIt
         {showImage ? (
           <Image
             source={{ uri: `${ASSETS_BASE_URL}${category.imageUrl}` }}
-            style={styles.avatarImage}
+            style={look.image}
             resizeMode="cover"
             onError={() => setImageFailed(true)}
           />

@@ -10,6 +10,7 @@ import { SearchBar } from '../../../components/SearchBar/SearchBar';
 import { layout } from '../../../theme';
 import type { RootStackParamList } from '../../../navigation/types';
 import { ServiceTile } from '../../home/components/CareCards';
+import { CARE_SEARCH_HINTS } from '../../home/utils/careSearchHints';
 
 export default function BookHomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -30,7 +31,7 @@ export default function BookHomeScreen() {
         <ServiceTile tone="lab" title="Book a lab test" onPress={() => navigation.navigate('LabCategories')} />
       </View>
 
-      <SearchBar value={search} onChangeText={setSearch} placeholder="Search doctors" onSubmitEditing={submitSearch} />
+      <SearchBar value={search} onChangeText={setSearch} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onSubmitEditing={submitSearch} />
 
       <ListGroup title="Browse">
         <ListRow icon="medkit-outline" title="All doctors" onPress={() => navigation.navigate('DoctorList', undefined)} />

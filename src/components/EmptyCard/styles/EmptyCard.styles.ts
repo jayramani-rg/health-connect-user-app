@@ -12,6 +12,9 @@ export const styles = StyleSheet.create({
     borderWidth: layout.hairline,
     borderColor: colors.border,
   },
+  cardCentered: {
+    alignItems: 'center',
+  },
   iconTile: {
     width: layout.iconTile,
     height: layout.iconTile,

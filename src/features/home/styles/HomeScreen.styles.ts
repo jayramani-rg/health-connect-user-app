@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
   categorySkeleton: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    rowGap: layout.gutter,
+    rowGap: layout.inlineGap,
   },
   categorySkeletonTile: {
     width: '25%',

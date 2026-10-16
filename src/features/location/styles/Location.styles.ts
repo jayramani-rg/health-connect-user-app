@@ -126,7 +126,6 @@ export const styles = StyleSheet.create({
     borderColor: colors.border,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs + 2,
-    marginBottom: spacing.lg,
   },
   chipText: {
     ...typography.label,

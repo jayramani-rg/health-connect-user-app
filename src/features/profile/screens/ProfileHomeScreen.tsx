@@ -194,7 +194,6 @@ export default function ProfileHomeScreen() {
           <ListRow
             icon="alert-circle-outline"
             title="Complete your profile"
-            subtitle="Add your basic details to book doctors and lab tests."
             onPress={() => navigation.navigate('ProfileBasics')}
           />
         </ListGroup>
@@ -204,7 +203,6 @@ export default function ProfileHomeScreen() {
         <ListRow
           icon="person-outline"
           title="Personal information"
-          subtitle="Name, date of birth and health details"
           onPress={() => navigation.navigate('EditProfile')}
         />
         <ListRow
@@ -220,7 +218,6 @@ export default function ProfileHomeScreen() {
         <ListRow
           icon="location-outline"
           title="Saved addresses"
-          subtitle="Used for lab home collection"
           onPress={() => navigation.navigate('SavedAddresses')}
         />
       </ListGroup>
@@ -229,7 +226,6 @@ export default function ProfileHomeScreen() {
         <ListRow
           icon="call-outline"
           title="Call history"
-          subtitle="Voice and video calls with your care team"
           onPress={() => navigation.navigate('CallHistory')}
         />
       </ListGroup>

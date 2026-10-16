@@ -13,8 +13,9 @@ export interface EmptyCardProps {
 }
 
 export function EmptyCard({ icon, title, description, actionLabel, onActionPress }: EmptyCardProps) {
+  const titleOnly = !description && !(actionLabel && onActionPress);
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, titleOnly && styles.cardCentered]}>
       <View style={styles.iconTile}>
         <Icon name={icon} size={20} color={colors.textSecondary} />
       </View>
