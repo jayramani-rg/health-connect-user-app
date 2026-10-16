@@ -24,13 +24,12 @@ import type { RootStackParamList } from '../../../navigation/types';
 import { LocalityChip } from '../../location/components/LocalityChip';
 import { LocationPromptCard } from '../../location/components/LocationPromptCard';
 import { useUserLocality } from '../../location/hooks/useUserLocality';
-import { CareRow, ServiceTile, UpNextCard } from '../components/CareCards';
+import { CareRow, ServiceTile } from '../components/CareCards';
 import { summarizeCare, type CareItem, type CareSummary } from '../utils/careActivity';
 import { CARE_SEARCH_HINTS } from '../utils/careSearchHints';
 import { styles } from '../styles/HomeScreen.styles';
 
 const HOME_CATEGORY_LIMIT = 8;
-const LOOKBACK_APPOINTMENTS_MS = 12 * 60 * 60 * 1000;
 const LOOKBACK_LAB_MS = 14 * 24 * 60 * 60 * 1000;
 
 type CareState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; summary: CareSummary };
@@ -46,14 +45,9 @@ function needsPayment(item: CareItem): boolean {
   return item.appointmentStatus === 'PAYMENT_PENDING' || item.labStatus === 'PAYMENT_PENDING';
 }
 
-function actionLabelFor(item: CareItem): string {
-  if (needsPayment(item)) return 'Pay now';
-  if (item.appointmentStatus === 'RESCHEDULE_PROPOSED') return 'Review new time';
-  if (item.kind === 'APPOINTMENT' && item.remote && (item.appointmentStatus === 'CONFIRMED' || item.appointmentStatus === 'IN_PROGRESS')) {
-    return 'Open consultation';
-  }
-  if (item.kind === 'LAB' && item.bucket !== 'awaiting') return 'Track booking';
-  return 'View details';
+function startOfToday(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 const HomeScreen: React.FC = () => {
@@ -89,7 +83,7 @@ const HomeScreen: React.FC = () => {
     const now = Date.now();
     try {
       const [appointmentsRes, bookingsRes] = await Promise.all([
-        appointmentService.list({ dateFromUtc: new Date(now - LOOKBACK_APPOINTMENTS_MS).toISOString(), pageSize: 50 }),
+        appointmentService.list({ dateFromUtc: startOfToday().toISOString(), pageSize: 50 }),
         labBookingService.list({ dateFromUtc: new Date(now - LOOKBACK_LAB_MS).toISOString(), pageSize: 50 }),
       ]);
       setCare({ status: 'ready', summary: summarizeCare(appointmentsRes.data.items, bookingsRes.data.items) });
@@ -134,7 +128,7 @@ const HomeScreen: React.FC = () => {
 
   function renderCare() {
     if (care.status === 'loading') {
-      return <SkeletonBlock width="100%" height={196} radius={layout.cardRadius} />;
+      return <SkeletonBlock width="100%" height={152} radius={layout.cardRadius} />;
     }
     if (care.status === 'error') {
       return (
@@ -151,8 +145,8 @@ const HomeScreen: React.FC = () => {
       );
     }
 
-    const { hero, attention, today, upcoming, awaiting, upcomingTotal } = care.summary;
-    const nothingActive = !hero && attention.length === 0 && awaiting.length === 0;
+    const { attention, today, upcoming, awaiting, upcomingTotal } = care.summary;
+    const nothingActive = attention.length === 0 && today.length === 0 && upcoming.length === 0 && awaiting.length === 0;
 
     if (nothingActive) {
       return (
@@ -164,59 +158,43 @@ const HomeScreen: React.FC = () => {
     }
 
     return (
-      <>
-        {attention.length > 0 ? (
-          <View style={styles.block}>
-            <SectionHeader title="Needs your attention" />
-            <ListGroup>
-              {attention.map((item) => (
-                <CareRow key={item.key} item={item} onPress={() => runPrimaryAction(item)} />
-              ))}
-            </ListGroup>
-          </View>
-        ) : null}
+      <View style={styles.careList}>
+        <ListGroup title="Needs your attention">
+          {attention.map((item) => (
+            <CareRow key={item.key} item={item} onPress={() => runPrimaryAction(item)} />
+          ))}
+        </ListGroup>
 
-        {hero ? (
-          <UpNextCard item={hero} actionLabel={actionLabelFor(hero)} onOpen={() => openItem(hero)} onAction={() => runPrimaryAction(hero)} />
-        ) : null}
+        <ListGroup title="Today">
+          {today.map((item) => (
+            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
+          ))}
+        </ListGroup>
 
-        {today.length > 0 ? (
-          <View style={styles.block}>
-            <SectionHeader title="Later today" />
-            <ListGroup>
-              {today.map((item) => (
-                <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-              ))}
-            </ListGroup>
-          </View>
-        ) : null}
+        <ListGroup title="Coming up">
+          {upcoming.map((item) => (
+            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
+          ))}
+        </ListGroup>
 
-        {upcoming.length > 0 ? (
-          <View style={styles.block}>
-            <SectionHeader
-              title="Coming up"
-              actionLabel={upcomingTotal > upcoming.length ? 'See all' : undefined}
-              onActionPress={() => openAppointmentsTab()}
-            />
-            <ListGroup>
-              {upcoming.map((item) => (
-                <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-              ))}
-            </ListGroup>
-          </View>
-        ) : null}
+        <ListGroup title="Awaiting confirmation">
+          {awaiting.map((item) => (
+            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
+          ))}
+        </ListGroup>
 
-        {awaiting.length > 0 ? (
-          <View style={styles.block}>
-            <SectionHeader title="Awaiting confirmation" />
-            <ListGroup>
-              {awaiting.map((item) => (
-                <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-              ))}
-            </ListGroup>
-          </View>
+        {upcomingTotal > upcoming.length ? (
+          <Pressable
+            onPress={() => openAppointmentsTab()}
+            accessibilityRole="button"
+            accessibilityLabel="See all bookings"
+            style={({ pressed }) => [styles.seeAll, pressed && styles.seeAllPressed]}
+          >
+            <Text style={styles.seeAllText}>See all bookings</Text>
+            <Icon name="chevron-forward" size={16} color={colors.brand} />
+          </Pressable>
         ) : null}
-      </>
+      </View>
     );
   }
 
@@ -252,7 +230,7 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        <View style={[styles.section, styles.specializationSection]}>
+        <View style={styles.section}>
           <SectionHeader title="Find by specialization" />
           {loadingCategories ? (
             <View style={styles.categorySkeleton}>
@@ -283,8 +261,8 @@ const HomeScreen: React.FC = () => {
           ) : null}
         </View>
 
-        <View style={styles.section}>
-          <SectionHeader title="Your care" actionLabel="All bookings" onActionPress={() => openAppointmentsTab()} />
+        <View style={[styles.section, styles.careSection]}>
+          <SectionHeader title="Your care" />
           {renderCare()}
         </View>
       </ScrollView>

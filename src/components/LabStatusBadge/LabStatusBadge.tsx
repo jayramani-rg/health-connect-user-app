@@ -5,7 +5,7 @@ import type { LabBookingStatus } from '../../features/labBookings/types/labBooki
 import { styles } from './styles/LabStatusBadge.styles';
 import type { LabStatusBadgeProps } from './types/LabStatusBadge.types';
 
-const STATUS_META: Record<LabBookingStatus, { label: string; bg: string; fg: string }> = {
+export const STATUS_META: Record<LabBookingStatus, { label: string; bg: string; fg: string }> = {
   PENDING: { label: 'Pending', bg: colors.pendingSoft, fg: colors.pending },
   CONFIRMED: { label: 'Confirmed', bg: colors.successSoft, fg: colors.success },
   COLLECTOR_ASSIGNED: { label: 'Collector assigned', bg: colors.brandSoft, fg: colors.brand },

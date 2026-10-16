@@ -19,11 +19,28 @@ export const styles = StyleSheet.create({
     gap: layout.blockGap,
     marginTop: layout.inlineGap,
   },
-  specializationSection: {
-    marginBottom: layout.inlineGap,
-  },
-  block: {
+  careSection: {
     gap: layout.inlineGap,
+  },
+  careList: {
+    gap: layout.blockGap,
+  },
+  seeAll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    alignSelf: 'center',
+    minHeight: 44,
+    paddingHorizontal: layout.blockGap,
+    borderRadius: radius.md,
+  },
+  seeAllPressed: {
+    backgroundColor: colors.brandSoft,
+  },
+  seeAllText: {
+    ...textRole.control,
+    color: colors.brand,
   },
   serviceRow: {
     flexDirection: 'row',

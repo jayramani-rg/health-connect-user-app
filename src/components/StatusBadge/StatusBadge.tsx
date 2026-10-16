@@ -5,7 +5,7 @@ import type { AppointmentStatus } from '../../features/appointments/types/appoin
 import { styles } from './styles/StatusBadge.styles';
 import type { StatusBadgeProps } from './types/StatusBadge.types';
 
-const STATUS_META: Record<AppointmentStatus, { label: string; bg: string; fg: string }> = {
+export const STATUS_META: Record<AppointmentStatus, { label: string; bg: string; fg: string }> = {
   PENDING: { label: 'Pending', bg: colors.pendingSoft, fg: colors.pending },
   RESCHEDULE_PROPOSED: { label: 'Reschedule offered', bg: colors.warningSoft, fg: colors.warning },
   CONFIRMED: { label: 'Confirmed', bg: colors.successSoft, fg: colors.success },

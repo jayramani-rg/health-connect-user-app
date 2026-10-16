@@ -19,12 +19,12 @@ export interface CareItem {
   modeIcon: IoniconsIconName;
   remote: boolean;
   bucket: CareBucket;
+  late: boolean;
   appointmentStatus?: AppointmentStatus;
   labStatus?: LabBookingStatus;
 }
 
 export interface CareSummary {
-  hero: CareItem | null;
   attention: CareItem[];
   today: CareItem[];
   upcoming: CareItem[];
@@ -32,20 +32,8 @@ export interface CareSummary {
   upcomingTotal: number;
 }
 
-export const LAB_PROGRESS_STAGES = ['Booked', 'Sample collected', 'Processing', 'Report ready'];
-
-const LAB_STAGE_INDEX: Partial<Record<LabBookingStatus, number>> = {
-  CONFIRMED: 0,
-  COLLECTOR_ASSIGNED: 0,
-  ON_THE_WAY: 0,
-  SAMPLE_COLLECTED: 1,
-  PROCESSING: 2,
-  REPORT_READY: 3,
-};
-
-export function labProgressIndex(status: LabBookingStatus): number | null {
-  return LAB_STAGE_INDEX[status] ?? null;
-}
+const UPCOMING_LIMIT = 3;
+const LAB_LATE_GRACE_MS = 30 * 60 * 1000;
 
 const CONSULT_ICON: Record<AppointmentListItem['consultationType'], IoniconsIconName> = {
   IN_CLINIC: 'business-outline',
@@ -53,9 +41,15 @@ const CONSULT_ICON: Record<AppointmentListItem['consultationType'], IoniconsIcon
   VOICE: 'call-outline',
 };
 
+function appointmentEnd(item: AppointmentListItem): number {
+  return new Date(item.scheduledStartAtUtc).getTime() + item.durationMinutes * 60 * 1000;
+}
+
+function stillRelevantToday(item: AppointmentListItem, now: Date): boolean {
+  return appointmentEnd(item) >= now.getTime() || isSameDay(item.scheduledStartAtUtc, now);
+}
+
 function appointmentBucket(item: AppointmentListItem, now: Date): CareBucket | null {
-  const start = new Date(item.scheduledStartAtUtc).getTime();
-  const end = start + item.durationMinutes * 60 * 1000;
   switch (item.status) {
     case 'IN_PROGRESS':
       return 'live';
@@ -63,12 +57,17 @@ function appointmentBucket(item: AppointmentListItem, now: Date): CareBucket | n
     case 'RESCHEDULE_PROPOSED':
       return 'attention';
     case 'PENDING':
-      return end >= now.getTime() ? 'awaiting' : null;
+      return stillRelevantToday(item, now) ? 'awaiting' : null;
     case 'CONFIRMED':
-      return end >= now.getTime() ? 'scheduled' : null;
+      return stillRelevantToday(item, now) ? 'scheduled' : null;
     default:
       return null;
   }
+}
+
+function appointmentLate(item: AppointmentListItem, now: Date): boolean {
+  if (item.status !== 'CONFIRMED' && item.status !== 'PENDING') return false;
+  return appointmentEnd(item) < now.getTime();
 }
 
 function labBucket(item: LabBookingListItem, now: Date): CareBucket | null {
@@ -90,7 +89,13 @@ function labBucket(item: LabBookingListItem, now: Date): CareBucket | null {
   }
 }
 
-function fromAppointment(item: AppointmentListItem, bucket: CareBucket): CareItem {
+function labLate(item: LabBookingListItem, now: Date): boolean {
+  if (item.status !== 'CONFIRMED' && item.status !== 'PENDING') return false;
+  if (!isSameDay(item.scheduledAtUtc, now)) return false;
+  return new Date(item.scheduledAtUtc).getTime() + LAB_LATE_GRACE_MS < now.getTime();
+}
+
+function fromAppointment(item: AppointmentListItem, bucket: CareBucket, now: Date): CareItem {
   return {
     key: `appointment-${item.id}`,
     kind: 'APPOINTMENT',
@@ -102,11 +107,12 @@ function fromAppointment(item: AppointmentListItem, bucket: CareBucket): CareIte
     modeIcon: CONSULT_ICON[item.consultationType],
     remote: item.consultationType !== 'IN_CLINIC',
     bucket,
+    late: appointmentLate(item, now),
     appointmentStatus: item.status,
   };
 }
 
-function fromLabBooking(item: LabBookingListItem, bucket: CareBucket): CareItem {
+function fromLabBooking(item: LabBookingListItem, bucket: CareBucket, now: Date): CareItem {
   const homeCollection = item.collectionMethod === 'HOME_COLLECTION';
   return {
     key: `lab-${item.id}`,
@@ -119,6 +125,7 @@ function fromLabBooking(item: LabBookingListItem, bucket: CareBucket): CareItem 
     modeIcon: homeCollection ? 'home-outline' : 'flask-outline',
     remote: false,
     bucket,
+    late: labLate(item, now),
     labStatus: item.status,
   };
 }
@@ -131,11 +138,11 @@ export function summarizeCare(appointments: AppointmentListItem[], bookings: Lab
   const items: CareItem[] = [];
   appointments.forEach((item) => {
     const bucket = appointmentBucket(item, now);
-    if (bucket) items.push(fromAppointment(item, bucket));
+    if (bucket) items.push(fromAppointment(item, bucket, now));
   });
   bookings.forEach((item) => {
     const bucket = labBucket(item, now);
-    if (bucket) items.push(fromLabBooking(item, bucket));
+    if (bucket) items.push(fromLabBooking(item, bucket, now));
   });
   items.sort(byTime);
 
@@ -144,26 +151,13 @@ export function summarizeCare(appointments: AppointmentListItem[], bookings: Lab
   const tracking = items.filter((item) => item.bucket === 'tracking').reverse();
   const scheduledToday = scheduled.filter((item) => isSameDay(item.scheduledAt, now));
   const scheduledLater = scheduled.filter((item) => !isSameDay(item.scheduledAt, now));
-
-  const hero = live[0] ?? scheduledToday[0] ?? scheduledLater[0] ?? tracking[0] ?? null;
-  const notHero = (item: CareItem) => item.key !== hero?.key;
-
-  const today = [...live, ...scheduledToday].filter(notHero);
-  const laterPool = [...scheduledLater, ...tracking].filter(notHero);
+  const laterPool = [...scheduledLater, ...tracking];
 
   return {
-    hero,
     attention: items.filter((item) => item.bucket === 'attention'),
-    today,
-    upcoming: laterPool.slice(0, 3),
+    today: [...live, ...scheduledToday],
+    upcoming: laterPool.slice(0, UPCOMING_LIMIT),
     awaiting: items.filter((item) => item.bucket === 'awaiting'),
     upcomingTotal: laterPool.length,
   };
-}
-
-export function heroEyebrow(item: CareItem, now: Date = new Date()): string {
-  if (item.bucket === 'live') return item.kind === 'LAB' ? 'Collection today' : 'Happening now';
-  if (item.bucket === 'tracking') return 'Tracking your sample';
-  if (isSameDay(item.scheduledAt, now)) return 'Today';
-  return 'Up next';
 }
