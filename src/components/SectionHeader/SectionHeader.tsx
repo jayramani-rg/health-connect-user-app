@@ -7,15 +7,16 @@ import { styles } from './styles/SectionHeader.styles';
 export interface SectionHeaderProps {
   title: string;
   meta?: string;
+  size?: 'default' | 'large';
   actionLabel?: string;
   onActionPress?: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
-export function SectionHeader({ title, meta, actionLabel, onActionPress, style }: SectionHeaderProps) {
+export function SectionHeader({ title, meta, size = 'default', actionLabel, onActionPress, style }: SectionHeaderProps) {
   return (
     <View style={[styles.row, style]}>
-      <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
+      <Text style={[styles.title, size === 'large' && styles.titleLarge]} numberOfLines={1} accessibilityRole="header">
         {title}
       </Text>
       {actionLabel && onActionPress ? (

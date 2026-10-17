@@ -159,6 +159,7 @@ export const motion = {
 export const layout = {
   gutter: 16,
   sectionGap: 20,
+  sectionSpacing: 28,
   blockGap: 12,
   inlineGap: 8,
   cardPadding: 14,

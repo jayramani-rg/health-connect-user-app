@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, layout, textRole } from '../../../theme';
+import { colors, fontFamily, layout, textRole } from '../../../theme';
 
 export const styles = StyleSheet.create({
   row: {
@@ -13,6 +13,12 @@ export const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     minWidth: 0,
+  },
+  titleLarge: {
+    fontFamily: fontFamily.bold,
+    fontSize: 18,
+    lineHeight: 24,
+    letterSpacing: -0.2,
   },
   meta: {
     ...textRole.meta,

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors, layout, radius, textRole } from '../../../theme';
+import { COMPACT_COLUMNS } from '../../../components/CategoryGrid/styles/CategoryGrid.styles';
+import { colors, layout, radius, spacing, textRole } from '../../../theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,39 +9,47 @@ export const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: layout.gutter,
-    paddingTop: 4,
+    paddingTop: spacing.xs,
+    gap: layout.sectionSpacing,
+  },
+  intro: {
     gap: layout.blockGap,
   },
   localityWrap: {
-    marginTop: 4,
+    marginTop: spacing.xs,
     alignItems: 'flex-start',
   },
   section: {
-    gap: layout.blockGap,
-    marginTop: layout.inlineGap,
-  },
-  careSection: {
-    gap: layout.inlineGap,
+    gap: spacing.lg,
   },
   careList: {
+    gap: layout.sectionGap,
+  },
+  careGroup: {
+    gap: layout.inlineGap,
+  },
+  attentionStack: {
     gap: layout.blockGap,
   },
-  seeAll: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    alignSelf: 'center',
-    minHeight: 44,
-    paddingHorizontal: layout.blockGap,
-    borderRadius: radius.md,
+  careCard: {
+    backgroundColor: colors.surface,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    overflow: 'hidden',
   },
-  seeAllPressed: {
-    backgroundColor: colors.brandSoft,
+  requestCard: {
+    backgroundColor: colors.surface,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderStyle: 'dashed',
+    borderColor: colors.borderStrong,
+    overflow: 'hidden',
   },
-  seeAllText: {
-    ...textRole.control,
-    color: colors.brand,
+  careDivider: {
+    height: layout.hairline,
+    backgroundColor: colors.border,
+    marginLeft: layout.cardPadding,
   },
   serviceRow: {
     flexDirection: 'row',
@@ -49,20 +58,20 @@ export const styles = StyleSheet.create({
   categorySkeleton: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    rowGap: layout.inlineGap,
+    rowGap: spacing.lg,
   },
   categorySkeletonTile: {
-    width: '25%',
+    width: `${100 / COMPACT_COLUMNS}%`,
     alignItems: 'center',
-    gap: layout.inlineGap,
+    gap: spacing.sm,
   },
   viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: layout.inlineGap,
-    height: 48,
-    marginTop: 4,
+    minHeight: 48,
+    paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
     borderWidth: layout.hairline,
     borderColor: colors.brand,

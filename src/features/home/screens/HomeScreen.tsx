@@ -5,11 +5,10 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { CategoryGrid } from '../../../components/CategoryGrid/CategoryGrid';
-import { ROUND_AVATAR_OUTER } from '../../../components/CategoryGrid/styles/CategoryGrid.styles';
+import { COMPACT_COLUMNS, ROUND_AVATAR_OUTER } from '../../../components/CategoryGrid/styles/CategoryGrid.styles';
 import { EmptyCard } from '../../../components/EmptyCard/EmptyCard';
 import { Icon } from '../../../components/Icon/Icon';
 import { IconButton } from '../../../components/IconButton/IconButton';
-import { ListGroup } from '../../../components/ListGroup/ListGroup';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { SearchBar } from '../../../components/SearchBar/SearchBar';
 import { SectionHeader } from '../../../components/SectionHeader/SectionHeader';
@@ -24,12 +23,12 @@ import type { RootStackParamList } from '../../../navigation/types';
 import { LocalityChip } from '../../location/components/LocalityChip';
 import { LocationPromptCard } from '../../location/components/LocationPromptCard';
 import { useUserLocality } from '../../location/hooks/useUserLocality';
-import { CareRow, ServiceTile } from '../components/CareCards';
+import { AttentionCard, CareGroupHeader, CareRow, RequestRow, ServiceTile, TimelineRow } from '../components/CareCards';
 import { summarizeCare, type CareItem, type CareSummary } from '../utils/careActivity';
 import { CARE_SEARCH_HINTS } from '../utils/careSearchHints';
 import { styles } from '../styles/HomeScreen.styles';
 
-const HOME_CATEGORY_LIMIT = 8;
+const HOME_CATEGORY_LIMIT = COMPACT_COLUMNS * 2;
 const LOOKBACK_LAB_MS = 14 * 24 * 60 * 60 * 1000;
 
 type CareState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; summary: CareSummary };
@@ -43,6 +42,20 @@ function greetingForHour(): string {
 
 function needsPayment(item: CareItem): boolean {
   return item.appointmentStatus === 'PAYMENT_PENDING' || item.labStatus === 'PAYMENT_PENDING';
+}
+
+function attentionAction(item: CareItem): { label: string; hint: string } {
+  if (needsPayment(item)) {
+    return { label: 'Pay now', hint: item.kind === 'APPOINTMENT' ? 'Complete payment to confirm your visit' : 'Complete payment to confirm your booking' };
+  }
+  if (item.appointmentStatus === 'RESCHEDULE_PROPOSED') {
+    return { label: 'Review time', hint: 'The doctor has proposed a new time' };
+  }
+  return { label: 'View details', hint: 'Open the booking to continue' };
+}
+
+function todayLabel(): string {
+  return new Date().toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function startOfToday(): Date {
@@ -159,40 +172,69 @@ const HomeScreen: React.FC = () => {
 
     return (
       <View style={styles.careList}>
-        <ListGroup title="Needs your attention">
-          {attention.map((item) => (
-            <CareRow key={item.key} item={item} onPress={() => runPrimaryAction(item)} />
-          ))}
-        </ListGroup>
+        {attention.length > 0 ? (
+          <View style={styles.careGroup}>
+            <CareGroupHeader title="Needs your attention" icon="alert-circle" iconColor={colors.warning} meta={`${attention.length}`} />
+            <View style={styles.attentionStack}>
+              {attention.map((item) => {
+                const action = attentionAction(item);
+                return (
+                  <AttentionCard
+                    key={item.key}
+                    item={item}
+                    actionLabel={action.label}
+                    hint={action.hint}
+                    onOpen={() => openItem(item)}
+                    onAction={() => runPrimaryAction(item)}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
 
-        <ListGroup title="Today">
-          {today.map((item) => (
-            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-          ))}
-        </ListGroup>
+        {today.length > 0 ? (
+          <View style={styles.careGroup}>
+            <CareGroupHeader title="Today" icon="today-outline" iconColor={colors.brand} meta={todayLabel()} />
+            <View style={styles.careCard}>
+              {today.map((item, index) => (
+                <TimelineRow key={item.key} item={item} first={index === 0} last={index === today.length - 1} onPress={() => openItem(item)} />
+              ))}
+            </View>
+          </View>
+        ) : null}
 
-        <ListGroup title="Coming up">
-          {upcoming.map((item) => (
-            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-          ))}
-        </ListGroup>
+        {upcoming.length > 0 ? (
+          <View style={styles.careGroup}>
+            <CareGroupHeader
+              title="Coming up"
+              icon="calendar-outline"
+              actionLabel={upcomingTotal > upcoming.length ? 'See all' : undefined}
+              onActionPress={() => openAppointmentsTab()}
+            />
+            <View style={styles.careCard}>
+              {upcoming.map((item, index) => (
+                <React.Fragment key={item.key}>
+                  {index > 0 ? <View style={styles.careDivider} /> : null}
+                  <CareRow item={item} onPress={() => openItem(item)} />
+                </React.Fragment>
+              ))}
+            </View>
+          </View>
+        ) : null}
 
-        <ListGroup title="Awaiting confirmation">
-          {awaiting.map((item) => (
-            <CareRow key={item.key} item={item} onPress={() => openItem(item)} />
-          ))}
-        </ListGroup>
-
-        {upcomingTotal > upcoming.length ? (
-          <Pressable
-            onPress={() => openAppointmentsTab()}
-            accessibilityRole="button"
-            accessibilityLabel="See all bookings"
-            style={({ pressed }) => [styles.seeAll, pressed && styles.seeAllPressed]}
-          >
-            <Text style={styles.seeAllText}>See all bookings</Text>
-            <Icon name="chevron-forward" size={16} color={colors.brand} />
-          </Pressable>
+        {awaiting.length > 0 ? (
+          <View style={styles.careGroup}>
+            <CareGroupHeader title="Awaiting confirmation" icon="hourglass-outline" iconColor={colors.pending} meta={`${awaiting.length}`} />
+            <View style={styles.requestCard}>
+              {awaiting.map((item, index) => (
+                <React.Fragment key={item.key}>
+                  {index > 0 ? <View style={styles.careDivider} /> : null}
+                  <RequestRow item={item} onPress={() => openItem(item)} />
+                </React.Fragment>
+              ))}
+            </View>
+          </View>
         ) : null}
       </View>
     );
@@ -205,25 +247,27 @@ const HomeScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.brand} colors={[colors.brand]} />}
       >
-        <PageHeader
-          eyebrow={greetingForHour()}
-          title={firstName}
-          subtitle={
-            <View style={styles.localityWrap}>
-              <LocalityChip label={locality.label} onPress={() => navigation.navigate('SelectLocation')} />
-            </View>
-          }
-          actions={<IconButton icon="notifications-outline" accessibilityLabel="Notifications" badge={unreadNotifications} onPress={() => navigation.navigate('NotificationCenter')} />}
-        />
+        <View style={styles.intro}>
+          <PageHeader
+            eyebrow={greetingForHour()}
+            title={firstName}
+            subtitle={
+              <View style={styles.localityWrap}>
+                <LocalityChip label={locality.label} onPress={() => navigation.navigate('SelectLocation')} />
+              </View>
+            }
+            actions={<IconButton icon="notifications-outline" accessibilityLabel="Notifications" badge={unreadNotifications} onPress={() => navigation.navigate('NotificationCenter')} />}
+          />
 
-        {locality.shouldShowPrompt && (
-          <LocationPromptCard loading={locality.detecting} onEnable={() => locality.enableAndDetect()} onDismiss={locality.dismissPrompt} />
-        )}
+          {locality.shouldShowPrompt && (
+            <LocationPromptCard loading={locality.detecting} onEnable={() => locality.enableAndDetect()} onDismiss={locality.dismissPrompt} />
+          )}
 
-        <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onPress={() => navigation.navigate('DoctorList', {})} />
+          <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onPress={() => navigation.navigate('DoctorList', {})} />
+        </View>
 
         <View style={styles.section}>
-          <SectionHeader title="Book care" />
+          <SectionHeader title="Book care" size="large" />
           <View style={styles.serviceRow}>
             <ServiceTile tone="doctor" title="Find a doctor" onPress={() => navigation.navigate('DoctorCategories')} />
             <ServiceTile tone="lab" title="Book a lab test" onPress={() => navigation.navigate('LabCategories')} />
@@ -231,7 +275,7 @@ const HomeScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <SectionHeader title="Find by specialization" />
+          <SectionHeader title="Find by specialization" size="large" />
           {loadingCategories ? (
             <View style={styles.categorySkeleton}>
               {Array.from({ length: HOME_CATEGORY_LIMIT }).map((_, index) => (
@@ -261,8 +305,8 @@ const HomeScreen: React.FC = () => {
           ) : null}
         </View>
 
-        <View style={[styles.section, styles.careSection]}>
-          <SectionHeader title="Your care" />
+        <View style={styles.section}>
+          <SectionHeader title="Your care" size="large" />
           {renderCare()}
         </View>
       </ScrollView>

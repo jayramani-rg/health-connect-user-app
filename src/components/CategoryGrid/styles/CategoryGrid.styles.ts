@@ -4,6 +4,7 @@ import { colors, radius, shadow, spacing, typography } from '../../../theme';
 export const ROUND_AVATAR_SIZE = 42;
 export const ROUND_AVATAR_PADDING = 8;
 export const ROUND_AVATAR_OUTER = ROUND_AVATAR_SIZE + ROUND_AVATAR_PADDING * 2;
+export const COMPACT_COLUMNS = 3;
 
 export const styles = StyleSheet.create({
   grid: {
@@ -18,8 +19,7 @@ export const styles = StyleSheet.create({
   compactGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -spacing.xs,
-    rowGap: spacing.sm,
+    rowGap: spacing.lg,
   },
   tile: {
     width: '48%',
@@ -38,9 +38,9 @@ export const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   compactTile: {
-    width: '25%',
+    width: `${100 / COMPACT_COLUMNS}%`,
     alignItems: 'center',
-    gap: spacing.xs + spacing.xxs,
+    gap: spacing.sm,
     paddingHorizontal: spacing.xs,
   },
   avatar: {
@@ -82,5 +82,11 @@ export const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.ink,
     textAlign: 'center',
+  },
+  compactName: {
+    ...typography.caption,
+    color: colors.ink,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
 });
