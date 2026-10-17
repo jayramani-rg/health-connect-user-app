@@ -1,52 +1,82 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../../../theme';
+import { colors, fontFamily, layout, radius, spacing, textRole } from '../../../../../theme';
+
+export const DATE_PILL_WIDTH = 64;
+export const DATE_PILL_GAP = spacing.sm;
 
 export const styles = StyleSheet.create({
   scroll: {
     flexGrow: 0,
+    marginHorizontal: -layout.gutter,
   },
   row: {
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
-    paddingRight: spacing.lg,
+    gap: DATE_PILL_GAP,
+    paddingHorizontal: layout.gutter,
+    paddingVertical: spacing.xxs,
   },
-  card: {
-    minWidth: 132,
-    borderWidth: 1.5,
+  pill: {
+    width: DATE_PILL_WIDTH,
+    paddingVertical: spacing.sm + 2,
+    borderRadius: radius.lg,
+    borderWidth: layout.hairline,
     borderColor: colors.border,
-    borderRadius: radius.md,
     backgroundColor: colors.surface,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+    gap: 2,
+  },
+  pillSelected: {
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
+  },
+  pillEmpty: {
+    backgroundColor: colors.canvas,
+  },
+  pillPressed: {
+    opacity: 0.85,
+  },
+  weekday: {
+    ...textRole.badge,
+    color: colors.textSecondary,
+  },
+  dayNumber: {
+    fontFamily: fontFamily.bold,
+    fontSize: 20,
+    lineHeight: 26,
+    color: colors.text,
+  },
+  textSelected: {
+    color: colors.white,
+  },
+  textMuted: {
+    color: colors.textTertiary,
+  },
+  availabilityRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    minHeight: 14,
   },
-  cardSelected: {
-    borderColor: colors.brand,
-    backgroundColor: colors.brandSoft,
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
-  dateLabel: {
-    ...typography.bodyStrong,
-    color: colors.text,
-    textAlign: 'center',
+  dotOpen: {
+    backgroundColor: colors.success,
   },
-  dateLabelSelected: {
-    color: colors.brandStrong,
+  dotEmpty: {
+    backgroundColor: colors.borderStrong,
   },
-  status: {
-    ...typography.caption,
-    fontSize: 12,
-    textAlign: 'center',
+  dotSelected: {
+    backgroundColor: colors.white,
   },
-  statusAvailable: {
-    color: colors.success,
-    fontFamily: typography.bodyStrong.fontFamily,
+  availability: {
+    fontFamily: fontFamily.medium,
+    fontSize: 11,
+    lineHeight: 14,
+    color: colors.textSecondary,
   },
-  statusUnavailable: {
-    color: colors.textTertiary,
-  },
-  statusMuted: {
-    color: colors.textTertiary,
+  availabilitySelected: {
+    color: colors.white,
   },
 });

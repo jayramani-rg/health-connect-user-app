@@ -1,198 +1,189 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { colors, layout, radius, spacing, textRole } from '../../../theme';
 
 export const styles = StyleSheet.create({
-  loadingWrapper: {
+  root: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: colors.canvas,
   },
-  headerBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.brand,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
+  header: {
+    backgroundColor: colors.canvas,
   },
-  headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  headerAvatarImage: {
-    width: '100%',
-    height: '100%',
-  },
-  headerAvatarInitial: {
-    ...typography.bodyStrong,
-    color: colors.white,
-  },
-  headerTextWrapper: {
-    flex: 1,
-  },
-  headerName: {
-    ...typography.title,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    ...typography.caption,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 2,
-  },
-  stepperWrapper: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    backgroundColor: colors.surface,
-  },
-  sectionTitle: {
-    ...typography.h2,
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  modeCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  modeCardSelected: {
-    borderColor: colors.brand,
-    backgroundColor: colors.brandSoft,
-  },
-  modeCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  modeName: {
-    ...typography.bodyStrong,
-    color: colors.text,
-  },
-  modeDetail: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  modeFee: {
-    ...typography.bodyStrong,
-    color: colors.brand,
-  },
-  slotsHeadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  slotsHeadingIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.pill,
-    backgroundColor: colors.brandSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  slotsHeading: {
-    ...typography.h2,
-    color: colors.text,
-  },
-  selectedDateHeading: {
-    ...typography.title,
-    color: colors.text,
-    marginTop: spacing.lg,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  slotGroup: {
-    marginBottom: spacing.lg,
-  },
-  groupHeaderRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginBottom: spacing.sm,
+    minHeight: layout.headerMinHeight,
+    paddingHorizontal: spacing.sm,
   },
-  groupLabel: {
-    ...typography.bodyStrong,
+  headerText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  headerTitle: {
+    ...textRole.sectionTitle,
+    fontSize: 17,
     color: colors.text,
   },
-  groupCount: {
-    ...typography.caption,
-    color: colors.textTertiary,
+  headerMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
   },
-  slotsWrapper: {
+  progressTrack: {
+    height: 3,
+    marginHorizontal: layout.gutter,
+    marginTop: spacing.xs,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.brand,
+    borderRadius: radius.pill,
+  },
+  progressHalf: {
+    width: '50%',
+  },
+  progressFull: {
+    width: '100%',
+  },
+  loadingBody: {
+    padding: layout.gutter,
+    gap: layout.sectionGap,
+  },
+  sectionTight: {
+    marginTop: spacing.sm,
+    marginBottom: -spacing.xs,
+  },
+  modeList: {
+    gap: spacing.sm,
+  },
+  modeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: 68,
+    paddingHorizontal: layout.cardPadding,
+    paddingVertical: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  modeCardSelected: {
+    borderColor: colors.brand,
+    borderWidth: 1.5,
+    backgroundColor: colors.brandSoft,
+  },
+  modeCardPressed: {
+    opacity: 0.9,
+  },
+  modeIcon: {
+    width: layout.iconTile,
+    height: layout.iconTile,
+    borderRadius: radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeIconSelected: {
+    backgroundColor: colors.brand,
+  },
+  modeText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  modeName: {
+    ...textRole.cardTitle,
+    color: colors.text,
+  },
+  modeDetail: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  modeFee: {
+    ...textRole.cardTitle,
+    color: colors.text,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioSelected: {
+    borderColor: colors.brand,
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.brand,
+  },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.xs + 2,
+    padding: spacing.sm + 2,
+    borderRadius: radius.sm,
+    backgroundColor: colors.warningSoft,
+  },
+  noticeText: {
+    ...textRole.meta,
+    color: '#7A4F10',
+    flex: 1,
+  },
+  groups: {
+    gap: layout.sectionGap,
+  },
+  group: {
+    gap: spacing.sm + 2,
+  },
+  groupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+  },
+  groupLabel: {
+    ...textRole.metaStrong,
+    color: colors.text,
+  },
+  groupMeta: {
+    ...textRole.meta,
+    color: colors.textTertiary,
+    marginLeft: 'auto',
+  },
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  slotChip: {
-    minWidth: 84,
+  nextOpen: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.brand,
-    backgroundColor: colors.surface,
-  },
-  slotChipSelected: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
-  },
-  slotText: {
-    ...typography.bodyStrong,
-    color: colors.brand,
-  },
-  slotTextSelected: {
-    color: colors.white,
-  },
-  summaryCard: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  summaryLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  summaryValue: {
-    ...typography.bodyStrong,
-    color: colors.text,
-  },
-  retryLink: {
+    gap: spacing.xs,
     alignSelf: 'flex-start',
-    marginTop: spacing.sm,
+    minHeight: layout.touchTarget,
   },
-  retryLinkText: {
-    ...typography.bodyStrong,
+  nextOpenText: {
+    ...textRole.metaStrong,
     color: colors.brand,
   },
-  footer: {
+  addNote: {
     flexDirection: 'row',
-    gap: spacing.md,
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+    alignSelf: 'flex-start',
+    minHeight: layout.touchTarget,
+    marginTop: spacing.xs,
   },
-  footerButton: {
-    flex: 1,
+  addNoteText: {
+    ...textRole.metaStrong,
+    color: colors.brand,
   },
 });

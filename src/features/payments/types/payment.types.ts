@@ -13,6 +13,8 @@ export interface PaymentQuote {
   customerPayableAmount: number;
   currency: string;
   paymentWindowMinutes: number;
+  reservationExpiresAtUtc?: string | null;
+  serverTimeUtc?: string;
 }
 
 export interface PaymentOrder {

@@ -1,48 +1,71 @@
-import React from 'react';
-import { ScrollView, Text, TouchableOpacity } from 'react-native';
-import { activeopacity, toLocalDateKey } from '../../../../utils/helpers';
-import { styles } from './styles/AppointmentDateStrip.styles';
+import React, { useEffect, useRef } from 'react';
+import { Pressable, ScrollView, Text, View, type ScrollViewInstance } from 'react-native';
+import { toLocalDateKey } from '../../../../utils/helpers';
+import { haptics } from '../../../../utils/haptics';
+import { DATE_PILL_GAP, DATE_PILL_WIDTH, styles } from './styles/AppointmentDateStrip.styles';
 import type { AppointmentDateStripProps } from './types/AppointmentDateStrip.types';
 
-function dayLabel(date: Date, index: number): string {
+function weekdayLabel(date: Date, index: number): string {
   if (index === 0) return 'Today';
-  if (index === 1) return 'Tomorrow';
   return date.toLocaleDateString(undefined, { weekday: 'short' });
 }
 
-function dateLabel(date: Date): string {
-  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+function availabilityLabel(count: number | undefined, loaded: boolean, failed: boolean): string {
+  if (failed || (!loaded && count === undefined)) return ' ';
+  if (!count) return 'Full';
+  return count === 1 ? '1 slot' : `${count} slots`;
 }
 
-export function AppointmentDateStrip({ days, selectedDate, onSelectDate, counts, countsFailed }: AppointmentDateStripProps) {
+export function AppointmentDateStrip({ days, selectedDate, onSelectDate, counts, countsLoaded, countsFailed }: AppointmentDateStripProps) {
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const selectedIndex = Math.max(0, days.findIndex((day) => toLocalDateKey(day) === selectedDate));
+
+  useEffect(() => {
+    const offset = Math.max(0, selectedIndex * (DATE_PILL_WIDTH + DATE_PILL_GAP) - DATE_PILL_WIDTH);
+    scrollRef.current?.scrollTo({ x: offset, animated: true });
+  }, [selectedIndex]);
+
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll} contentContainerStyle={styles.row}>
+    <ScrollView
+      ref={scrollRef}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
+      contentContainerStyle={styles.row}
+      accessibilityRole="tablist"
+    >
       {days.map((date, index) => {
         const key = toLocalDateKey(date);
         const selected = key === selectedDate;
         const count = counts[key];
-        const loaded = count !== undefined;
+        const known = countsLoaded && !countsFailed && count !== undefined;
+        const empty = known && count === 0;
+        const label = availabilityLabel(count, countsLoaded, countsFailed);
+        const fullDate = date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 
         return (
-          <TouchableOpacity
+          <Pressable
             key={key}
-            activeOpacity={activeopacity}
-            style={[styles.card, selected && styles.cardSelected]}
-            onPress={() => onSelectDate(key)}
+            onPress={() => {
+              if (!selected) haptics.selection();
+              onSelectDate(key);
+            }}
+            accessibilityRole="tab"
+            accessibilityState={{ selected }}
+            accessibilityLabel={known ? `${fullDate}, ${empty ? 'no open slots' : label}` : fullDate}
+            style={({ pressed }) => [styles.pill, selected && styles.pillSelected, empty && !selected && styles.pillEmpty, pressed && styles.pillPressed]}
           >
-            <Text style={[styles.dateLabel, selected && styles.dateLabelSelected]} numberOfLines={1}>
-              {dayLabel(date, index)}, {dateLabel(date)}
+            <Text style={[styles.weekday, selected && styles.textSelected, empty && !selected && styles.textMuted]} numberOfLines={1}>
+              {weekdayLabel(date, index)}
             </Text>
-            {countsFailed ? (
-              <Text style={[styles.status, styles.statusMuted]}>Tap to check</Text>
-            ) : !loaded ? (
-              <Text style={[styles.status, styles.statusMuted]}>Checking…</Text>
-            ) : count > 0 ? (
-              <Text style={[styles.status, styles.statusAvailable]}>{count} slots available</Text>
-            ) : (
-              <Text style={[styles.status, styles.statusUnavailable]}>No slots available</Text>
-            )}
-          </TouchableOpacity>
+            <Text style={[styles.dayNumber, selected && styles.textSelected, empty && !selected && styles.textMuted]}>{date.getDate()}</Text>
+            <View style={styles.availabilityRow}>
+              {known ? <View style={[styles.dot, empty ? styles.dotEmpty : styles.dotOpen, selected && styles.dotSelected]} /> : null}
+              <Text style={[styles.availability, selected && styles.availabilitySelected]} numberOfLines={1}>
+                {label}
+              </Text>
+            </View>
+          </Pressable>
         );
       })}
     </ScrollView>

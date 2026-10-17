@@ -15,9 +15,10 @@ interface UsePaymentArgs {
   kind: PaymentBookingKind;
   bookingId: string;
   onPaid: () => void;
+  onCheckoutEnded?: (status: 'cancelled' | 'failed', message?: string) => Promise<void>;
 }
 
-export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
+export function usePayment({ kind, bookingId, onPaid, onCheckoutEnded }: UsePaymentArgs) {
   const [quote, setQuote] = useState<PaymentQuote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -105,12 +106,19 @@ export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
       const outcome = await openCheckout(order.data);
 
       if (outcome.status === 'cancelled') {
-        setNotice('Payment was cancelled. You can try again whenever you are ready.');
+        if (onCheckoutEnded) {
+          await onCheckoutEnded('cancelled');
+        } else {
+          setNotice('Payment was cancelled. You can try again whenever you are ready.');
+        }
         return;
       }
 
       if (outcome.status === 'failed') {
         setPayError(outcome.message);
+        if (onCheckoutEnded) {
+          await onCheckoutEnded('failed', outcome.message);
+        }
         return;
       }
 
@@ -123,7 +131,7 @@ export function usePayment({ kind, bookingId, onPaid }: UsePaymentArgs) {
         setPaying(false);
       }
     }
-  }, [kind, bookingId, confirm]);
+  }, [kind, bookingId, confirm, onCheckoutEnded]);
 
-  return { quote, loadingQuote, loadError, loadQuote, paying, payError, notice, confirmationPending, pay };
+  return { quote, loadingQuote, loadError, loadQuote, paying, payError, setPayError, notice, setNotice, confirmationPending, pay };
 }

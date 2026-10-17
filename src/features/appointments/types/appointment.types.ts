@@ -93,9 +93,63 @@ export interface AppointmentQuery {
   pageSize?: number;
 }
 
+export type SlotStatus = 'AVAILABLE' | 'RESERVED' | 'BOOKED' | 'UNAVAILABLE';
+
+export type SlotUnavailableReason = 'TOO_SOON' | 'DAY_FULL';
+
 export interface AvailableSlot {
   startAtUtc: string;
   durationMinutes: number;
+  status?: SlotStatus;
+  unavailableReason?: SlotUnavailableReason | null;
+  heldByMe?: boolean;
+  waitingByMe?: boolean;
+  queueLength?: number;
+}
+
+export type BookingRequestStatus = 'WAITING' | 'RESERVED' | 'CONFIRMED' | 'RELEASED' | 'LEFT' | 'CLOSED';
+
+export type BookingRequestReason =
+  | 'EXPIRED'
+  | 'CHECKOUT_CANCELLED'
+  | 'PAYMENT_FAILED'
+  | 'CANCELLED'
+  | 'SLOT_TAKEN'
+  | 'SLOT_UNAVAILABLE'
+  | 'SLOT_PASSED'
+  | 'LATE_PAYMENT_REINSTATED';
+
+export interface BookingRequest {
+  id: string;
+  status: BookingRequestStatus;
+  statusReason: BookingRequestReason | null;
+  doctorProfileId: string;
+  doctorName: string | null;
+  consultationType: ConsultationType;
+  scheduledStartAtUtc: string;
+  durationMinutes: number;
+  queuePosition: number | null;
+  appointmentId: string | null;
+  appointmentStatus: AppointmentStatus | null;
+  reservationExpiresAtUtc: string | null;
+  consultationFee: number | null;
+  requiresPayment: boolean;
+  createdAt: string;
+  updatedAt: string;
+  serverTimeUtc: string;
+}
+
+export interface CreateBookingRequestPayload {
+  doctorProfileId: string;
+  consultationType: ConsultationType;
+  scheduledStartAtUtc: string;
+  reason?: string;
+  idempotencyKey: string;
+}
+
+export interface DoctorSlotsChangedEvent {
+  doctorProfileId: string;
+  date: string | null;
 }
 
 export interface AvailableSlotsResponse {
