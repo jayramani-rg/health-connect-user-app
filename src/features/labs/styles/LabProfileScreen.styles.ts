@@ -1,100 +1,165 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { colors, fontFamily, layout, radius, spacing, textRole } from '../../../theme';
 
 export const styles = StyleSheet.create({
-  loadingWrapper: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.lg,
-    backgroundColor: colors.brandSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  name: {
-    ...typography.h2,
-    color: colors.text,
-  },
-  address: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  operatingHours: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  sectionTitle: {
-    ...typography.title,
-    color: colors.text,
-    marginTop: spacing.xl,
-    marginBottom: spacing.sm,
-  },
-  serviceCard: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  serviceCardSelected: {
-    borderColor: colors.brand,
-    backgroundColor: colors.brandSoft,
-  },
-  serviceTopRow: {
+  skeletonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
   },
-  serviceName: {
-    ...typography.bodyStrong,
+  section: {
+    marginTop: spacing.md,
+    marginBottom: -spacing.xs,
+  },
+  optionRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  optionCard: {
+    flex: 1,
+    gap: 2,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  optionCardOff: {
+    backgroundColor: colors.canvas,
+    borderStyle: 'dashed',
+    borderColor: colors.borderStrong,
+  },
+  optionTitle: {
+    ...textRole.metaStrong,
+    color: colors.text,
+    marginTop: spacing.xs,
+  },
+  optionOff: {
+    color: colors.textSecondary,
+  },
+  optionMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  list: {
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingHorizontal: layout.cardPadding,
+    paddingVertical: spacing.md,
+  },
+  rowDivider: {
+    borderTopWidth: layout.hairline,
+    borderTopColor: colors.border,
+  },
+  rowSelected: {
+    backgroundColor: colors.brandSoft,
+  },
+  rowPressed: {
+    opacity: 0.85,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    marginTop: 1,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  checkboxOn: {
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
+  },
+  rowText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  rowTitle: {
+    ...textRole.cardTitle,
     color: colors.text,
   },
-  servicePrice: {
-    ...typography.bodyStrong,
-    color: colors.brand,
+  rowMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
   },
-  serviceStrikePrice: {
-    ...typography.caption,
+  tags: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+    marginTop: 2,
+  },
+  tag: {
+    ...textRole.badge,
+    color: colors.textSecondary,
+    backgroundColor: colors.surfaceSunken,
+    paddingHorizontal: spacing.xs + 2,
+    paddingVertical: 1,
+    borderRadius: radius.sm,
+    overflow: 'hidden',
+  },
+  priceCol: {
+    alignItems: 'flex-end',
+  },
+  price: {
+    fontFamily: fontFamily.bold,
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.text,
+  },
+  strike: {
+    ...textRole.meta,
     color: colors.textTertiary,
     textDecorationLine: 'line-through',
   },
-  categoryPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.surface2,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    marginTop: spacing.xs,
-  },
-  categoryPillText: {
-    ...typography.label,
-    fontSize: 11,
+  hint: {
+    ...textRole.meta,
     color: colors.textSecondary,
   },
-  metaRow: {
+  chatCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: spacing.sm,
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    backgroundColor: colors.surfaceSunken,
   },
-  metaText: {
-    ...typography.caption,
-    color: colors.textSecondary,
+  chatText: {
+    ...textRole.meta,
+    color: colors.text,
+    flex: 1,
+  },
+  chatButton: {
+    minWidth: 104,
   },
   footer: {
-    marginTop: spacing.xl,
-    gap: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  footerText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  footerTotal: {
+    fontFamily: fontFamily.bold,
+    fontSize: 18,
+    lineHeight: 24,
+    color: colors.text,
+  },
+  footerMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  footerCta: {
+    minWidth: 150,
   },
 });

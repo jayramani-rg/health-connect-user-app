@@ -18,10 +18,11 @@ function formatRelativeTime(iso: string | null): string {
 export function ChatListItem({ conversation, onPress }: ChatListItemProps) {
   const name = conversation.providerType === 'DOCTOR' ? conversation.doctorName ?? 'Doctor' : conversation.laboratoryName ?? 'Laboratory';
   const subtitle = conversation.providerType === 'DOCTOR' ? conversation.doctorSpecialization : 'Laboratory';
+  const photoUrl = conversation.providerType === 'DOCTOR' ? conversation.doctorPhotoUrl : conversation.laboratoryPhotoUrl;
 
   return (
     <TouchableOpacity activeOpacity={activeopacity} style={styles.row} onPress={onPress}>
-      <Avatar name={name} />
+      <Avatar name={name} imageUrl={photoUrl ?? null} />
       <View style={styles.body}>
         <View style={styles.topLine}>
           <Text style={styles.name} numberOfLines={1}>

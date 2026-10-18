@@ -10,4 +10,9 @@ export const styles = StyleSheet.create({
   initial: {
     fontFamily: typography.bodyStrong.fontFamily,
   },
+  image: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
 });

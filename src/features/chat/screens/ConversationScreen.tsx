@@ -9,8 +9,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import { chatHeaderTitle } from '../../../components/ChatHeaderTitle/ChatHeaderTitle';
 import { Icon } from '../../../components/Icon/Icon';
 import { KeyboardAvoidingContainer } from '../../../components/KeyboardAware/KeyboardAvoidingContainer';
 import { MessageBubble } from '../../../components/MessageBubble/MessageBubble';
@@ -19,7 +21,7 @@ import { chatService } from '../../../services/chatService';
 import { chatSocket } from '../../../services/chatSocket';
 import type { RootStackParamList } from '../../../navigation/types';
 import { useAppSelector } from '../../../store';
-import type { ChatMessage, OutgoingChatMessage } from '../types/chat.types';
+import type { ChatConversationDetail, ChatMessage, OutgoingChatMessage } from '../types/chat.types';
 import { appendOlder, mergeIncoming, mergeSent } from '../utils/mergeMessages';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ChatConversation'>;
@@ -71,7 +73,45 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [draft, setDraft] = useState('');
+  const [conversation, setConversation] = useState<ChatConversationDetail | null>(null);
   const cursorRef = useRef<{ beforeSentAtUtc?: string; beforeId?: string }>({});
+  const openingProfile = useRef(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      openingProfile.current = false;
+    }, []),
+  );
+
+  const openProviderProfile = useCallback(() => {
+    if (!conversation || openingProfile.current) return;
+    if (conversation.providerType === 'DOCTOR' && conversation.doctorProfileId) {
+      openingProfile.current = true;
+      navigation.navigate('DoctorProfile', { doctorProfileId: conversation.doctorProfileId });
+    } else if (conversation.providerType === 'LABORATORY' && conversation.laboratoryId) {
+      openingProfile.current = true;
+      navigation.navigate('LabProfile', { laboratoryId: conversation.laboratoryId });
+    }
+  }, [conversation, navigation]);
+
+  useEffect(() => {
+    if (!conversation) return;
+    const isDoctor = conversation.providerType === 'DOCTOR';
+    const name = isDoctor ? conversation.doctorName ?? 'Doctor' : conversation.laboratoryName ?? 'Laboratory';
+    const subtitle = isDoctor ? conversation.doctorSpecialization ?? 'Doctor' : 'Laboratory';
+    const imageUrl = isDoctor ? conversation.doctorPhotoUrl : conversation.laboratoryPhotoUrl;
+    const hasTarget = isDoctor ? !!conversation.doctorProfileId : !!conversation.laboratoryId;
+    navigation.setOptions({
+      title: name,
+      headerTitle: chatHeaderTitle({
+        name,
+        subtitle,
+        imageUrl,
+        onPress: hasTarget ? openProviderProfile : undefined,
+        accessibilityHint: isDoctor ? 'Opens the doctor profile' : 'Opens the laboratory profile',
+      }),
+    });
+  }, [conversation, navigation, openProviderProfile]);
 
   useEffect(() => {
     let active = true;
@@ -84,10 +124,7 @@ const ConversationScreen: React.FC<Props> = ({ route, navigation }) => {
         ]);
         if (!active) return;
 
-        const conversation = conversationRes.data;
-        const title = conversation.providerType === 'DOCTOR' ? conversation.doctorName ?? 'Doctor' : conversation.laboratoryName ?? 'Laboratory';
-        navigation.setOptions({ title });
-
+        setConversation(conversationRes.data);
         setMessages(messagesRes.data.items);
         setHasMore(messagesRes.data.hasMore);
         cursorRef.current = {

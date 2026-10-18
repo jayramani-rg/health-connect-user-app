@@ -55,6 +55,7 @@ export interface DoctorAvailabilitySummary {
 }
 
 export interface DoctorDetail extends DoctorListItem {
+  isVerified?: boolean;
   bio: string | null;
   clinicName: string | null;
   clinicAddress: string | null;

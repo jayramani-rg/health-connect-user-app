@@ -39,7 +39,7 @@ function groupByLaboratory(rows: LabServiceSearchResultItem[]): LabListItem[] {
         city: row.city,
         state: '',
         locality: row.locality,
-        photoUrl: null,
+        photoUrl: row.laboratoryPhotoUrl ?? null,
         homeCollectionEnabled: row.homeCollectionEnabled,
         isAcceptingBookings: null,
         serviceCount: 1,

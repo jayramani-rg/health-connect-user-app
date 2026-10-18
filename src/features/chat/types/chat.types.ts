@@ -26,10 +26,13 @@ export interface ChatConversationListItem {
   doctorProfileId: string | null;
   doctorName: string | null;
   doctorSpecialization: string | null;
+  doctorPhotoUrl?: string | null;
   laboratoryId: string | null;
   laboratoryName: string | null;
+  laboratoryPhotoUrl?: string | null;
   patientUserId: string;
   patientName: string | null;
+  patientPhotoUrl?: string | null;
   lastMessageBody: string | null;
   lastMessageAtUtc: string | null;
   unreadCount: number;

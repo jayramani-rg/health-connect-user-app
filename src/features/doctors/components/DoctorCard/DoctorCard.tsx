@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { useRemoteImage } from '../../../../utils/media';
 import { Icon } from '../../../../components/Icon/Icon';
 import type { IoniconsIconName } from '../../../../components/Icon/Icon';
 import { colors } from '../../../../theme';
@@ -17,11 +18,11 @@ const MODE_META: Record<ConsultationType, { label: string; icon: IoniconsIconNam
 type AvailabilityTone = 'open' | 'muted' | 'warning';
 
 function DoctorPhoto({ name, uri }: { name: string; uri: string | null }) {
-  const [failed, setFailed] = useState(false);
+  const image = useRemoteImage(uri);
   return (
     <View style={styles.photo}>
-      {uri && !failed ? (
-        <Image source={{ uri }} style={styles.photoImage} resizeMode="cover" onError={() => setFailed(true)} accessibilityIgnoresInvertColors />
+      {image.showImage && image.uri ? (
+        <Image source={{ uri: image.uri }} style={styles.photoImage} resizeMode="cover" onError={image.onError} accessibilityIgnoresInvertColors />
       ) : (
         <Text style={styles.photoInitial}>{name.trim().charAt(0).toUpperCase() || '?'}</Text>
       )}

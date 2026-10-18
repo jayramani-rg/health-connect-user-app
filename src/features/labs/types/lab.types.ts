@@ -34,6 +34,7 @@ export interface LabListItem {
 }
 
 export interface LabDetail {
+  isVerified?: boolean;
   laboratoryId: string;
   name: string;
   address: string;
@@ -71,6 +72,7 @@ export interface LabServiceSearchResultItem {
   homeCollectionEnabled: boolean;
   laboratoryId: string;
   laboratoryName: string;
+  laboratoryPhotoUrl?: string | null;
   city: string;
   locality: string | null;
   localityMatch: LocalityMatch | null;

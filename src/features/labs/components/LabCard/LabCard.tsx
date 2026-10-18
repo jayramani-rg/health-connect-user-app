@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { Icon } from '../../../../components/Icon/Icon';
 import type { IoniconsIconName } from '../../../../components/Icon/Icon';
 import { colors } from '../../../../theme';
-import { ASSETS_BASE_URL } from '../../../../config/env';
+import { useRemoteImage } from '../../../../utils/media';
 import { formatFee, formatNextAvailable, joinArea } from '../../../../utils/providerFormat';
 import type { LabListItem } from '../../types/lab.types';
 import { styles } from './styles/LabCard.styles';
@@ -51,15 +51,15 @@ function CollectionOption({ icon, title, detail, tone, off }: OptionProps) {
 }
 
 function LabLogo({ photoUrl }: { photoUrl: string | null }) {
-  const [failed, setFailed] = useState(false);
+  const image = useRemoteImage(photoUrl);
   return (
     <View style={styles.logo}>
-      {photoUrl && !failed ? (
+      {image.showImage && image.uri ? (
         <Image
-          source={{ uri: `${ASSETS_BASE_URL}${photoUrl}` }}
+          source={{ uri: image.uri }}
           style={styles.logoImage}
           resizeMode="cover"
-          onError={() => setFailed(true)}
+          onError={image.onError}
           accessibilityIgnoresInvertColors
         />
       ) : (

@@ -1,80 +1,137 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { colors, fontFamily, layout, radius, spacing, textRole } from '../../../theme';
 
 export const styles = StyleSheet.create({
-  loadingWrapper: {
+  skeletonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  section: {
+    marginTop: spacing.md,
+    marginBottom: -spacing.xs,
+  },
+  availabilityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+  },
+  availabilityText: {
+    ...textRole.meta,
+    color: colors.textSecondary,
     flex: 1,
+  },
+  availabilityOpen: {
+    color: colors.success,
+    fontFamily: fontFamily.semiBold,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    padding: layout.cardPadding,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  infoCardActive: {
+    borderColor: colors.brand,
+  },
+  infoIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: colors.brandSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    alignItems: 'center',
+  infoText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
   },
-  name: {
-    ...typography.h2,
+  infoTitle: {
+    ...textRole.cardTitle,
     color: colors.text,
   },
-  specialization: {
-    ...typography.body,
+  infoBody: {
+    ...textRole.meta,
     color: colors.textSecondary,
-    marginTop: 2,
   },
-  sectionTitle: {
-    ...typography.title,
-    color: colors.text,
-    marginTop: spacing.xl,
-    marginBottom: spacing.sm,
-  },
-  bodyText: {
-    ...typography.body,
-    color: colors.text,
-    lineHeight: 21,
-  },
-  qualificationRow: {
-    ...typography.body,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  modeCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  modeCardSelected: {
-    borderColor: colors.brand,
-    backgroundColor: colors.brandSoft,
-  },
-  modeName: {
-    ...typography.bodyStrong,
+  body: {
+    ...textRole.body,
     color: colors.text,
   },
-  modeDetail: {
-    ...typography.caption,
+  bodyMuted: {
+    ...textRole.meta,
     color: colors.textSecondary,
-    marginTop: 2,
   },
-  modeFee: {
-    ...typography.bodyStrong,
+  link: {
+    ...textRole.metaStrong,
     color: colors.brand,
   },
-  policyText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
+  list: {
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    paddingHorizontal: layout.cardPadding,
   },
-  footer: {
-    marginTop: spacing.xl,
+  listRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  listRowDivider: {
+    borderTopWidth: layout.hairline,
+    borderTopColor: colors.border,
+  },
+  listTitle: {
+    ...textRole.metaStrong,
+    color: colors.text,
+  },
+  listMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  chatCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    backgroundColor: colors.surfaceSunken,
+  },
+  chatText: {
+    ...textRole.meta,
+    color: colors.text,
+    flex: 1,
   },
   chatButton: {
-    marginTop: 0,
+    minWidth: 104,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  footerText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  footerFee: {
+    fontFamily: fontFamily.bold,
+    fontSize: 18,
+    lineHeight: 24,
+    color: colors.text,
+  },
+  footerMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  footerCta: {
+    minWidth: 170,
   },
 });

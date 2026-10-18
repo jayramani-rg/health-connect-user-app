@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Avatar } from '../../../components/Avatar/Avatar';
-import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
+import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { Icon } from '../../../components/Icon/Icon';
+import { ProviderHero, type ProviderHeroChip } from '../../../components/ProviderHero/ProviderHero';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
-import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
-import { activeopacity } from '../../../utils/helpers';
+import { SectionHeader } from '../../../components/SectionHeader/SectionHeader';
+import { SkeletonBlock, SkeletonCard } from '../../../components/SkeletonLoader/SkeletonLoader';
+import { colors } from '../../../theme';
+import { toLocalDateKey } from '../../../utils/helpers';
+import { formatFee, joinArea } from '../../../utils/providerFormat';
 import { doctorService } from '../../../services/doctorService';
+import { availabilityService } from '../../../services/availabilityService';
 import type { RootStackParamList } from '../../../navigation/types';
 import { CONSULT_LABEL } from '../../appointments/utils/consultationType';
 import type { ConsultationType, DoctorDetail } from '../types/doctor.types';
+import { ConsultationModePicker, type ConsultationModeOption } from '../components/ConsultationModePicker/ConsultationModePicker';
 import { useChatCta } from '../../chat/hooks/useChatCta';
 import { useProfileGate } from '../../profile/hooks/useProfileGate';
 import { ProfileGateDialog } from '../../profile/components/ProfileGateDialog';
@@ -21,6 +27,29 @@ import { getErrorMessage } from '../../../utils/errors';
 type Props = NativeStackScreenProps<RootStackParamList, 'DoctorProfile'>;
 
 const MODE_ORDER: ConsultationType[] = ['VIDEO', 'VOICE', 'IN_CLINIC'];
+const AVAILABILITY_DAYS = 7;
+const BIO_PREVIEW_LINES = 4;
+
+type AvailabilityState = { kind: 'loading' } | { kind: 'open'; dateKey: string; count: number } | { kind: 'none' } | { kind: 'unknown' };
+
+function modeOptions(doctor: DoctorDetail): ConsultationModeOption[] {
+  const a = doctor.availability;
+  return MODE_ORDER.map((mode) => {
+    const entry = mode === 'IN_CLINIC' ? a?.inClinic : mode === 'VIDEO' ? a?.video : a?.voice;
+    const enabled = mode === 'IN_CLINIC' ? doctor.inClinicEnabled : mode === 'VIDEO' ? doctor.videoEnabled : doctor.voiceEnabled;
+    return { mode, enabled, fee: entry?.fee ?? null, durationMinutes: entry?.durationMinutes ?? null };
+  });
+}
+
+function dayLabel(dateKey: string): string {
+  const today = toLocalDateKey(new Date());
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (dateKey === today) return 'today';
+  if (dateKey === toLocalDateKey(tomorrow)) return 'tomorrow';
+  const [y, m, d] = dateKey.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+}
 
 const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const { doctorProfileId } = route.params;
@@ -28,33 +57,63 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<ConsultationType | null>(null);
+  const [availability, setAvailability] = useState<AvailabilityState>({ kind: 'loading' });
+  const [bioExpanded, setBioExpanded] = useState(false);
   const chatCta = useChatCta('DOCTOR', doctorProfileId);
   const { runWithProfileGate, dialogVisible, handleCompleteProfile, handleDismissGate } = useProfileGate();
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    setErrorText(null);
+    try {
+      const response = await doctorService.getById(doctorProfileId);
+      setDoctor(response.data);
+      setSelectedMode((current) => current ?? modeOptions(response.data).find((o) => o.enabled)?.mode ?? null);
+    } catch (error) {
+      setErrorText(getErrorMessage(error, 'Could not load this doctor.'));
+    } finally {
+      setLoading(false);
+    }
+  }, [doctorProfileId]);
+
   useEffect(() => {
+    load();
+  }, [load]);
+
+  const accepting = doctor?.isAcceptingAppointments ?? false;
+  useEffect(() => {
+    if (!selectedMode || !accepting) {
+      setAvailability({ kind: 'unknown' });
+      return undefined;
+    }
     let active = true;
-    (async () => {
-      try {
-        const response = await doctorService.getById(doctorProfileId);
+    setAvailability({ kind: 'loading' });
+    availabilityService
+      .getSlotCounts(doctorProfileId, selectedMode, toLocalDateKey(new Date()), AVAILABILITY_DAYS)
+      .then((response) => {
         if (!active) return;
-        setDoctor(response.data);
-        const firstEnabled = MODE_ORDER.find((mode) => modeEnabled(response.data, mode));
-        setSelectedMode(firstEnabled ?? null);
-      } catch (error) {
-        if (active) setErrorText(getErrorMessage(error, 'Could not load this doctor.'));
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
+        const first = response.data.days.find((day) => day.availableCount > 0);
+        setAvailability(first ? { kind: 'open', dateKey: first.date.slice(0, 10), count: first.availableCount } : { kind: 'none' });
+      })
+      .catch(() => active && setAvailability({ kind: 'unknown' }));
     return () => {
       active = false;
     };
-  }, [doctorProfileId]);
+  }, [doctorProfileId, selectedMode, accepting]);
+
+  const options = useMemo(() => (doctor ? modeOptions(doctor) : []), [doctor]);
 
   if (loading) {
     return (
       <ScreenContainer variant="page">
-        <SkeletonList count={4} />
+        <SkeletonCard />
+        <SkeletonBlock width="45%" height={16} />
+        <View style={styles.skeletonRow}>
+          <SkeletonBlock width="31%" height={112} radius={16} />
+          <SkeletonBlock width="31%" height={112} radius={16} />
+          <SkeletonBlock width="31%" height={112} radius={16} />
+        </View>
+        <SkeletonBlock width="100%" height={72} radius={16} />
       </ScreenContainer>
     );
   }
@@ -62,125 +121,159 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
   if (!doctor) {
     return (
       <ScreenContainer variant="page">
-        <Banner variant="error" message={errorText ?? 'Doctor not found.'} />
+        <EmptyState title="Could not load this doctor" description={errorText ?? 'Please try again.'} actionLabel="Try again" onActionPress={load} />
       </ScreenContainer>
     );
   }
 
-  const modeFee: Record<ConsultationType, { enabled: boolean; fee: number | null; duration: number | null }> = {
-    IN_CLINIC: { enabled: doctor.availability?.inClinic.enabled ?? false, fee: doctor.availability?.inClinic.fee ?? null, duration: doctor.availability?.inClinic.durationMinutes ?? null },
-    VIDEO: { enabled: doctor.availability?.video.enabled ?? false, fee: doctor.availability?.video.fee ?? null, duration: doctor.availability?.video.durationMinutes ?? null },
-    VOICE: { enabled: doctor.availability?.voice.enabled ?? false, fee: doctor.availability?.voice.fee ?? null, duration: doctor.availability?.voice.durationMinutes ?? null },
-  };
-
-  const availableModes = MODE_ORDER.filter((mode) => modeEnabled(doctor, mode));
-  const canBook = doctor.isAcceptingAppointments && availableModes.length > 0 && !!selectedMode;
+  const selected = options.find((o) => o.mode === selectedMode && o.enabled) ?? null;
+  const anyEnabled = options.some((o) => o.enabled);
+  const canBook = accepting && !!selected;
+  const credentials = doctor.qualifications.map((q) => q.degree).filter(Boolean).join(', ');
+  const specialty = [doctor.specialization, doctor.subSpecialization].filter(Boolean).join(' · ');
+  const area = joinArea(doctor.clinicLocality, doctor.clinicCity);
+  const meta = [doctor.experienceYears > 0 ? `${doctor.experienceYears} years experience` : null, area || null].filter(Boolean).join(' · ');
+  const clinicAddress = [doctor.clinicName, doctor.clinicAddress, doctor.clinicLocality, doctor.clinicCity, doctor.clinicPincode].filter(Boolean).join(', ');
   const chatConversationId = chatCta.state.kind === 'chat' ? chatCta.state.conversationId : null;
 
-  function handleRequestAppointment() {
-    if (!selectedMode) return;
-    runWithProfileGate(() => navigation.navigate('BookAppointment', { doctorProfileId, consultationType: selectedMode }));
+  const chips: ProviderHeroChip[] = [];
+  if (!accepting) {
+    chips.push({ icon: 'pause-circle-outline', label: 'Not taking appointments', tone: 'warning' });
+  } else if (availability.kind === 'open') {
+    chips.push({ icon: 'calendar-outline', label: `Available ${dayLabel(availability.dateKey)}`, tone: 'brand' });
+  }
+  if (doctor.minConsultationFee != null) {
+    chips.push({ icon: 'wallet-outline', label: `From ${formatFee(doctor.minConsultationFee)}` });
   }
 
-  return (
-    <ScreenContainer variant="page">
-      <View style={styles.headerRow}>
-        <Avatar name={doctor.fullName} imageUrl={doctor.profilePhotoUrl} size={72} />
-        <View>
-          <Text style={styles.name}>{doctor.fullName}</Text>
-          <Text style={styles.specialization}>
-            {doctor.specialization}
-            {doctor.experienceYears > 0 ? ` · ${doctor.experienceYears} yrs exp` : ''}
-          </Text>
-        </View>
-      </View>
+  function handleBook() {
+    if (!selected) return;
+    runWithProfileGate(() => navigation.navigate('BookAppointment', { doctorProfileId, consultationType: selected.mode }));
+  }
 
-      {!doctor.isAcceptingAppointments && <Banner variant="warning" message="This doctor is not accepting new appointment requests right now." />}
+  const availabilityLine =
+    !accepting
+      ? 'This doctor is not accepting new appointment requests right now.'
+      : availability.kind === 'loading'
+        ? 'Checking availability…'
+        : availability.kind === 'open'
+          ? `Next opening ${dayLabel(availability.dateKey)} · ${availability.count} ${availability.count === 1 ? 'slot' : 'slots'}`
+          : availability.kind === 'none'
+            ? `No ${selected ? CONSULT_LABEL[selected.mode].toLowerCase() : ''} openings in the next ${AVAILABILITY_DAYS} days`
+            : null;
+
+  const footer = (
+    <View style={styles.footer}>
+      <View style={styles.footerText}>
+        <Text style={styles.footerFee}>{selected ? (selected.fee != null ? formatFee(selected.fee) : 'Fee on request') : '—'}</Text>
+        <Text style={styles.footerMeta} numberOfLines={1}>
+          {selected ? `${CONSULT_LABEL[selected.mode]}${selected.durationMinutes ? ` · ${selected.durationMinutes} min` : ''}` : 'No consultation available'}
+        </Text>
+      </View>
+      <View style={styles.footerCta}>
+        <Button label={accepting ? 'Book appointment' : 'Unavailable'} onPress={handleBook} disabled={!canBook} />
+      </View>
+    </View>
+  );
+
+  return (
+    <ScreenContainer variant="page" footer={footer}>
+      <ProviderHero
+        name={doctor.fullName}
+        imageUrl={doctor.profilePhotoUrl}
+        shape="circle"
+        verified={doctor.isVerified}
+        title={specialty}
+        subtitle={credentials || null}
+        meta={meta || null}
+        chips={chips}
+      />
+
+      <SectionHeader title="Consultation type" style={styles.section} />
+      {anyEnabled ? (
+        <>
+          <ConsultationModePicker options={options} value={selectedMode} onChange={setSelectedMode} />
+          {availabilityLine ? (
+            <View style={styles.availabilityRow} accessibilityLiveRegion="polite">
+              <Icon name={availability.kind === 'open' ? 'time-outline' : 'information-circle-outline'} size={15} color={availability.kind === 'open' ? colors.success : colors.textSecondary} />
+              <Text style={[styles.availabilityText, availability.kind === 'open' && styles.availabilityOpen]}>{availabilityLine}</Text>
+            </View>
+          ) : null}
+        </>
+      ) : (
+        <Text style={styles.bodyMuted}>This doctor has not opened any consultation types yet.</Text>
+      )}
+
+      {doctor.inClinicEnabled && clinicAddress ? (
+        <View style={[styles.infoCard, selected?.mode === 'IN_CLINIC' && styles.infoCardActive]}>
+          <View style={styles.infoIcon}>
+            <Icon name="location-outline" size={18} color={colors.brand} />
+          </View>
+          <View style={styles.infoText}>
+            <Text style={styles.infoTitle}>{doctor.clinicName || 'Clinic'}</Text>
+            <Text style={styles.infoBody}>{clinicAddress}</Text>
+          </View>
+        </View>
+      ) : null}
 
       {doctor.bio ? (
         <>
-          <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.bodyText}>{doctor.bio}</Text>
-        </>
-      ) : null}
-
-      {doctor.inClinicEnabled && doctor.clinicAddress ? (
-        <>
-          <Text style={styles.sectionTitle}>Clinic</Text>
-          <Text style={styles.bodyText}>
-            {[doctor.clinicName, doctor.clinicAddress, doctor.clinicLocality, doctor.clinicCity, doctor.clinicPincode].filter(Boolean).join(', ')}
+          <SectionHeader title="About" style={styles.section} />
+          <Text style={styles.body} numberOfLines={bioExpanded ? undefined : BIO_PREVIEW_LINES}>
+            {doctor.bio}
           </Text>
+          {doctor.bio.length > 220 ? (
+            <Pressable onPress={() => setBioExpanded((v) => !v)} hitSlop={8} accessibilityRole="button">
+              <Text style={styles.link}>{bioExpanded ? 'Show less' : 'Read more'}</Text>
+            </Pressable>
+          ) : null}
         </>
       ) : null}
 
-      {doctor.qualifications.length > 0 && (
+      {doctor.qualifications.length > 0 ? (
         <>
-          <Text style={styles.sectionTitle}>Qualifications</Text>
-          {doctor.qualifications.map((q, index) => (
-            <Text key={`${q.degree}-${index}`} style={styles.qualificationRow}>
-              {q.degree}, {q.institution} ({q.passingYear})
-            </Text>
-          ))}
+          <SectionHeader title="Education" style={styles.section} />
+          <View style={styles.list}>
+            {doctor.qualifications.map((q, index) => (
+              <View key={`${q.degree}-${index}`} style={[styles.listRow, index > 0 && styles.listRowDivider]}>
+                <Icon name="school-outline" size={16} color={colors.textSecondary} />
+                <View style={styles.infoText}>
+                  <Text style={styles.listTitle}>{q.degree}</Text>
+                  <Text style={styles.listMeta}>
+                    {q.institution}
+                    {q.passingYear ? ` · ${q.passingYear}` : ''}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
         </>
-      )}
+      ) : null}
 
-      <Text style={styles.sectionTitle}>Choose a consultation type</Text>
-      {availableModes.map((mode) => {
-        const selected = selectedMode === mode;
-        return (
-          <TouchableOpacity
-            key={mode}
-            activeOpacity={activeopacity}
-            style={[styles.modeCard, selected && styles.modeCardSelected]}
-            onPress={() => setSelectedMode(mode)}
-          >
-            <View>
-              <Text style={styles.modeName}>{CONSULT_LABEL[mode]}</Text>
-              {modeFee[mode].duration ? <Text style={styles.modeDetail}>{modeFee[mode].duration} min</Text> : null}
-            </View>
-            <Text style={styles.modeFee}>{modeFee[mode].fee != null ? `₹${modeFee[mode].fee}` : 'Fee not available'}</Text>
-          </TouchableOpacity>
-        );
-      })}
-      {doctor.availability?.cancellationPolicy ? <Text style={styles.policyText}>{doctor.availability.cancellationPolicy}</Text> : null}
+      {doctor.availability?.cancellationPolicy ? (
+        <>
+          <SectionHeader title="Cancellation policy" style={styles.section} />
+          <Text style={styles.bodyMuted}>{doctor.availability.cancellationPolicy}</Text>
+        </>
+      ) : null}
 
-      <View style={styles.footer}>
-        <Button
-          label={canBook ? `Request ${CONSULT_LABEL[selectedMode!]} appointment` : 'Not accepting requests'}
-          disabled={!canBook}
-          onPress={handleRequestAppointment}
-        />
-        {chatCta.state.kind === 'invite' && (
-          <Button
-            label="Chat with doctor"
-            variant="secondary"
-            onPress={() => runWithProfileGate(chatCta.sendInvitation)}
-            style={styles.chatButton}
-          />
-        )}
-        {chatCta.state.kind === 'sending' && <Button label="Sending invitation…" variant="secondary" disabled onPress={() => {}} style={styles.chatButton} />}
-        {chatCta.state.kind === 'pending' && (
-          <Button label="Invitation sent. Waiting for a reply" variant="ghost" disabled onPress={() => {}} style={styles.chatButton} />
-        )}
-        {chatConversationId && (
-          <Button
-            label="Open chat"
-            variant="secondary"
-            onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })}
-            style={styles.chatButton}
-          />
-        )}
+      <View style={styles.chatCard}>
+        <Icon name="chatbubbles-outline" size={18} color={colors.brand} />
+        <Text style={styles.chatText}>
+          {chatCta.state.kind === 'pending' ? 'Chat invitation sent. Waiting for a reply.' : 'Have a question before booking?'}
+        </Text>
+        {chatCta.state.kind === 'invite' ? (
+          <Button label="Message" variant="secondary" onPress={() => runWithProfileGate(chatCta.sendInvitation)} style={styles.chatButton} />
+        ) : chatCta.state.kind === 'sending' ? (
+          <Button label="Sending" variant="secondary" disabled loading onPress={() => undefined} style={styles.chatButton} />
+        ) : chatConversationId ? (
+          <Button label="Open chat" variant="secondary" onPress={() => navigation.navigate('ChatConversation', { conversationId: chatConversationId })} style={styles.chatButton} />
+        ) : null}
       </View>
 
       <ProfileGateDialog visible={dialogVisible} onComplete={handleCompleteProfile} onDismiss={handleDismissGate} />
     </ScreenContainer>
   );
 };
-
-function modeEnabled(doctor: DoctorDetail, mode: ConsultationType): boolean {
-  if (mode === 'IN_CLINIC') return doctor.inClinicEnabled;
-  if (mode === 'VIDEO') return doctor.videoEnabled;
-  return doctor.voiceEnabled;
-}
 
 export default DoctorProfileScreen;
