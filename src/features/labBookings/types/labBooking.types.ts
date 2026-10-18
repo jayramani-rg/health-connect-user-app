@@ -125,6 +125,7 @@ export interface AvailableLabSlotsResponse {
   date: string;
   collectionMethod: CollectionMethod;
   labAcceptingBookings: boolean;
+  dayStatus?: 'AVAILABLE' | 'FULL' | 'NO_SLOTS';
   slots: AvailableLabSlot[];
 }
 

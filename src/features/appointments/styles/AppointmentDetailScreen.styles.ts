@@ -80,8 +80,4 @@ export const styles = StyleSheet.create({
     marginTop: spacing.lg,
     gap: spacing.sm,
   },
-  rescheduleRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
 });

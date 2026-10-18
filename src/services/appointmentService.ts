@@ -30,6 +30,4 @@ export const appointmentService = {
   cancel: (id: string, reason?: string): Promise<ApiResponse<AppointmentDetail>> =>
     API.request<AppointmentDetail>(`/appointments/${id}/cancel`, { method: 'POST', body: { reason } }),
 
-  respondToReschedule: (id: string, accept: boolean): Promise<ApiResponse<AppointmentDetail>> =>
-    API.request<AppointmentDetail>(`/appointments/${id}/respond-reschedule`, { method: 'POST', body: { accept } }),
 };

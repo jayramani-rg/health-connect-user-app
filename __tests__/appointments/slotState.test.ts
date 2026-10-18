@@ -2,6 +2,7 @@ import type { AvailableSlot, BookingRequest } from '../../src/features/appointme
 import {
   clockSkewMs,
   countOpen,
+  dayAvailabilityLabel,
   formatCountdown,
   groupSlotsByPeriod,
   isSelectable,
@@ -10,7 +11,9 @@ import {
   nextOpenDateKey,
   queueMessage,
   remainingMs,
+  resolveDayStatus,
   resolveSlotState,
+  slotConsumesCapacity,
   slotAccessibilityLabel,
 } from '../../src/features/appointments/utils/slotState';
 
@@ -157,5 +160,33 @@ describe('queue messaging and helpers', () => {
     const keys = new Set(Array.from({ length: 200 }, () => newIdempotencyKey()));
     expect(keys.size).toBe(200);
     keys.forEach((key) => expect(key.length).toBeLessThanOrEqual(64));
+  });
+});
+
+describe('day availability', () => {
+  it('uses the server status when present', () => {
+    expect(resolveDayStatus({ availableCount: 0, status: 'FULL' })).toBe('FULL');
+    expect(resolveDayStatus({ availableCount: 0, status: 'NO_SLOTS' })).toBe('NO_SLOTS');
+    expect(resolveDayStatus({ availableCount: 3, status: 'AVAILABLE' })).toBe('AVAILABLE');
+  });
+
+  it('never infers full from an empty count without a server status', () => {
+    expect(resolveDayStatus({ availableCount: 0 })).toBe('NO_SLOTS');
+    expect(resolveDayStatus({ availableCount: 2 })).toBe('AVAILABLE');
+  });
+
+  it('labels full, empty and open days distinctly', () => {
+    expect(dayAvailabilityLabel('FULL', 0)).toBe('Full');
+    expect(dayAvailabilityLabel('NO_SLOTS', 0)).toBe('No slots');
+    expect(dayAvailabilityLabel('AVAILABLE', 1)).toBe('1 slot');
+    expect(dayAvailabilityLabel('AVAILABLE', 6)).toBe('6 slots');
+  });
+
+  it('treats only booked, held and day cap slots as consumed capacity', () => {
+    expect(slotConsumesCapacity(slot({ status: 'BOOKED' }))).toBe(true);
+    expect(slotConsumesCapacity(slot({ status: 'RESERVED' }))).toBe(true);
+    expect(slotConsumesCapacity(slot({ status: 'UNAVAILABLE', unavailableReason: 'DAY_FULL' }))).toBe(true);
+    expect(slotConsumesCapacity(slot({ status: 'UNAVAILABLE', unavailableReason: 'TOO_SOON' }))).toBe(false);
+    expect(slotConsumesCapacity(slot({ status: 'AVAILABLE' }))).toBe(false);
   });
 });

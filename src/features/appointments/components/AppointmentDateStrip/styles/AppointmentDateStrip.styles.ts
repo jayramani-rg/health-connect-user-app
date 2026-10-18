@@ -67,6 +67,9 @@ export const styles = StyleSheet.create({
   dotEmpty: {
     backgroundColor: colors.borderStrong,
   },
+  dotFull: {
+    backgroundColor: colors.warning,
+  },
   dotSelected: {
     backgroundColor: colors.white,
   },

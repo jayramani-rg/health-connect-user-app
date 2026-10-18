@@ -54,7 +54,6 @@ function appointmentBucket(item: AppointmentListItem, now: Date): CareBucket | n
     case 'IN_PROGRESS':
       return 'live';
     case 'PAYMENT_PENDING':
-    case 'RESCHEDULE_PROPOSED':
       return 'attention';
     case 'PENDING':
       return stillRelevantToday(item, now) ? 'awaiting' : null;

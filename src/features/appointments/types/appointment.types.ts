@@ -4,7 +4,6 @@ export type { ConsultationType };
 
 export type AppointmentStatus =
   | 'PENDING'
-  | 'RESCHEDULE_PROPOSED'
   | 'CONFIRMED'
   | 'IN_PROGRESS'
   | 'COMPLETED'
@@ -62,9 +61,6 @@ export interface AppointmentDetail {
   patientUserId: string;
   patientName: string | null;
   patientPhone: string | null;
-  rescheduleProposedStartAtUtc: string | null;
-  rescheduleProposedDurationMinutes: number | null;
-  rescheduleNote: string | null;
   cancelledByRole: string | null;
   cancellationReason: string | null;
   rejectionReason: string | null;
@@ -156,11 +152,21 @@ export interface AvailableSlotsResponse {
   date: string;
   consultationType: ConsultationType;
   doctorAcceptingAppointments: boolean;
+  dayStatus?: DayAvailabilityStatus;
   slots: AvailableSlot[];
 }
 
+export type DayAvailabilityStatus = 'AVAILABLE' | 'FULL' | 'NO_SLOTS';
+
 export interface DaySlotCount {
   date: string;
+  availableCount: number;
+  totalCount?: number;
+  status?: DayAvailabilityStatus;
+}
+
+export interface DayAvailability {
+  status: DayAvailabilityStatus;
   availableCount: number;
 }
 
@@ -173,7 +179,7 @@ export type AppointmentTab = 'upcoming' | 'pending' | 'past' | 'cancelled';
 
 export const STATUS_BY_TAB: Record<AppointmentTab, AppointmentStatus[]> = {
   upcoming: ['CONFIRMED', 'IN_PROGRESS'],
-  pending: ['PAYMENT_PENDING', 'PENDING', 'RESCHEDULE_PROPOSED'],
+  pending: ['PAYMENT_PENDING', 'PENDING'],
   past: ['COMPLETED', 'NO_SHOW'],
   cancelled: ['CANCELLED', 'REJECTED', 'EXPIRED'],
 };

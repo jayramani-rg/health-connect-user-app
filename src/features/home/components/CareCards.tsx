@@ -4,7 +4,7 @@ import { images } from '../../../assets/images';
 import { Button } from '../../../components/Button/Button';
 import { Icon, type IoniconsIconName } from '../../../components/Icon/Icon';
 import { STATUS_META as LAB_STATUS_META } from '../../../components/LabStatusBadge/LabStatusBadge';
-import { STATUS_META as APPOINTMENT_STATUS_META } from '../../../components/StatusBadge/StatusBadge';
+import { statusMeta as appointmentStatusMeta } from '../../../components/StatusBadge/StatusBadge';
 import { colors } from '../../../theme';
 import { formatSlotTime } from '../../../utils/providerFormat';
 import { formatWhen, type CareItem } from '../utils/careActivity';
@@ -22,7 +22,6 @@ const STATUS_ICON: Record<string, IoniconsIconName> = {
   CONFIRMED: 'checkmark-circle-outline',
   IN_PROGRESS: 'radio-button-on',
   PAYMENT_PENDING: 'card-outline',
-  RESCHEDULE_PROPOSED: 'swap-horizontal-outline',
   COLLECTOR_ASSIGNED: 'person-outline',
   ON_THE_WAY: 'navigate-outline',
   SAMPLE_COLLECTED: 'flask-outline',
@@ -35,7 +34,7 @@ function statusVisual(item: CareItem): StatusVisual | null {
   }
   const status = item.appointmentStatus ?? item.labStatus;
   if (!status) return null;
-  const meta = item.appointmentStatus ? APPOINTMENT_STATUS_META[item.appointmentStatus] : LAB_STATUS_META[item.labStatus!];
+  const meta = item.appointmentStatus ? appointmentStatusMeta(item.appointmentStatus) : LAB_STATUS_META[item.labStatus!];
   return { label: meta.label, fg: meta.fg, bg: meta.bg, icon: STATUS_ICON[status] ?? 'ellipse-outline' };
 }
 

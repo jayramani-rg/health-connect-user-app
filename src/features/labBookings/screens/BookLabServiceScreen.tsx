@@ -23,6 +23,7 @@ import type { LabDetail } from '../../labs/types/lab.types';
 import type { Dependent, PatientAddress } from '../../patients/types/patient.types';
 import type { AvailableLabSlot, CollectionMethod, HomeCollectionEligibility } from '../types/labBooking.types';
 import { routeAfterBooking } from '../../payments/utils/routeAfterBooking';
+import { labDayMessage } from '../utils/labSlotState';
 import { styles } from '../styles/BookLabServiceScreen.styles';
 import { getErrorMessage } from '../../../utils/errors';
 
@@ -59,6 +60,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
   const [slots, setSlots] = useState<AvailableLabSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsMessage, setSlotsMessage] = useState<string | null>(null);
+  const [slotsFull, setSlotsFull] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<AvailableLabSlot | null>(null);
 
   const [addresses, setAddresses] = useState<PatientAddress[]>([]);
@@ -101,9 +103,11 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       const response = await labBookingService.getAvailableSlots(laboratoryId, collectionMethod, dateKey);
       setSlots(response.data.slots);
-      if (response.data.slots.length === 0) setSlotsMessage(response.message || 'No slots available on this day.');
+      setSlotsFull(response.data.dayStatus === 'FULL');
+      if (response.data.slots.length === 0) setSlotsMessage(labDayMessage(response.data));
     } catch (error) {
       setSlots([]);
+      setSlotsFull(false);
       setSlotsMessage(getErrorMessage(error, 'Could not load available slots.'));
     } finally {
       setLoadingSlots(false);
@@ -361,7 +365,7 @@ const BookLabServiceScreen: React.FC<Props> = ({ route, navigation }) => {
             {loadingSlots ? (
               <ActivityIndicator style={{ marginTop: 24 }} color={colors.brand} />
             ) : slots.length === 0 ? (
-              <Banner variant="info" message={slotsMessage ?? 'No slots available on this day.'} />
+              <Banner variant={slotsFull ? 'warning' : 'info'} message={slotsMessage ?? 'No slots on this day.'} />
             ) : (
               <View style={styles.slotsWrapper}>
                 {slots.map((slot) => {

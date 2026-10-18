@@ -1,4 +1,4 @@
-import type { AvailableSlot, BookingRequest, BookingRequestStatus, SlotStatus } from '../types/appointment.types';
+import type { AvailableSlot, BookingRequest, BookingRequestStatus, DayAvailabilityStatus, DaySlotCount, SlotStatus } from '../types/appointment.types';
 
 export type SlotVisualState = 'available' | 'selected' | 'reserved' | 'booked' | 'unavailable' | 'held' | 'waiting' | 'processing';
 
@@ -120,6 +120,22 @@ export function formatCountdown(ms: number): string {
 export function newIdempotencyKey(): string {
   const random = () => Math.random().toString(36).slice(2, 10);
   return `${Date.now().toString(36)}-${random()}-${random()}`;
+}
+
+export function slotConsumesCapacity(slot: AvailableSlot): boolean {
+  const status = slotStatus(slot);
+  return status === 'BOOKED' || status === 'RESERVED' || (status === 'UNAVAILABLE' && slot.unavailableReason === 'DAY_FULL');
+}
+
+export function resolveDayStatus(day: Pick<DaySlotCount, 'availableCount' | 'status'>): DayAvailabilityStatus {
+  if (day.status) return day.status;
+  return day.availableCount > 0 ? 'AVAILABLE' : 'NO_SLOTS';
+}
+
+export function dayAvailabilityLabel(status: DayAvailabilityStatus, availableCount: number): string {
+  if (status === 'FULL') return 'Full';
+  if (status === 'NO_SLOTS' || availableCount <= 0) return 'No slots';
+  return availableCount === 1 ? '1 slot' : `${availableCount} slots`;
 }
 
 export function nextOpenDateKey(orderedKeys: string[], counts: Record<string, number>, afterKey?: string): string | null {

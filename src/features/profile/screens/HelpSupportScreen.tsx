@@ -20,8 +20,8 @@ const FAQS = [
     answer: 'Open a doctor or lab profile and use the chat option there. Once they accept your invitation, you can continue the conversation from your recent chats on Home.',
   },
   {
-    question: 'How do I cancel or reschedule an appointment?',
-    answer: 'Open the appointment from the Appointments tab. You can cancel a pending or confirmed appointment, or respond to a reschedule offer, from its detail screen.',
+    question: 'How do I cancel an appointment?',
+    answer: 'Open the appointment from the Appointments tab. You can cancel a pending or confirmed appointment from its detail screen. To change the time, cancel and book a new slot.',
   },
   {
     question: 'How do I add a family member?',

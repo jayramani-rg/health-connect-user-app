@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { availabilityService } from '../../../services/availabilityService';
 import { chatSocket } from '../../../services/chatSocket';
 import { getErrorMessage } from '../../../utils/errors';
-import type { AvailableSlot, ConsultationType } from '../types/appointment.types';
+import type { AvailableSlot, ConsultationType, DayAvailabilityStatus } from '../types/appointment.types';
+import { resolveDayStatus } from '../utils/slotState';
 
 const REFRESH_DEBOUNCE_MS = 250;
 const OFFLINE_POLL_MS = 30000;
@@ -21,7 +22,9 @@ export function useDoctorSlots({ doctorProfileId, consultationType, dateKey, fro
   const [accepting, setAccepting] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dayStatus, setDayStatus] = useState<DayAvailabilityStatus | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [dayStatuses, setDayStatuses] = useState<Record<string, DayAvailabilityStatus>>({});
   const [countsLoaded, setCountsLoaded] = useState(false);
   const [countsFailed, setCountsFailed] = useState(false);
   const slotSeq = useRef(0);
@@ -40,10 +43,16 @@ export function useDoctorSlots({ doctorProfileId, consultationType, dateKey, fro
         if (seq !== slotSeq.current) return;
         setSlots(response.data.slots);
         setAccepting(response.data.doctorAcceptingAppointments);
+        const openCount = response.data.slots.filter((slot) => (slot.status ?? 'AVAILABLE') === 'AVAILABLE').length;
+        const status = response.data.dayStatus ?? resolveDayStatus({ availableCount: openCount });
+        setDayStatus(status);
+        setDayStatuses((current) => (current[dateKey] === status ? current : { ...current, [dateKey]: status }));
+        setCounts((current) => (current[dateKey] === openCount ? current : { ...current, [dateKey]: openCount }));
         setError(null);
       } catch (err) {
         if (seq !== slotSeq.current || silent) return;
         setSlots([]);
+        setDayStatus(null);
         setError(getErrorMessage(err, 'Could not load time slots.'));
       } finally {
         if (seq === slotSeq.current && !silent) setLoading(false);
@@ -59,10 +68,14 @@ export function useDoctorSlots({ doctorProfileId, consultationType, dateKey, fro
       const response = await availabilityService.getSlotCounts(doctorProfileId, consultationType, fromDateKey, days);
       if (seq !== countSeq.current) return;
       const byDate: Record<string, number> = {};
+      const statusByDate: Record<string, DayAvailabilityStatus> = {};
       response.data.days.forEach((day) => {
-        byDate[day.date.slice(0, 10)] = day.availableCount;
+        const key = day.date.slice(0, 10);
+        byDate[key] = day.availableCount;
+        statusByDate[key] = resolveDayStatus(day);
       });
       setCounts(byDate);
+      setDayStatuses(statusByDate);
       setCountsFailed(false);
       setCountsLoaded(true);
     } catch {
@@ -118,5 +131,5 @@ export function useDoctorSlots({ doctorProfileId, consultationType, dateKey, fro
     loadCountsRef.current();
   }, []);
 
-  return { slots, accepting, loading, error, counts, countsLoaded, countsFailed, reload: loadSlots, refresh };
+  return { slots, accepting, dayStatus, loading, error, counts, dayStatuses, countsLoaded, countsFailed, reload: loadSlots, refresh };
 }

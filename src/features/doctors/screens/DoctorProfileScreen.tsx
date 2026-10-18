@@ -30,7 +30,7 @@ const MODE_ORDER: ConsultationType[] = ['VIDEO', 'VOICE', 'IN_CLINIC'];
 const AVAILABILITY_DAYS = 7;
 const BIO_PREVIEW_LINES = 4;
 
-type AvailabilityState = { kind: 'loading' } | { kind: 'open'; dateKey: string; count: number } | { kind: 'none' } | { kind: 'unknown' };
+type AvailabilityState = { kind: 'loading' } | { kind: 'open'; dateKey: string; count: number } | { kind: 'none'; full: boolean } | { kind: 'unknown' };
 
 function modeOptions(doctor: DoctorDetail): ConsultationModeOption[] {
   const a = doctor.availability;
@@ -93,7 +93,8 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
       .then((response) => {
         if (!active) return;
         const first = response.data.days.find((day) => day.availableCount > 0);
-        setAvailability(first ? { kind: 'open', dateKey: first.date.slice(0, 10), count: first.availableCount } : { kind: 'none' });
+        const full = response.data.days.some((day) => day.status === 'FULL');
+        setAvailability(first ? { kind: 'open', dateKey: first.date.slice(0, 10), count: first.availableCount } : { kind: 'none', full });
       })
       .catch(() => active && setAvailability({ kind: 'unknown' }));
     return () => {
@@ -159,7 +160,9 @@ const DoctorProfileScreen: React.FC<Props> = ({ route, navigation }) => {
         : availability.kind === 'open'
           ? `Next opening ${dayLabel(availability.dateKey)} · ${availability.count} ${availability.count === 1 ? 'slot' : 'slots'}`
           : availability.kind === 'none'
-            ? `No ${selected ? CONSULT_LABEL[selected.mode].toLowerCase() : ''} openings in the next ${AVAILABILITY_DAYS} days`
+            ? availability.full
+              ? `Fully booked for the next ${AVAILABILITY_DAYS} days`
+              : `No ${selected ? CONSULT_LABEL[selected.mode].toLowerCase() : ''} slots in the next ${AVAILABILITY_DAYS} days`
             : null;
 
   const footer = (

@@ -23,7 +23,11 @@ import type { RootStackParamList } from '../../../navigation/types';
 import { LocalityChip } from '../../location/components/LocalityChip';
 import { LocationPromptCard } from '../../location/components/LocationPromptCard';
 import { useUserLocality } from '../../location/hooks/useUserLocality';
+import { bannerService } from '../../../services/bannerService';
 import { AttentionCard, CareGroupHeader, CareRow, RequestRow, ServiceTile, TimelineRow } from '../components/CareCards';
+import { HomeBanners } from '../components/HomeBanners';
+import type { HomeBanner } from '../types/banner.types';
+import type { BannerRoute } from '../utils/bannerNavigation';
 import { summarizeCare, type CareItem, type CareSummary } from '../utils/careActivity';
 import { CARE_SEARCH_HINTS } from '../utils/careSearchHints';
 import { styles } from '../styles/HomeScreen.styles';
@@ -32,6 +36,8 @@ const HOME_CATEGORY_LIMIT = COMPACT_COLUMNS * 2;
 const LOOKBACK_LAB_MS = 14 * 24 * 60 * 60 * 1000;
 
 type CareState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; summary: CareSummary };
+
+let sessionBanners: HomeBanner[] | null = null;
 
 function greetingForHour(): string {
   const hour = new Date().getHours();
@@ -47,9 +53,6 @@ function needsPayment(item: CareItem): boolean {
 function attentionAction(item: CareItem): { label: string; hint: string } {
   if (needsPayment(item)) {
     return { label: 'Pay now', hint: item.kind === 'APPOINTMENT' ? 'Complete payment to confirm your visit' : 'Complete payment to confirm your booking' };
-  }
-  if (item.appointmentStatus === 'RESCHEDULE_PROPOSED') {
-    return { label: 'Review time', hint: 'The doctor has proposed a new time' };
   }
   return { label: 'View details', hint: 'Open the booking to continue' };
 }
@@ -75,7 +78,33 @@ const HomeScreen: React.FC = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [care, setCare] = useState<CareState>({ status: 'loading' });
   const [refreshing, setRefreshing] = useState(false);
+  const [banners, setBanners] = useState<HomeBanner[]>(sessionBanners ?? []);
+  const [bannersLoading, setBannersLoading] = useState(sessionBanners === null);
   const locality = useUserLocality();
+
+  const loadBanners = useCallback(async () => {
+    try {
+      const response = await bannerService.getActive();
+      sessionBanners = response.data;
+      setBanners(response.data);
+    } catch {
+      if (sessionBanners === null) sessionBanners = [];
+    } finally {
+      setBannersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBanners();
+  }, [loadBanners]);
+
+  const openBannerRoute = useCallback(
+    (route: BannerRoute) => {
+      const navigate = navigation.navigate as (name: BannerRoute['name'], params?: object) => void;
+      navigate(route.name, 'params' in route ? route.params : undefined);
+    },
+    [navigation],
+  );
   const refreshOnMount = useRef(locality.refreshQuietly);
 
   useEffect(() => {
@@ -113,7 +142,7 @@ const HomeScreen: React.FC = () => {
 
   async function handleRefresh() {
     setRefreshing(true);
-    await loadCare();
+    await Promise.all([loadCare(), loadBanners()]);
     setRefreshing(false);
   }
 
@@ -265,6 +294,8 @@ const HomeScreen: React.FC = () => {
 
           <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onPress={() => navigation.navigate('DoctorList', {})} />
         </View>
+
+        <HomeBanners banners={banners} loading={bannersLoading} onNavigate={openBannerRoute} />
 
         <View style={styles.section}>
           <SectionHeader title="Book care" size="large" />

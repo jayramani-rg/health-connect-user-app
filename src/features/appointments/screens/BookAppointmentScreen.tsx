@@ -32,7 +32,7 @@ import { BookingFooter } from '../components/BookingFooter/BookingFooter';
 import { useBookingRequest } from '../hooks/useBookingRequest';
 import { useCountdown } from '../hooks/useCountdown';
 import { useDoctorSlots } from '../hooks/useDoctorSlots';
-import { countOpen, groupSlotsByPeriod, isActiveRequest, nextOpenDateKey, resolveSlotState, slotStatus } from '../utils/slotState';
+import { countOpen, groupSlotsByPeriod, isActiveRequest, nextOpenDateKey, resolveSlotState, slotConsumesCapacity, slotStatus } from '../utils/slotState';
 import { styles } from '../styles/BookAppointmentScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookAppointment'>;
@@ -388,13 +388,14 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
           selectedDate={dateKey}
           onSelectDate={selectDate}
           counts={slots.counts}
+          dayStatuses={slots.dayStatuses}
           countsLoaded={slots.countsLoaded}
           countsFailed={slots.countsFailed}
         />
 
         <SectionHeader
           title={formatDay(selectedDate)}
-          meta={slots.loading ? undefined : openCount > 0 ? `${openCount} open` : undefined}
+          meta={slots.loading || slots.error ? undefined : openCount > 0 ? `${openCount} open` : slots.dayStatus === 'FULL' ? 'Booking full' : undefined}
           style={styles.sectionTight}
         />
         <SlotLegend />
@@ -415,7 +416,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
         ) : slots.slots.length === 0 ? (
           <EmptyCard
             icon="calendar-clear-outline"
-            title="No times on this day"
+            title="No slots on this day"
             description={nextOpen ? 'The doctor has open times on another day.' : 'The doctor has no open times in the next two weeks.'}
             actionLabel={nextOpen ? `Go to ${formatDay(dateWindow[dateKeys.indexOf(nextOpen)])}` : undefined}
             onActionPress={nextOpen ? () => selectDate(nextOpen) : undefined}
@@ -429,7 +430,7 @@ const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
                   <View style={styles.groupHeader}>
                     <Icon name={PERIOD_ICON[group.key]} size={16} color={colors.textSecondary} />
                     <Text style={styles.groupLabel}>{group.label}</Text>
-                    <Text style={styles.groupMeta}>{open > 0 ? `${open} open` : 'Fully booked'}</Text>
+                    <Text style={styles.groupMeta}>{open > 0 ? `${open} open` : group.slots.some(slotConsumesCapacity) ? 'Fully booked' : 'Unavailable'}</Text>
                   </View>
                   <View style={styles.grid}>
                     {group.slots.map((slot) => (

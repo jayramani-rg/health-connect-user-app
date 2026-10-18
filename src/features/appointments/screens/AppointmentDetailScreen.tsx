@@ -83,9 +83,8 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
-  const canCancel = ['PENDING', 'CONFIRMED', 'RESCHEDULE_PROPOSED', 'PAYMENT_PENDING'].includes(appointment.status);
+  const canCancel = ['PENDING', 'CONFIRMED', 'PAYMENT_PENDING'].includes(appointment.status);
   const awaitingPayment = appointment.status === 'PAYMENT_PENDING';
-  const isRescheduleProposed = appointment.status === 'RESCHEDULE_PROPOSED';
 
   return (
     <ScreenContainer variant="page">
@@ -148,35 +147,6 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </>
       )}
 
-      {isRescheduleProposed && appointment.rescheduleProposedStartAtUtc && (
-        <>
-          <Text style={styles.sectionTitle}>New time proposed</Text>
-          <Banner
-            variant="warning"
-            message={`${appointment.doctorName} proposed ${formatDateTime(appointment.rescheduleProposedStartAtUtc)}${
-              appointment.rescheduleNote ? `: "${appointment.rescheduleNote}"` : ''
-            }`}
-          />
-          <View style={[styles.rescheduleRow, { marginTop: 12 }]}>
-            <View style={{ flex: 1 }}>
-              <Button
-                label="Decline"
-                variant="secondary"
-                disabled={actionLoading}
-                onPress={() => runAction(() => appointmentService.respondToReschedule(appointmentId, false))}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button
-                label="Accept new time"
-                loading={actionLoading}
-                onPress={() => runAction(() => appointmentService.respondToReschedule(appointmentId, true))}
-              />
-            </View>
-          </View>
-        </>
-      )}
-
       {appointment.cancellationReason && (
         <>
           <Text style={styles.sectionTitle}>Cancellation reason</Text>
@@ -205,7 +175,7 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </>
       )}
 
-      {canCancel && !isRescheduleProposed && (
+      {canCancel && (
         <View style={styles.actions}>
           <Button label="Cancel appointment" variant="secondary" disabled={actionLoading} onPress={() => setCancelSheetVisible(true)} />
         </View>
