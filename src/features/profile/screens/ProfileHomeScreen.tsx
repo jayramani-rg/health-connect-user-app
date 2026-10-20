@@ -94,9 +94,8 @@ export default function ProfileHomeScreen() {
   }
 
   function handleLogout() {
-    setActiveSheet('none');
     setLoggingOut(true);
-    signOut();
+    return signOut();
   }
 
   const fullName =
@@ -251,20 +250,20 @@ export default function ProfileHomeScreen() {
         visible={activeSheet === 'photo'}
         title="Profile photo"
         message="Update or remove your profile photo."
+        icon="camera-outline"
+        tone="primary"
         actions={photoActions}
         onRequestClose={() => setActiveSheet('none')}
       />
       <ConfirmSheet
         visible={activeSheet === 'logout'}
-        title="Log out"
-        message="Are you sure you want to log out?"
+        title="Log out?"
+        message="Are you sure you want to log out of your account?"
+        icon="log-out-outline"
+        tone="danger"
         actions={[
-          {
-            label: 'Cancel',
-            variant: 'secondary',
-            onPress: () => setActiveSheet('none'),
-          },
           { label: 'Log out', variant: 'destructive', onPress: handleLogout },
+          { label: 'Cancel', variant: 'secondary', onPress: () => setActiveSheet('none') },
         ]}
         onRequestClose={() => setActiveSheet('none')}
       />

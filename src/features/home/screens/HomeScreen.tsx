@@ -295,8 +295,6 @@ const HomeScreen: React.FC = () => {
           <SearchBar value="" onChangeText={() => {}} placeholder="Search doctors and labs" placeholderHints={CARE_SEARCH_HINTS} onPress={() => navigation.navigate('DoctorList', {})} />
         </View>
 
-        <HomeBanners banners={banners} loading={bannersLoading} onNavigate={openBannerRoute} />
-
         <View style={styles.section}>
           <SectionHeader title="Book care" size="large" />
           <View style={styles.serviceRow}>
@@ -335,6 +333,8 @@ const HomeScreen: React.FC = () => {
             </Pressable>
           ) : null}
         </View>
+
+        <HomeBanners banners={banners} loading={bannersLoading} onNavigate={openBannerRoute} />
 
         <View style={styles.section}>
           <SectionHeader title="Your care" size="large" />

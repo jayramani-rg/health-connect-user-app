@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
+import { confirmAction } from '../../../components/Dialog/Dialog';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { Icon } from '../../../components/Icon/Icon';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
@@ -79,25 +80,25 @@ const SavedAddressesScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   function confirmDelete(address: PatientAddress) {
-    Alert.alert('Remove address?', `"${address.label}" will be removed. Past bookings keep the address they were made with.`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
-          setBusyId(address.id);
-          try {
-            await patientAddressService.remove(address.id);
-            if (selectedAddressId === address.id) dispatch(clearLocality());
-            await load();
-          } catch (err) {
-            setError(getErrorMessage(err, 'Could not remove this address.'));
-          } finally {
-            setBusyId(null);
-          }
-        },
+    confirmAction({
+      title: 'Remove address?',
+      message: `"${address.label}" will be removed. Past bookings keep the address they were made with.`,
+      icon: 'location-outline',
+      confirmLabel: 'Remove address',
+      cancelLabel: 'Keep address',
+      errorFallback: 'Could not remove this address. Please try again.',
+      onConfirm: async () => {
+        setBusyId(address.id);
+        try {
+          await patientAddressService.remove(address.id);
+          if (selectedAddressId === address.id) dispatch(clearLocality());
+          setError(null);
+          await load();
+        } finally {
+          setBusyId(null);
+        }
       },
-    ]);
+    });
   }
 
   return (

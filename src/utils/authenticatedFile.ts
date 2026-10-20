@@ -1,13 +1,30 @@
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { API_BASE_URL } from '../config/env';
 
+export class FileRequestError extends Error {
+  status: number;
+
+  constructor(status: number) {
+    super(messageFor(status));
+    this.name = 'FileRequestError';
+    this.status = status;
+  }
+}
+
+function messageFor(status: number): string {
+  if (status === 401) return 'Your session has expired. Please sign in again.';
+  if (status === 403) return 'This report is not available on your account.';
+  if (status === 404) return 'This report could not be found. Ask the lab to upload it again.';
+  return `Could not load this file (${status}). Please try again.`;
+}
+
 export async function fetchAsDataUri(path: string, token: string | null): Promise<string> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 
   if (!response.ok) {
-    throw new Error(`Could not load file (${response.status}).`);
+    throw new FileRequestError(response.status);
   }
 
   const blob = await response.blob();
@@ -27,7 +44,8 @@ export async function downloadToLocalFile(path: string, token: string | null, fi
 
   const status = response.info().status;
   if (status < 200 || status >= 300) {
-    throw new Error(`Could not load file (${status}).`);
+    await ReactNativeBlobUtil.fs.unlink(target).catch(() => undefined);
+    throw new FileRequestError(status);
   }
 
   return `file://${response.path()}`;

@@ -1,52 +1,63 @@
-import React, { useCallback, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Banner } from '../../../components/Banner/Banner';
 import { Button } from '../../../components/Button/Button';
 import { ConfirmSheet } from '../../../components/ConfirmSheet/ConfirmSheet';
+import { Icon } from '../../../components/Icon/Icon';
 import { LabStatusBadge } from '../../../components/LabStatusBadge/LabStatusBadge';
 import { ScreenContainer } from '../../../components/ScreenContainer/ScreenContainer';
 import { SkeletonList } from '../../../components/SkeletonLoader/SkeletonLoader';
-import { colors, radius, spacing, typography } from '../../../theme';
-import { activeopacity } from '../../../utils/helpers';
+import { colors } from '../../../theme';
 import { labBookingService } from '../../../services/labBookingService';
+import { chatSocket } from '../../../services/chatSocket';
 import type { RootStackParamList } from '../../../navigation/types';
-import type { LabBookingDetail } from '../types/labBooking.types';
+import type { LabBookingDetail, LabReport } from '../types/labBooking.types';
 import { getErrorMessage } from '../../../utils/errors';
+import { cancellationMessage } from '../../../utils/cancellationCopy';
+import { patientProgress } from '../utils/labProgress';
+import { styles } from '../styles/LabBookingDetailScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LabBookingDetail'>;
+
+const CANCELLABLE = ['PENDING', 'CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY', 'PAYMENT_PENDING'];
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
 
-const TRACKING_STEPS: { status: string; label: string }[] = [
-  { status: 'CONFIRMED', label: 'Booking confirmed' },
-  { status: 'COLLECTOR_ASSIGNED', label: 'Collector assigned' },
-  { status: 'ON_THE_WAY', label: 'On the way' },
-  { status: 'SAMPLE_COLLECTED', label: 'Sample collected' },
-  { status: 'PROCESSING', label: 'Processing' },
-  { status: 'REPORT_READY', label: 'Report ready' },
-];
+function formatFileSize(bytes: number): string {
+  if (!bytes) return '';
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { bookingId } = route.params;
+  const isFocused = useIsFocused();
   const [booking, setBooking] = useState<LabBookingDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [cancelSheetVisible, setCancelSheetVisible] = useState(false);
+  const loadingRef = useRef(false);
 
   const load = useCallback(async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     try {
       const response = await labBookingService.getById(bookingId);
       setBooking(response.data);
+      setLoadError(null);
     } catch (error) {
-      setActionError(getErrorMessage(error, 'Could not load this booking.'));
+      setLoadError(getErrorMessage(error, 'Could not load this booking.'));
     } finally {
+      loadingRef.current = false;
       setLoading(false);
+      setRefreshing(false);
     }
   }, [bookingId]);
 
@@ -56,18 +67,42 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }, [load]),
   );
 
+  useEffect(() => {
+    if (!isFocused) return undefined;
+    const offNotification = chatSocket.onNotification((notification) => {
+      if (notification.entityType === 'LabBooking' && notification.entityId === bookingId) {
+        load();
+      }
+    });
+    const appState = AppState.addEventListener('change', (next) => {
+      if (next === 'active') load();
+    });
+    return () => {
+      offNotification();
+      appState.remove();
+    };
+  }, [isFocused, bookingId, load]);
+
+  const progress = useMemo(
+    () =>
+      booking
+        ? patientProgress({
+            status: booking.status,
+            collectionMethod: booking.collectionMethod,
+            collectorName: booking.assignedCollectorName,
+            laboratoryName: booking.laboratoryName,
+          })
+        : null,
+    [booking],
+  );
+
   async function handleConfirmCancel() {
-    setCancelSheetVisible(false);
-    setActionLoading(true);
-    setActionError(null);
-    try {
-      const response = await labBookingService.cancel(bookingId);
-      setBooking(response.data);
-    } catch (error) {
-      setActionError(getErrorMessage(error, 'This action could not be completed.'));
-    } finally {
-      setActionLoading(false);
-    }
+    const response = await labBookingService.cancel(bookingId);
+    setBooking(response.data);
+  }
+
+  function openReport(report: LabReport) {
+    navigation.navigate('ReportViewer', { bookingId, reportId: report.id, label: report.label, mimeType: report.mimeType });
   }
 
   if (loading) {
@@ -78,155 +113,204 @@ const LabBookingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
-  if (!booking) {
+  if (!booking || !progress) {
     return (
       <ScreenContainer variant="page">
-        <Banner variant="error" message={actionError ?? 'Booking not found.'} />
+        <Banner variant="error" message={loadError ?? 'Booking not found.'} />
+        <View style={styles.spacer} />
+        <Button
+          label="Try again"
+          variant="secondary"
+          onPress={() => {
+            setLoading(true);
+            load();
+          }}
+        />
       </ScreenContainer>
     );
   }
 
   const isHomeCollection = booking.collectionMethod === 'HOME_COLLECTION';
-  const canCancel = ['PENDING', 'CONFIRMED', 'COLLECTOR_ASSIGNED', 'ON_THE_WAY', 'PAYMENT_PENDING'].includes(booking.status);
+  const canCancel = CANCELLABLE.includes(booking.status);
   const awaitingPayment = booking.status === 'PAYMENT_PENDING';
-  const currentTrackingIndex = TRACKING_STEPS.findIndex((s) => s.status === booking.status);
+  const showReports = booking.reports.length > 0 || progress.reportsExpected;
 
   return (
-    <ScreenContainer variant="page">
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.md }}>
-        <View style={{ flex: 1 }}>
-          <Text style={typography.h2}>{booking.laboratoryName}</Text>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+    <ScrollView
+      contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => {
+            setRefreshing(true);
+            load();
+          }}
+          tintColor={colors.brand}
+          colors={[colors.brand]}
+        />
+      }
+    >
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.labName}>{booking.laboratoryName}</Text>
           {booking.dependentName ? (
-            <Text style={{ ...typography.body, color: colors.textSecondary }}>For {booking.dependentName} ({booking.dependentRelation})</Text>
+            <Text style={styles.subtle}>
+              For {booking.dependentName}
+              {booking.dependentRelation ? ` (${booking.dependentRelation})` : ''}
+            </Text>
           ) : null}
         </View>
         <LabStatusBadge status={booking.status} />
       </View>
 
-      {actionError && <Banner variant="error" message={actionError} />}
+      {loadError ? <Banner variant="error" message={loadError} /> : null}
 
-      {awaitingPayment && (
-        <>
-          <Banner variant="warning" message="Payment is pending. Pay to send this booking to the lab before it is released." />
-          <View style={{ marginBottom: spacing.md }}>
+      <View style={styles.card}>
+        <Text style={styles.progressHeadline}>{progress.headline}</Text>
+        {progress.message ? <Text style={styles.progressMessage}>{progress.message}</Text> : null}
+        {awaitingPayment ? (
+          <View style={styles.steps}>
             <Button label="Pay now" onPress={() => navigation.navigate('PaymentSummary', { kind: 'LAB_BOOKING', bookingId })} />
           </View>
-        </>
-      )}
-      {booking.status === 'COLLECTION_FAILED' && (
-        <Banner variant="warning" message="The last collection attempt was unsuccessful. The lab will arrange a new time." />
-      )}
-
-      {currentTrackingIndex >= 0 && isHomeCollection && (
-        <View style={{ marginBottom: spacing.md }}>
-          {TRACKING_STEPS.map((s, i) => (
-            <View key={s.status} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-              <View
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: i <= currentTrackingIndex ? colors.brand : colors.border,
-                  marginRight: spacing.sm,
-                }}
-              />
-              <Text style={{ ...typography.body, color: i <= currentTrackingIndex ? colors.text : colors.textSecondary }}>{s.label}</Text>
-            </View>
-          ))}
-        </View>
-      )}
-
-      <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md }}>
-        <Row label="Method" value={isHomeCollection ? 'Home collection' : 'Lab visit'} />
-        <Row label="Scheduled for" value={formatDateTime(booking.scheduledAtUtc)} />
-        {booking.totalAmount !== null && <Row label="Total" value={`₹${booking.totalAmount}`} />}
-        {isHomeCollection && booking.addressLine1 && (
-          <Row label="Address" value={[booking.addressLine1, booking.addressLine2, booking.addressCity, booking.addressPincode].filter(Boolean).join(', ')} />
-        )}
-        {booking.assignedCollectorName && <Row label="Collector" value={booking.assignedCollectorName} />}
+        ) : null}
+        {progress.steps.length > 0 ? (
+          <View style={styles.steps} accessibilityRole="list">
+            {progress.steps.map((step, index) => {
+              const last = index === progress.steps.length - 1;
+              const done = step.state === 'done';
+              const current = step.state === 'current';
+              return (
+                <View key={step.label} style={styles.stepRow} accessibilityLabel={`${step.label}, ${done ? 'completed' : current ? 'in progress' : 'upcoming'}`}>
+                  <View style={styles.stepRail}>
+                    <View style={[styles.stepDot, done && styles.stepDotDone, current && styles.stepDotCurrent]}>
+                      {done ? <Icon name="checkmark" size={12} color={colors.white} /> : current ? <View style={styles.stepDotInner} /> : null}
+                    </View>
+                    {!last ? <View style={[styles.stepLine, done && styles.stepLineDone]} /> : null}
+                  </View>
+                  <View style={[styles.stepBody, last && styles.stepBodyLast]}>
+                    <Text style={[styles.stepLabel, (done || current) && styles.stepLabelActive]}>{step.label}</Text>
+                    {step.detail ? <Text style={styles.stepDetail}>{step.detail}</Text> : null}
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
       </View>
 
-      {booking.items.length > 0 && (
+      {showReports ? (
         <>
-          <Text style={sectionTitle}>Tests</Text>
-          {booking.items.map((item, i) => (
-            <Text key={i} style={typography.body}>
-              {item.serviceName}{booking.totalAmount !== null ? ` · ₹${item.price}` : ''}
-            </Text>
-          ))}
+          <Text style={styles.sectionTitle}>Reports</Text>
+          <View style={[styles.card, styles.cardFlush]}>
+            {booking.reports.length === 0 ? (
+              <View style={styles.emptyRow}>
+                <Icon name="hourglass-outline" size={20} color={colors.textTertiary} />
+                <Text style={styles.emptyText}>Your report will appear here once the lab uploads it. We will notify you.</Text>
+              </View>
+            ) : (
+              booking.reports.map((report, index) => (
+                <Pressable
+                  key={report.id}
+                  onPress={() => openReport(report)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`View ${report.label}`}
+                  style={({ pressed }) => [styles.listRow, index > 0 && styles.listDivider, pressed && styles.listPressed]}
+                >
+                  <View style={styles.reportIcon}>
+                    <Icon name={report.mimeType === 'application/pdf' ? 'document-text-outline' : 'image-outline'} size={20} color={colors.brand} />
+                  </View>
+                  <View style={styles.listBody}>
+                    <Text style={styles.listTitle} numberOfLines={1}>
+                      {report.label}
+                    </Text>
+                    <Text style={styles.listMeta} numberOfLines={1}>
+                      {['Uploaded ' + formatDateTime(report.uploadedAt), formatFileSize(report.fileSize)].filter(Boolean).join(' · ')}
+                    </Text>
+                  </View>
+                  <Text style={styles.viewChip}>View</Text>
+                </Pressable>
+              ))
+            )}
+          </View>
         </>
-      )}
+      ) : null}
 
-      {booking.cancellationReason && (
-        <>
-          <Text style={sectionTitle}>Cancellation reason</Text>
-          <Text style={typography.body}>{booking.cancellationReason}</Text>
-        </>
-      )}
-      {booking.rejectionReason && (
-        <>
-          <Text style={sectionTitle}>Reason declined</Text>
-          <Text style={typography.body}>{booking.rejectionReason}</Text>
-        </>
-      )}
+      <Text style={styles.sectionTitle}>Details</Text>
+      <View style={styles.card}>
+        <InfoRow label="Service" value={isHomeCollection ? 'Home collection' : 'Lab visit'} />
+        <InfoRow label="Scheduled for" value={formatDateTime(booking.scheduledAtUtc)} />
+        {isHomeCollection && booking.addressLine1 ? (
+          <InfoRow label="Address" value={[booking.addressLine1, booking.addressLine2, booking.addressCity, booking.addressPincode].filter(Boolean).join(', ')} />
+        ) : null}
+        {isHomeCollection && booking.assignedCollectorName ? <InfoRow label="Collector" value={booking.assignedCollectorName} /> : null}
+        {booking.collectedAt ? <InfoRow label="Sample collected" value={formatDateTime(booking.collectedAt)} /> : null}
+        {booking.totalAmount !== null ? <InfoRow label="Total" value={`₹${booking.totalAmount}`} /> : null}
+      </View>
 
-      {booking.reports.length > 0 && (
+      {booking.items.length > 0 ? (
         <>
-          <Text style={sectionTitle}>Reports</Text>
-          {booking.reports.map((r) => (
-            <TouchableOpacity
-              key={r.id}
-              activeOpacity={activeopacity}
-              style={reportRowStyle}
-              onPress={() => navigation.navigate('ReportViewer', { bookingId, reportId: r.id, label: r.label, mimeType: r.mimeType })}
-            >
-              <Text style={typography.bodyStrong}>{r.label}</Text>
-              <Text style={{ ...typography.caption, color: colors.brand }}>View</Text>
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.sectionTitle}>Tests</Text>
+          <View style={[styles.card, styles.cardFlush]}>
+            {booking.items.map((item, index) => (
+              <View key={`${item.laboratoryServiceId}-${index}`} style={[styles.listRow, index > 0 && styles.listDivider]}>
+                <Icon name="flask-outline" size={18} color={colors.brand} />
+                <Text style={[styles.listTitle, styles.listBody]} numberOfLines={2}>
+                  {item.serviceName}
+                </Text>
+                {booking.totalAmount !== null ? <Text style={styles.testPrice}>₹{item.price}</Text> : null}
+              </View>
+            ))}
+          </View>
         </>
-      )}
+      ) : null}
 
-      {canCancel && (
-        <View style={{ marginTop: spacing.lg }}>
-          <Button label="Cancel booking" variant="secondary" disabled={actionLoading} onPress={() => setCancelSheetVisible(true)} />
-        </View>
-      )}
+      {booking.cancellationReason ? (
+        <>
+          <Text style={styles.sectionTitle}>Cancellation reason</Text>
+          <View style={styles.card}>
+            <Text style={styles.reasonText}>{booking.cancellationReason}</Text>
+          </View>
+        </>
+      ) : null}
+      {booking.rejectionReason ? (
+        <>
+          <Text style={styles.sectionTitle}>Reason declined</Text>
+          <View style={styles.card}>
+            <Text style={styles.reasonText}>{booking.rejectionReason}</Text>
+          </View>
+        </>
+      ) : null}
+
+      <View style={styles.footer}>
+        {canCancel ? <Button label="Cancel booking" variant="secondary" onPress={() => setCancelSheetVisible(true)} /> : null}
+      </View>
 
       <ConfirmSheet
         visible={cancelSheetVisible}
-        title="Cancel booking"
-        message="Are you sure you want to cancel this booking?"
+        title="Cancel booking?"
+        message={cancellationMessage('labBooking', booking.status)}
+        icon="calendar-clear-outline"
+        tone="danger"
+        errorFallback="Could not cancel this booking. Please try again."
         actions={[
-          { label: 'No', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
-          { label: 'Yes, cancel', variant: 'destructive', onPress: handleConfirmCancel },
+          { label: 'Cancel booking', variant: 'destructive', onPress: handleConfirmCancel },
+          { label: 'Keep booking', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
         ]}
         onRequestClose={() => setCancelSheetVisible(false)}
       />
-    </ScreenContainer>
+    </ScrollView>
+    </SafeAreaView>
   );
 };
 
-function Row({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs }}>
-      <Text style={{ ...typography.caption, color: colors.textSecondary }}>{label}</Text>
-      <Text style={{ ...typography.bodyStrong, color: colors.text, maxWidth: '65%', textAlign: 'right' }}>{value}</Text>
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
     </View>
   );
 }
-
-const sectionTitle = { ...typography.title, color: colors.text, marginTop: spacing.lg, marginBottom: spacing.sm };
-const reportRowStyle = {
-  flexDirection: 'row' as const,
-  justifyContent: 'space-between' as const,
-  alignItems: 'center' as const,
-  backgroundColor: colors.surface,
-  borderWidth: 1,
-  borderColor: colors.border,
-  borderRadius: radius.md,
-  padding: spacing.md,
-  marginBottom: spacing.sm,
-};
 
 export default LabBookingDetailScreen;

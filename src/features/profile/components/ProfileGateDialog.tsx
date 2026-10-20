@@ -13,9 +13,11 @@ export function ProfileGateDialog({ visible, onComplete, onDismiss }: ProfileGat
       visible={visible}
       title="Complete your profile"
       message="Please add your first name and last name before booking an appointment or starting a chat."
+      icon="person-circle-outline"
+      tone="primary"
       actions={[
+        { label: 'Complete profile', variant: 'primary', onPress: onComplete },
         { label: 'Not now', variant: 'secondary', onPress: onDismiss },
-        { label: 'Complete Profile', onPress: onComplete },
       ]}
       onRequestClose={onDismiss}
     />

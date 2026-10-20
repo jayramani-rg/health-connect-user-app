@@ -9,6 +9,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { store, persistor } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import { SplashScreen } from './src/components/SplashScreen/SplashScreen';
+import { DialogHost } from './src/components/Dialog/Dialog';
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <BottomSheetModalProvider>
               <StatusBar barStyle="dark-content" />
               <RootNavigator />
+              <DialogHost />
             </BottomSheetModalProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>

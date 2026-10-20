@@ -93,14 +93,9 @@ const FamilyMembersScreen: React.FC = () => {
 
   async function handleConfirmRemove() {
     if (!removeTarget) return;
-    const dependent = removeTarget;
-    setRemoveTarget(null);
-    try {
-      await dependentService.remove(dependent.id);
-      await load();
-    } catch (error) {
-      setErrorText(getErrorMessage(error, 'Could not remove this family member.'));
-    }
+    await dependentService.remove(removeTarget.id);
+    setErrorText(null);
+    await load();
   }
 
   if (loading) {
@@ -179,11 +174,18 @@ const FamilyMembersScreen: React.FC = () => {
 
       <ConfirmSheet
         visible={!!removeTarget}
-        title="Remove family member"
-        message={removeTarget ? `Remove ${removeTarget.firstName} ${removeTarget.lastName}?` : ''}
+        title="Remove family member?"
+        message={
+          removeTarget
+            ? `${removeTarget.firstName} ${removeTarget.lastName} will be removed from your family members.`
+            : ''
+        }
+        icon="person-remove-outline"
+        tone="danger"
+        errorFallback="Could not remove this family member. Please try again."
         actions={[
-          { label: 'Cancel', variant: 'secondary', onPress: () => setRemoveTarget(null) },
           { label: 'Remove', variant: 'destructive', onPress: handleConfirmRemove },
+          { label: 'Cancel', variant: 'secondary', onPress: () => setRemoveTarget(null) },
         ]}
         onRequestClose={() => setRemoveTarget(null)}
       />

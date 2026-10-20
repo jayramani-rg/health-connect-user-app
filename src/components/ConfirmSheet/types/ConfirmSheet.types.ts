@@ -1,6 +1,9 @@
+import type { IoniconsIconName } from '../../Icon/Icon';
+import type { DialogTone } from '../../Dialog/types/Dialog.types';
+
 export interface ConfirmSheetAction {
   label: string;
-  onPress: () => void;
+  onPress: () => unknown;
   variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'destructive';
 }
 
@@ -9,5 +12,8 @@ export interface ConfirmSheetProps {
   title: string;
   message: string;
   actions: ConfirmSheetAction[];
+  icon?: IoniconsIconName;
+  tone?: DialogTone;
+  errorFallback?: string;
   onRequestClose?: () => void;
 }

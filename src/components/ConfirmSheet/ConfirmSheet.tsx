@@ -1,47 +1,32 @@
-import React, { useEffect, useRef } from 'react';
-import { Text, View } from 'react-native';
-import { BottomSheetModal, BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
-import { Button } from '../Button/Button';
-import { motion } from '../../theme';
-import { styles } from './styles/ConfirmSheet.styles';
-import type { ConfirmSheetProps } from './types/ConfirmSheet.types';
+import React from 'react';
+import { DialogSheet } from '../Dialog/Dialog';
+import type { DialogActionVariant } from '../Dialog/types/Dialog.types';
+import type { ConfirmSheetAction, ConfirmSheetProps } from './types/ConfirmSheet.types';
 
-export function ConfirmSheet({ visible, title, message, actions, onRequestClose }: ConfirmSheetProps) {
-  const sheetRef = useRef<BottomSheetModal>(null);
-  const animationConfigs = useBottomSheetSpringConfigs(motion.spring.sheet);
+const VARIANT_MAP: Record<NonNullable<ConfirmSheetAction['variant']>, DialogActionVariant> = {
+  primary: 'primary',
+  secondary: 'secondary',
+  tertiary: 'secondary',
+  ghost: 'ghost',
+  destructive: 'danger',
+};
 
-  useEffect(() => {
-    if (visible) {
-      sheetRef.current?.present();
-    } else {
-      sheetRef.current?.dismiss();
-    }
-  }, [visible]);
-
+export function ConfirmSheet({ visible, title, message, actions, icon, tone, errorFallback, onRequestClose }: ConfirmSheetProps) {
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      enableDynamicSizing
-      animationConfigs={animationConfigs}
-      onDismiss={onRequestClose}
-      backgroundStyle={styles.background}
-      handleIndicatorStyle={styles.handle}
-    >
-      <BottomSheetView style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.message}>{message}</Text>
-        <View style={styles.actions}>
-          {actions.map((action, index) => (
-            <Button
-              key={action.label}
-              label={action.label}
-              onPress={action.onPress}
-              variant={action.variant ?? (index === actions.length - 1 ? 'primary' : 'secondary')}
-            />
-          ))}
-        </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+    <DialogSheet
+      visible={visible}
+      title={title}
+      message={message}
+      icon={icon}
+      tone={tone ?? (actions.some(action => action.variant === 'destructive') ? 'danger' : 'primary')}
+      errorFallback={errorFallback}
+      actions={actions.map((action, index) => ({
+        label: action.label,
+        onPress: action.onPress,
+        variant: action.variant ? VARIANT_MAP[action.variant] : index === 0 ? 'primary' : 'secondary',
+      }))}
+      onRequestClose={() => onRequestClose?.()}
+    />
   );
 }
 

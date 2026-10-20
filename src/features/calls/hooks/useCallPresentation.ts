@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { Alert } from 'react-native';
+import { confirmAction } from '../../../components/Dialog/dialogStore';
 import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ASSETS_BASE_URL } from '../../../config/env';
 import { useAppSelector } from '../../../store';
@@ -63,10 +63,16 @@ export function useConfirmLeaveCall(navigation: NavigationProp<ParamListBase>) {
         return;
       }
       event.preventDefault();
-      Alert.alert('End this call?', 'You will be disconnected from the call.', [
-        { text: 'Stay on call', style: 'cancel' },
-        { text: 'End call', style: 'destructive', onPress: () => endCall('HANGUP') },
-      ]);
+      confirmAction({
+        title: 'End this call?',
+        message: 'You will be disconnected from the call.',
+        icon: 'call-outline',
+        confirmLabel: 'End call',
+        cancelLabel: 'Stay on call',
+        onConfirm: () => {
+          endCall('HANGUP');
+        },
+      });
     });
   }, [navigation, endCall]);
 }

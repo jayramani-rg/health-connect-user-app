@@ -14,10 +14,20 @@ export function signOut(): Promise<void> {
 
 async function endSession(): Promise<void> {
   const { isAuthenticated, tokens } = store.getState().authData;
-  if (isAuthenticated) {
-    await authService.logout(tokens?.refreshToken ?? undefined).catch(() => undefined);
-  }
   store.dispatch(logout());
   store.dispatch(setUnreadCount(0));
-  await persistor.flush();
+  await persistor.flush().catch(() => undefined);
+  if (isAuthenticated && tokens?.accessToken) {
+    revokeOnServer(tokens.accessToken, tokens.refreshToken ?? undefined).catch(() => undefined);
+  }
+}
+
+async function revokeOnServer(accessToken: string, refreshToken?: string): Promise<void> {
+  try {
+    await authService.logout(refreshToken, false, accessToken);
+  } catch (error) {
+    if ((error as { statusCode?: number })?.statusCode !== 401 || !refreshToken) return;
+    const renewed = await authService.refreshSession(refreshToken);
+    await authService.logout(renewed.data.refreshToken, false, renewed.data.accessToken);
+  }
 }

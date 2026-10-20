@@ -17,6 +17,7 @@ import type { AppointmentDetail } from '../types/appointment.types';
 import { CONSULT_LABEL } from '../utils/consultationType';
 import { styles } from '../styles/AppointmentDetailScreen.styles';
 import { getErrorMessage } from '../../../utils/errors';
+import { cancellationMessage } from '../../../utils/cancellationCopy';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AppointmentDetail'>;
 
@@ -29,7 +30,6 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
   const [cancelSheetVisible, setCancelSheetVisible] = useState(false);
 
   const load = useCallback(async () => {
@@ -49,22 +49,10 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }, [load]),
   );
 
-  async function runAction(action: () => Promise<{ data: AppointmentDetail }>) {
-    setActionLoading(true);
+  async function handleConfirmCancel() {
+    const response = await appointmentService.cancel(appointmentId);
+    setAppointment(response.data);
     setActionError(null);
-    try {
-      const response = await action();
-      setAppointment(response.data);
-    } catch (error) {
-      setActionError(getErrorMessage(error, 'This action could not be completed.'));
-    } finally {
-      setActionLoading(false);
-    }
-  }
-
-  function handleConfirmCancel() {
-    setCancelSheetVisible(false);
-    runAction(() => appointmentService.cancel(appointmentId));
   }
 
   if (loading) {
@@ -177,17 +165,20 @@ const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       {canCancel && (
         <View style={styles.actions}>
-          <Button label="Cancel appointment" variant="secondary" disabled={actionLoading} onPress={() => setCancelSheetVisible(true)} />
+          <Button label="Cancel appointment" variant="secondary" onPress={() => setCancelSheetVisible(true)} />
         </View>
       )}
 
       <ConfirmSheet
         visible={cancelSheetVisible}
-        title="Cancel appointment"
-        message="Are you sure you want to cancel this appointment?"
+        title="Cancel appointment?"
+        message={cancellationMessage('appointment', appointment.status)}
+        icon="calendar-clear-outline"
+        tone="danger"
+        errorFallback="Could not cancel this appointment. Please try again."
         actions={[
-          { label: 'No', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
-          { label: 'Yes, cancel', variant: 'destructive', onPress: handleConfirmCancel },
+          { label: 'Cancel appointment', variant: 'destructive', onPress: handleConfirmCancel },
+          { label: 'Keep appointment', variant: 'secondary', onPress: () => setCancelSheetVisible(false) },
         ]}
         onRequestClose={() => setCancelSheetVisible(false)}
       />

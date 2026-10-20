@@ -14,8 +14,11 @@ export const authService = {
   login: (payload: LoginPayload): Promise<ApiResponse<LoginResult>> =>
     API.request<LoginResult>('/auth/login', { method: 'POST', body: payload, skipAuth: true }),
 
-  logout: (refreshToken?: string, allDevices = false): Promise<ApiResponse<string>> =>
-    API.request<string>('/auth/logout', { method: 'POST', body: { refreshToken, allDevices }, timeoutMs: 8000 }),
+  logout: (refreshToken?: string, allDevices = false, accessToken?: string): Promise<ApiResponse<string>> =>
+    API.request<string>('/auth/logout', { method: 'POST', body: { refreshToken, allDevices }, timeoutMs: 8000, authOverride: accessToken }),
+
+  refreshSession: (refreshToken: string): Promise<ApiResponse<{ accessToken: string; refreshToken: string }>> =>
+    API.request<{ accessToken: string; refreshToken: string }>('/auth/refresh-token', { method: 'POST', body: { refreshToken }, skipAuth: true, timeoutMs: 8000 }),
 
   checkAccount: (mobileNumber: string, role: AuthRole = 'PATIENT'): Promise<ApiResponse<CheckAccountResult>> =>
     API.request<CheckAccountResult>('/auth/check-account', { method: 'POST', body: { mobileNumber, role }, skipAuth: true }),

@@ -1,5 +1,6 @@
-import { Alert, Linking, Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { check, openSettings, PERMISSIONS, request, RESULTS, type Permission, type PermissionStatus } from 'react-native-permissions';
+import { confirmAction, showNotice } from '../../../components/Dialog/dialogStore';
 import type { CallType } from '../types/call.types';
 
 export type CallPermissionState = 'granted' | 'denied' | 'blocked' | 'unavailable';
@@ -65,13 +66,21 @@ export async function requestCallPermissions(callType: CallType): Promise<CallPe
 }
 
 function promptForSettings(title: string, message: string, blocked: boolean): void {
-  const buttons = blocked
-    ? [
-        { text: 'Not now', style: 'cancel' as const },
-        { text: 'Open settings', onPress: () => openSettings().catch(() => Linking.openSettings()) },
-      ]
-    : [{ text: 'OK' }];
-  Alert.alert(title, message, buttons);
+  if (!blocked) {
+    showNotice({ title, message, tone: 'warning', icon: 'mic-off-outline' });
+    return;
+  }
+  confirmAction({
+    title,
+    message,
+    tone: 'warning',
+    icon: 'settings-outline',
+    confirmLabel: 'Open settings',
+    cancelLabel: 'Not now',
+    onConfirm: () => {
+      openSettings().catch(() => Linking.openSettings());
+    },
+  });
 }
 
 export interface CallReadiness {
