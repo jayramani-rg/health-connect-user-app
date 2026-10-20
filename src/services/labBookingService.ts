@@ -8,6 +8,7 @@ import type {
   LabBookingDetail,
   LabBookingListItem,
   LabBookingQuery,
+  LabSlotCountsResponse,
 } from '../features/labBookings/types/labBooking.types';
 
 function buildQuery<T extends object>(params: T): string {
@@ -33,9 +34,20 @@ export const labBookingService = {
   cancel: (id: string, reason?: string): Promise<ApiResponse<LabBookingDetail>> =>
     API.request<LabBookingDetail>(`/lab-bookings/${id}/cancel`, { method: 'POST', body: { reason } }),
 
-  getAvailableSlots: (laboratoryId: string, collectionMethod: CollectionMethod, date: string): Promise<ApiResponse<AvailableLabSlotsResponse>> =>
+  getAvailableSlots: (
+    laboratoryId: string,
+    collectionMethod: CollectionMethod,
+    date: string,
+    includeTaken = false,
+  ): Promise<ApiResponse<AvailableLabSlotsResponse>> =>
     API.request<AvailableLabSlotsResponse>(
-      `/lab-availability/slots?laboratoryId=${laboratoryId}&collectionMethod=${collectionMethod}&date=${date}`,
+      `/lab-availability/slots?laboratoryId=${laboratoryId}&collectionMethod=${collectionMethod}&date=${date}${includeTaken ? '&includeTaken=true' : ''}`,
+      { method: 'GET' },
+    ),
+
+  getSlotCounts: (laboratoryId: string, collectionMethod: CollectionMethod, fromDate: string, days: number): Promise<ApiResponse<LabSlotCountsResponse>> =>
+    API.request<LabSlotCountsResponse>(
+      `/lab-availability/slot-counts?laboratoryId=${laboratoryId}&collectionMethod=${collectionMethod}&fromDate=${fromDate}&days=${days}`,
       { method: 'GET' },
     ),
 

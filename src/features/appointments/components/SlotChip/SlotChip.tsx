@@ -63,17 +63,24 @@ function SlotChipBase({ slot, state, width, onPress }: SlotChipProps) {
 
 export const SlotChip = memo(SlotChipBase);
 
-const LEGEND: { state: SlotVisualState; label: string }[] = [
-  { state: 'available', label: 'Available' },
-  { state: 'selected', label: 'Selected' },
-  { state: 'reserved', label: 'Held' },
-  { state: 'booked', label: 'Booked' },
-];
+const LEGEND_LABEL: Partial<Record<SlotVisualState, { label: string; spoken: string }>> = {
+  available: { label: 'Available', spoken: 'available' },
+  selected: { label: 'Selected', spoken: 'selected' },
+  reserved: { label: 'Held', spoken: 'held by another patient' },
+  booked: { label: 'Booked', spoken: 'booked' },
+  unavailable: { label: 'Unavailable', spoken: 'not available' },
+};
 
-export function SlotLegend() {
+const DEFAULT_LEGEND: SlotVisualState[] = ['available', 'selected', 'reserved', 'booked'];
+
+export function SlotLegend({ states = DEFAULT_LEGEND }: { states?: SlotVisualState[] }) {
+  const items = states.flatMap((state) => {
+    const entry = LEGEND_LABEL[state];
+    return entry ? [{ state, ...entry }] : [];
+  });
   return (
-    <View style={styles.legend} accessibilityRole="summary" accessibilityLabel="Legend: available, selected, held by another patient, booked">
-      {LEGEND.map(({ state, label }) => {
+    <View style={styles.legend} accessibilityRole="summary" accessibilityLabel={`Legend: ${items.map((item) => item.spoken).join(', ')}`}>
+      {items.map(({ state, label }) => {
         const tone = slotTone[state];
         return (
           <View key={state} style={styles.legendItem}>

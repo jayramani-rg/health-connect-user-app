@@ -1,3 +1,5 @@
+import type { AvailableSlot, DayAvailabilityStatus, DaySlotCount } from '../../appointments/types/appointment.types';
+
 export type CollectionMethod = 'LAB_VISIT' | 'HOME_COLLECTION';
 
 export type LabBookingStatus =
@@ -117,16 +119,19 @@ export interface LabBookingQuery {
   pageSize?: number;
 }
 
-export interface AvailableLabSlot {
-  startAtUtc: string;
-}
+export type AvailableLabSlot = AvailableSlot;
 
 export interface AvailableLabSlotsResponse {
   date: string;
   collectionMethod: CollectionMethod;
   labAcceptingBookings: boolean;
-  dayStatus?: 'AVAILABLE' | 'FULL' | 'NO_SLOTS';
+  dayStatus?: DayAvailabilityStatus;
   slots: AvailableLabSlot[];
+}
+
+export interface LabSlotCountsResponse {
+  labAcceptingBookings: boolean;
+  days: DaySlotCount[];
 }
 
 export type HomeCollectionEligibilityCode = 'OK' | 'HOME_COLLECTION_NOT_OFFERED' | 'PINCODE_NOT_SERVICEABLE' | 'NOT_ACCEPTING_BOOKINGS';

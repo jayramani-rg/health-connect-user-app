@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '../../../theme';
+import { colors, layout, radius, spacing, textRole, typography } from '../../../theme';
 
 export const styles = StyleSheet.create({
   loadingWrapper: {
@@ -41,30 +41,107 @@ export const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
-  slotsWrapper: {
+  contextCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: layout.blockGap,
+    padding: layout.cardPadding,
+    backgroundColor: colors.surface,
+    borderRadius: layout.cardRadius,
+    borderWidth: layout.hairline,
+    borderColor: colors.border,
+  },
+  contextIcon: {
+    width: layout.iconTile,
+    height: layout.iconTile,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.brandSoft,
+  },
+  contextText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  contextTitle: {
+    ...textRole.cardTitle,
+    color: colors.text,
+  },
+  contextMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
+  },
+  sectionTight: {
+    marginTop: spacing.sm,
+    marginBottom: -spacing.xs,
+  },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.xs + 2,
+    padding: spacing.sm + 2,
+    borderRadius: radius.sm,
+    backgroundColor: colors.warningSoft,
+  },
+  noticeText: {
+    ...textRole.meta,
+    color: '#7A4F10',
+    flex: 1,
+  },
+  groups: {
+    gap: layout.sectionGap,
+  },
+  group: {
+    gap: spacing.sm + 2,
+  },
+  groupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+  },
+  groupLabel: {
+    ...textRole.metaStrong,
+    color: colors.text,
+  },
+  groupMeta: {
+    ...textRole.meta,
+    color: colors.textTertiary,
+    marginLeft: 'auto',
+  },
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    marginTop: spacing.md,
   },
-  slotChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+  nextOpen: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    alignSelf: 'flex-start',
+    minHeight: layout.touchTarget,
   },
-  slotChipSelected: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+  nextOpenText: {
+    ...textRole.metaStrong,
+    color: colors.brand,
   },
-  slotText: {
-    ...typography.bodyStrong,
+  slotFooter: {
+    gap: layout.blockGap,
+  },
+  slotSummary: {
+    gap: 2,
+  },
+  slotSummaryTitle: {
+    ...textRole.cardTitle,
     color: colors.text,
   },
-  slotTextSelected: {
-    color: colors.white,
+  slotSummaryTitleMuted: {
+    ...textRole.cardTitle,
+    color: colors.textSecondary,
+  },
+  slotSummaryMeta: {
+    ...textRole.meta,
+    color: colors.textSecondary,
   },
   summaryCard: {
     backgroundColor: colors.surface,
